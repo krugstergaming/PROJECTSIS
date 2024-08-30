@@ -31,53 +31,70 @@ class AdminHOD(models.Model):
 class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    # New Addition
-    employee_no = models.TextField(max_length=6, default=123456)
-    registration_no = models.TextField(max_length=6, default=123456)
-    registration_date = models.DateField(auto_now=True)
-    profile_pic = models.FileField()
-    teacher_license = models.FileField()
-    signature = models.FileField()
-    # end
     address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class YearLevel(models.Model):
+
+
+class Courses(models.Model):
     id = models.AutoField(primary_key=True)
-    yearlevel_name = models.CharField(max_length=255)
+    course_name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    # def __str__(self):
+	#     return self.course_name
+
 
 
 class Subjects(models.Model):
     id =models.AutoField(primary_key=True)
     subject_name = models.CharField(max_length=255)
-    yearlevel_id = models.ForeignKey(YearLevel, on_delete=models.CASCADE, default=1) #need to give defauult yearlevel
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1) #need to give defauult course
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 
+
 class Students(models.Model):
-    id = models.AutoField(primary_key=True)  
+    id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
     gender = models.CharField(max_length=50)
-    profile_pic = models.FileField()    
-    is_enrolled = models.BooleanField(default=True)
-    lrn = models.TextField(max_length=12, default=123456789102)
-    nationality = models.TextField(default='Unknown')    
-    nickname = models.TextField(default = "Budoy")
-    religion = models.TextField(default='Unknown')
-    address = models.TextField(default = "Planet Earth")
-    yearlevel_id = models.ForeignKey(YearLevel, on_delete=models.DO_NOTHING, default=1)
+    profile_pic = models.FileField()
+    address = models.TextField()
+    course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING, default=1)
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+
+# class Assessment(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
+
+
+
+class Schedule(models.Model):
+    id = models.AutoField(primary_key=True)
+    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)  # The subject being scheduled
+    staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)      # The staff assigned to the subject
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE)    # The course the subject belongs to
+    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)  # The session year
+    day_of_week = models.CharField(max_length=10)                       # The day of the week (e.g., "Monday")
+    start_time = models.TimeField()                                     # The start time of the class
+    end_time = models.TimeField()                                       # The end time of the class
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+    def __str__(self):
+        return f"{self.subject_id.subject_name} - {self.course_id.course_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
 
 
 class Attendance(models.Model):
@@ -167,11 +184,26 @@ class StudentResult(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    
+    subject_first_quarter = models.FloatField(default=0)
+    subject_second_quarter = models.FloatField(default=0)
+    subject_third_quarter = models.FloatField(default=0)
+    subject_fourth_quarter = models.FloatField(default=0)
+    subject_final_grade = models.FloatField(default=0)
+
     subject_exam_marks = models.FloatField(default=0)
     subject_assignment_marks = models.FloatField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+
+class GradingConfiguration(models.Model):
+    is_grading_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "Grading is Active" if self.is_grading_active else "Grading is Inactive"
 
 
 #Creating Django Signals
@@ -189,7 +221,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 2:
             Staffs.objects.create(admin=instance)
         if instance.user_type == 3:
-            Students.objects.create(admin=instance, yearlevel_id=YearLevel.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", gender="")
+            Students.objects.create(admin=instance, course_id=Courses.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", gender="")
     
 
 @receiver(post_save, sender=CustomUser)

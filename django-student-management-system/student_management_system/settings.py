@@ -1,4 +1,4 @@
-import dj_database_url
+
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -67,8 +67,16 @@ WSGI_APPLICATION = 'student_management_system.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'studentsis',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -100,8 +108,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-# Kung may problema sa Timezone, paki true to, pero IDK kung gagana pa yung database by then
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -113,7 +120,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -123,3 +129,5 @@ AUTH_USER_MODEL = "student_management_app.CustomUser"
 
 # Registering Custom Backend "EmailBackEnd"
 AUTHENTICATION_BACKENDS = ['student_management_app.EmailBackEnd.EmailBackEnd']
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

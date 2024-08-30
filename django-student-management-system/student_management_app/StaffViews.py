@@ -6,27 +6,28 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
+from django.shortcuts import get_object_or_404
 
+from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
 
-from student_management_app.models import CustomUser, Staffs, YearLevel, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult
 
 
 def staff_home(request):
     # Fetching All Students under Staff
 
     subjects = Subjects.objects.filter(staff_id=request.user.id)
-    yearlevel_id_list = []
+    course_id_list = []
     for subject in subjects:
-        yearlevel = YearLevel.objects.get(id=subject.yearlevel_id.id)
-        yearlevel_id_list.append(yearlevel.id)
+        course = Courses.objects.get(id=subject.course_id.id)
+        course_id_list.append(course.id)
     
-    final_yearlevel = []
-    # Removing Duplicate Year Level Id
-    for yearlevel_id in yearlevel_id_list:
-        if yearlevel_id not in final_yearlevel:
-            final_yearlevel.append(yearlevel_id)
+    final_course = []
+    # Removing Duplicate Course Id
+    for course_id in course_id_list:
+        if course_id not in final_course:
+            final_course.append(course_id)
     
-    students_count = Students.objects.filter(yearlevel_id__in=final_yearlevel).count()
+    students_count = Students.objects.filter(course_id__in=final_course).count()
     subject_count = subjects.count()
 
     # Fetch All Attendance Count
@@ -43,7 +44,7 @@ def staff_home(request):
         subject_list.append(subject.subject_name)
         attendance_list.append(attendance_count1)
 
-    students_attendance = Students.objects.filter(yearlevel_id__in=final_yearlevel)
+    students_attendance = Students.objects.filter(course_id__in=final_course)
     student_list = []
     student_list_attendance_present = []
     student_list_attendance_absent = []
@@ -141,25 +142,44 @@ def get_students(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year")
 
-    # Students enroll to Year Level, Year Level has Subjects
+    # Students enroll to Course, Course has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
 
-    students = Students.objects.filter(yearlevel_id=subject_model.yearlevel_id, session_year_id=session_model)
+    students = Students.objects.filter(course_id=subject_model.course_id, session_year_id=session_model)
 
+    student_results = StudentResult.objects.filter(subject_id=subject_model)
+
+    results_dict = {result.student_id.id: {
+                        "first_quarter": result.subject_first_quarter,
+                        "second_quarter": result.subject_second_quarter,
+                        "third_quarter": result.subject_third_quarter,
+                        "fourth_quarter": result.subject_fourth_quarter,
+                        "final_grade": result.subject_final_grade
+                        } for result in student_results
+                    }
+    
     # Only Passing Student Id and Student Name Only
     list_data = []
 
     for student in students:
-        data_small={"id":student.admin.id, "name":student.admin.first_name+" "+student.admin.last_name}
+
+        grades = results_dict.get(student.id, {})
+
+        data_small = {
+            "id": student.admin.id,
+            "name": student.admin.first_name + " " + student.admin.last_name,
+            "first_quarter": grades.get("first_quarter", ""),
+            "second_quarter": grades.get("second_quarter", ""),
+            "third_quarter": grades.get("third_quarter", ""),
+            "fourth_quarter": grades.get("fourth_quarter", ""),
+            "final_grade": grades.get("final_grade", "")
+        }
         list_data.append(data_small)
 
     return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
-
-
-
 
 @csrf_exempt
 def save_attendance_data(request):
@@ -192,8 +212,6 @@ def save_attendance_data(request):
         return HttpResponse("Error")
 
 
-
-
 def staff_update_attendance(request):
     subjects = Subjects.objects.filter(staff_id=request.user.id)
     session_years = SessionYearModel.objects.all()
@@ -211,13 +229,13 @@ def get_attendance_dates(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year_id")
 
-    # Students enroll to Year Level, Year Level has Subjects
+    # Students enroll to Course, Course has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
 
-    # students = Students.objects.filter(yearlevel_id=subject_model.yearlevel_id, session_year_id=session_model)
+    # students = Students.objects.filter(course_id=subject_model.course_id, session_year_id=session_model)
     attendance = Attendance.objects.filter(subject_id=subject_model, session_year_id=session_model)
 
     # Only Passing Student Id and Student Name Only
@@ -313,12 +331,25 @@ def staff_profile_update(request):
 
 
 def staff_add_result(request):
+    # Fetch the grading configuration to check if grading is active
+    config = GradingConfiguration.objects.first()
+
+    # Check if grading is active; if not, render the closed template
+    if config and not config.is_grading_active:
+        return render(request, "staff_template/close_result_template.html")
+
+    # Fetch subjects assigned to the current staff member
     subjects = Subjects.objects.filter(staff_id=request.user.id)
+    # Fetch all session years
     session_years = SessionYearModel.objects.all()
+    
+    # Context data to be passed to the template
     context = {
         "subjects": subjects,
         "session_years": session_years,
     }
+
+    # Render the active grading template when grading is enabled
     return render(request, "staff_template/add_result_template.html", context)
 
 
@@ -328,28 +359,60 @@ def staff_add_result_save(request):
         return redirect('staff_add_result')
     else:
         student_admin_id = request.POST.get('student_list')
-        assignment_marks = request.POST.get('assignment_marks')
-        exam_marks = request.POST.get('exam_marks')
+        
+        # assignment_marks = request.POST.get('assignment_marks')
+        # exam_marks = request.POST.get('exam_marks')
+
+        first_quarter = request.POST.get('first_quarter')
+        second_quarter = request.POST.get('second_quarter')
+        third_quarter = request.POST.get('third_quarter')
+        fourth_quarter = request.POST.get('fourth_quarter')
+        
         subject_id = request.POST.get('subject')
 
         student_obj = Students.objects.get(admin=student_admin_id)
         subject_obj = Subjects.objects.get(id=subject_id)
 
         try:
+            # Convert the grades to integers (or floats)
+            first_quarter = int(first_quarter) if first_quarter else 0
+            second_quarter = int(second_quarter) if second_quarter else 0
+            third_quarter = int(third_quarter) if third_quarter else 0
+            fourth_quarter = int(fourth_quarter) if fourth_quarter else 0
+
+            # Calculate the final grade
+            final_grade = (first_quarter + second_quarter + third_quarter + fourth_quarter) / 4
+
             # Check if Students Result Already Exists or not
             check_exist = StudentResult.objects.filter(subject_id=subject_obj, student_id=student_obj).exists()
             if check_exist:
                 result = StudentResult.objects.get(subject_id=subject_obj, student_id=student_obj)
-                result.subject_assignment_marks = assignment_marks
-                result.subject_exam_marks = exam_marks
+                # result.subject_assignment_marks = assignment_marks
+                # result.subject_exam_marks = exam_marks
+
+                result.subject_first_quarter = first_quarter
+                result.subject_second_quarter = second_quarter
+                result.subject_third_quarter = third_quarter
+                result.subject_fourth_quarter = fourth_quarter
+                result.subject_final_grade = final_grade
+          
                 result.save()
                 messages.success(request, "Result Updated Successfully!")
                 return redirect('staff_add_result')
             else:
-                result = StudentResult(student_id=student_obj, subject_id=subject_obj, subject_exam_marks=exam_marks, subject_assignment_marks=assignment_marks)
+                result = StudentResult(student_id=student_obj, 
+                                       subject_id=subject_obj, 
+                                    #    subject_exam_marks= exam_marks, 
+                                    #    subject_assignment_marks= assignment_marks,
+                                       subject_first_quarter = first_quarter,
+                                       subject_second_quarter = second_quarter,
+                                       subject_third_quarter = third_quarter,
+                                       subject_fourth_quarter = fourth_quarter,
+                                       subject_final_grade = final_grade
+                                       )
                 result.save()
                 messages.success(request, "Result Added Successfully!")
                 return redirect('staff_add_result')
-        except:
-            messages.error(request, "Failed to Add Result!")
+        except Exception as e:
+            messages.error(request, f"Failed to Add Result! Error: {e}")
             return redirect('staff_add_result')

@@ -57,10 +57,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Year Level </label>
-                                <select class="form-control" name="yearlevel">
-                                    {% for yearlevel in yearlevels %}
-                                        <option value="{{ yearlevel.id }}" {% if yearlevel.id == subject.yearlevel_id.id %} selected {% endif %}>{{ yearlevel.yearlevel_name }}</option>
+                                <label>Course </label>
+                                <select class="form-control" name="course">
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}" {% if course.id == subject.course_id.id %} selected {% endif %}>{{ course.course_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

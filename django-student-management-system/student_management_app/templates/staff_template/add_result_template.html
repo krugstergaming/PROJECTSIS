@@ -70,7 +70,7 @@
 
 
                         </div>
-                        <!-- /.card-body -->
+                        <!-- /.card-body --> 
 
                         <div class="card-footer">
                         <button type="button" class="btn btn-primary" id="fetch_student">Fetch Student</button>
@@ -99,110 +99,73 @@
     $(document).ready(function(){
         $("#fetch_student").click(function(){
 
-            // Displaying Students Based on Staff, Year Level and Session Enrolled
-
-            var subject=$("#subject").val()
-            var session_year=$("#session_year").val()
+            var subject = $("#subject").val();
+            var session_year = $("#session_year").val();
 
             $.ajax({
-                url:'{% url 'get_students' %}',
-                type:'POST',
-                data:{subject:subject, session_year:session_year},
-            })
+                url: '{% url 'get_students' %}',
+                type: 'POST',
+                data: {subject: subject, session_year: session_year},
+                success: function(response){
+                    var json_data = JSON.parse(response);
+                    console.log(json_data);
 
-            
-            .done(function(response){
-                var json_data=JSON.parse(response);
-                console.log(json_data)
-                //Displaying Attendance Date Input and Students Attendance
-                var div_data="<div class='form-group'><label>Student List</label> <select class='student_list form-control' name='student_list'>"
+                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' name='student_list' id='student_list'>";
 
-                for(key in json_data)
-                {
-                    div_data+="<option value='"+ json_data[key]['id'] +"'>ID: "+ json_data[key]['id'] +" : "+ json_data[key]['name'] +"</option>";
+                    for (var key in json_data) {
+                        div_data += "<option value='" + key + "'>ID: " + json_data[key]['id'] + " : " + json_data[key]['name'] + "</option>";
+                    }
 
+                    div_data += "</select></div>";
+                    div_data += "<div class='form-group'><div class='row'>";
+
+                    // Grade inputs
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>First Quarter : </label><input type='text' name='first_quarter' class='form-control' id='first_quarter' placeholder='First Quarter' />";
+                    div_data += "</div>";
+
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Second Quarter : </label><input type='text' name='second_quarter' class='form-control' id='second_quarter' placeholder='Second Quarter' />";
+                    div_data += "</div>";
+
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Third Quarter : </label><input type='text' name='third_quarter' class='form-control' id='third_quarter' placeholder='Third Quarter' />";
+                    div_data += "</div>";
+
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Fourth Quarter : </label><input type='text' name='fourth_quarter' class='form-control' id='fourth_quarter' placeholder='Fourth Quarter' />";
+                    div_data += "</div>";
+
+                    div_data += "</div></div>";
+
+                    div_data += "<div class='form-group'>";
+                    div_data += "<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
+                    div_data += "</div>";
+
+                    $("#student_data").html(div_data);
+
+                    // Initialize grades for the first student
+                    updateGradeFields(json_data, Object.keys(json_data)[0]);
+
+                    // Update grades when the student selection changes
+                    $("#student_list").change(function() {
+                        var selectedStudentKey = $(this).val();
+                        updateGradeFields(json_data, selectedStudentKey);
+                    });
+                },
+                error: function(){
+                    alert("Error in Fetching Students.");
                 }
-                div_data+="</select>";
-                div_data+="</div>";
-                div_data+="<div class='form-group'><div class='row'>";
+            });
+        });
 
-                div_data+="<div class='col-lg-6'>";
-                div_data+="<label>Assignment Marks : </label><input type='text'name='assignment_marks' class='form-control' placeholder='Assignment Marks' />";
-                div_data+="</div>";
-
-                div_data+="<div class='col-lg-6'>";
-                div_data+="<label>Exam Marks : </label><input type='text'name='exam_marks' class='form-control' placeholder='Exam Marks' />";
-                div_data+="</div>";
-
-                div_data+="</div></div>";
-
-                div_data+="<div class='form-group'>";
-                div_data+="<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
-                div_data+="</div>";
-                $("#student_data").html(div_data);
-
-            })
-            .fail(function(){
-                alert("Error in Fetching Students.")
-            })
-
-            // Save Attendance Data to Database
-            /*
-            $(document).on("click", "#save_attendance", function(){
-                
-                //Disabling the Button while data is being saved in Server
-                $(this).attr("disabled", "disabled")
-                $(this).text("Saving Attendance Data...")
-
-                //console.log("SAVE")
-                var student_data=$("input[name='student_data[]'").map(function(){ 
-                        if($(this).is(":checked")){
-                            return {"id":$(this).val(), "status":1}; // Getting ID and Value of Students
-                        }
-                        else
-                        {
-                            return {"id":$(this).val(), "status":0}; // Getting ID and Value of Students
-                        }
-                    }).get()
-                var attendance_date=$("#attendance_date").val();
-                var subject_id=$("#subject").val();
-                var session_year_id=$("#session_year").val();
-                //console.log(attendance_date)
-                //console.log(student_data);
-                student_data = JSON.stringify(student_data)
-
-                // Saving Attendance Data into Database
-
-                $.ajax({
-                    url:'{% url 'save_attendance_data' %}',
-                    type:'POST',
-                    data:{student_ids:student_data, attendance_date:attendance_date, subject_id:subject_id, session_year_id:session_year_id},
-                })
-
-                
-                .done(function(response){
-                    
-                    if(response=="OK")
-                    {
-                        alert("Attendance Saved!")
-                    }
-                    else
-                    {
-                        alert("Failed to Save Attendance!")
-                    }
-                    location.reload()
-                    
-                    //console.log(response)
-                })
-
-                .fail(function(){
-                    alert("Error in Saving Students Attendance Data.")
-                })
-
-            })
-            */
-
-        })
-    })
+        // Function to update grade fields based on selected student
+        function updateGradeFields(json_data, key) {
+            $("#first_quarter").val(json_data[key] ? json_data[key]['first_quarter'] : "");
+            $("#second_quarter").val(json_data[key] ? json_data[key]['second_quarter'] : "");
+            $("#third_quarter").val(json_data[key] ? json_data[key]['third_quarter'] : "");
+            $("#fourth_quarter").val(json_data[key] ? json_data[key]['fourth_quarter'] : "");
+        }
+    });
 </script>
 {% endblock custom_js %}
