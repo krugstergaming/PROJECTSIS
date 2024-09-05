@@ -1,0 +1,106 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Manage Schedule
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <a class="btn btn-primary" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp;
+
+        {% if messages %}
+        <div class="form-group">
+            <div class="col-12">
+                {% for message in messages %}
+                {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% elif message.tags == "success" %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Schedule Details</h3>
+
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Course</th>
+                                    <th>Subject</th>
+                                    <th>Staff</th>
+                                    <th>Session Start Year</th>
+                                    <th>Session End Year</th>
+                                    <th>Day of Week</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for schedule in schedules %}
+                                <tr>
+                                    <td>{{ schedule.id }}</td>
+                                    <td>{{ schedule.course_id.course_name }}</td>
+                                    <td>{{ schedule.subject_id.subject_name }}</td>
+                                    <td>{{ schedule.staff_id.admin.first_name }} {{ schedule.staff_id.admin.last_name }}</td>
+                                    <td>{{ schedule.session_year_id.session_start_year }}</td>
+                                    <td>{{ schedule.session_year_id.session_end_year }}</td>
+                                    <td>{{ schedule.day_of_week }}</td>
+                                    <td>{{ schedule.start_time }}</td>
+                                    <td>{{ schedule.end_time }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_schedule' schedule.id %}" class="btn btn-warning">Edit</a> 
+                                        
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+{% endblock main_content %}
