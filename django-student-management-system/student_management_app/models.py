@@ -9,6 +9,7 @@ class SessionYearModel(models.Model):
     id = models.AutoField(primary_key=True)
     session_start_year = models.DateField()
     session_end_year = models.DateField()
+    session_limit = models.IntegerField(blank=True, null=True)
     objects = models.Manager()
 
 
@@ -48,6 +49,14 @@ class Courses(models.Model):
     # def __str__(self):
 	#     return self.course_name
 
+class Section(models.Model):
+    id = models.AutoField(primary_key=True)
+    section_name = models.CharField(max_length=255)
+    section_limit = models.IntegerField(blank=True, null=True)
+    course_id = models.ForeignKey(Courses, on_delete=models.CASCADE, default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
 
 
 class Subjects(models.Model):
@@ -63,22 +72,60 @@ class Subjects(models.Model):
 
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    gender = models.CharField(max_length=50)
-    profile_pic = models.FileField()
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    student_number = models.CharField(max_length=8, unique=True, editable=False, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
+    profile_pic = models.FileField(upload_to='profile_pics/', blank=True, null=True)
     address = models.TextField()
     course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING, default=1)
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    grade_level = models.CharField(max_length=20, blank=True, null=True)
+    nickname = models.CharField(max_length=50, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    place_of_birth = models.CharField(max_length=100, blank=True, null=True)
+    nationality = models.CharField(max_length=50, blank=True, null=True)
+    religion = models.CharField(max_length=50, blank=True, null=True)
+    rank_in_family = models.IntegerField(blank=True, null=True)
+    telephone_nos = models.CharField(max_length=20, blank=True, null=True)
+    mobile_phone_nos = models.CharField(max_length=20, blank=True, null=True)
+    is_covid_vaccinated = models.BooleanField(default=False)
+    date_of_vaccination = models.DateField(blank=True, null=True)
     objects = models.Manager()
 
 
-# class Assessment(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
+class ParentGuardian(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    father_name = models.CharField(max_length=100, blank=True, null=True)
+    father_occupation = models.CharField(max_length=100, blank=True, null=True)
+    mother_name = models.CharField(max_length=100, blank=True, null=True)
+    mother_occupation = models.CharField(max_length=100, blank=True, null=True)
+    guardian_name = models.CharField(max_length=100, blank=True, null=True)
+    guardian_occupation = models.CharField(max_length=100, blank=True, null=True)
+    objects = models.Manager()
 
 
+class PreviousSchool(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    school_name = models.CharField(max_length=100, blank=True, null=True)
+    school_address = models.CharField(max_length=255, blank=True, null=True)
+    grade_level = models.CharField(max_length=20, blank=True, null=True)
+    school_year_attended = models.CharField(max_length=20, blank=True, null=True)
+    teacher_name = models.CharField(max_length=100, blank=True, null=True)
+    objects = models.Manager()
+
+class EmergencyContact(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    relation = models.CharField(max_length=50, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    telephone_nos = models.CharField(max_length=20, blank=True, null=True)
+    enrolling_teacher = models.CharField(max_length=100, blank=True, null=True)
+    referred_by = models.CharField(max_length=100, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    objects = models.Manager()
 
 class Schedule(models.Model):
     id = models.AutoField(primary_key=True)

@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Add Session Year
+    Add Section
 {% endblock page_title %}
 
 {% block main_content %}
@@ -16,11 +16,11 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Add Session Year</h3>
+                        <h3 class="card-title">Add Section</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form role="form" method="POST" action="{% url 'add_session_save' %}">
+                    <form role="form" method="POST" action="{% url 'add_section_save' %}">
                         {% csrf_token %}
 
                         
@@ -52,25 +52,29 @@
 
                         <div class="card-body">
                             <div class="form-group">
-                                <label>Session Start Year </label>
-                                <input type="date" class="form-control" name="session_start_year">
+                                <label>Section Name </label>
+                                <input type="text" class="form-control" name="section_name" placeholder="Enter Section">
                             </div>
 
                             <div class="form-group">
-                                <label>Session End Year </label>
-                                <input type="date" class="form-control" name="session_end_year">
+                                <label>Grade level </label>
+                                <select class="form-control" name="course">
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
 
                             <div class="form-group">
-                                <label>Session Limit </label>
-                                <input type="text" class="form-control" name="session_limit">
+                                <label>Section Limit </label>
+                                <input type="text" class="form-control" name="section_limit" placeholder="Enter Section Limit">
                             </div>
 
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Add Session Year</button>
+                        <button type="submit" class="btn btn-primary">Add Section</button>
                         </div>
                     </form>
                     </div>

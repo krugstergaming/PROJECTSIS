@@ -21,11 +21,13 @@ urlpatterns = [
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
     path('add_course/', HodViews.add_course, name="add_course"),
+
     path('add_course_save/', HodViews.add_course_save, name="add_course_save"),
     path('manage_course/', HodViews.manage_course, name="manage_course"),
     path('edit_course/<course_id>/', HodViews.edit_course, name="edit_course"),
     path('edit_course_save/', HodViews.edit_course_save, name="edit_course_save"),
     path('delete_course/<course_id>/', HodViews.delete_course, name="delete_course"),
+
     path('manage_session/', HodViews.manage_session, name="manage_session"),
     path('add_session/', HodViews.add_session, name="add_session"),
     path('add_session_save/', HodViews.add_session_save, name="add_session_save"),
@@ -40,6 +42,7 @@ urlpatterns = [
     path('edit_student_save/', HodViews.edit_student_save, name="edit_student_save"),
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
+
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
@@ -48,13 +51,24 @@ urlpatterns = [
 
 
 
+
     path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
+
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),
     path('manage_subject/', HodViews.manage_subject, name="manage_subject"),
     path('edit_subject/<subject_id>/', HodViews.edit_subject, name="edit_subject"),
     path('edit_subject_save/', HodViews.edit_subject_save, name="edit_subject_save"),
     path('delete_subject/<subject_id>/', HodViews.delete_subject, name="delete_subject"),
+
+
+    path('add_section/', HodViews.add_section, name="add_section"),
+    path('add_section_save/', HodViews.add_section_save, name="add_section_save"),
+    path('manage_section/', HodViews.manage_section, name="manage_section"),
+    # path('edit_section/<section_id>/', HodViews.edit_section, name="edit_section"),
+    # path('edit_section_save/', HodViews.edit_section_save, name="edit_section_save"),
+    # path('delete_section/<section_id>/', HodViews.delete_section, name="delete_section"),
+
     path('check_email_exist/', HodViews.check_email_exist, name="check_email_exist"),
     path('check_username_exist/', HodViews.check_username_exist, name="check_username_exist"),
     path('student_feedback_message/', HodViews.student_feedback_message, name="student_feedback_message"),

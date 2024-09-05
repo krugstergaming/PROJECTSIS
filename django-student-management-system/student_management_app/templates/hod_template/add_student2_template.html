@@ -1,0 +1,182 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Student
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Student</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'add_student_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Display Messages -->
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <!-- Form Fields -->
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="first_name">First Name</label>
+                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select class="form-control" name="gender" id="gender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <input type="number" class="form-control" name="age" id="age" placeholder="Enter Age">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date_of_birth">Date of Birth</label>
+                                <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="place_of_birth">Place of Birth</label>
+                                <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nationality">Nationality</label>
+                                <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="religion">Religion</label>
+                                <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rank_in_family">Rank in the Family</label>
+                                <input type="number" class="form-control" name="rank_in_family" id="rank_in_family" placeholder="Enter Rank in Family">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="telephone_nos">Telephone Nos</label>
+                                <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mobile_phone_nos">Mobile Phone Nos</label>
+                                <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
+                                <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
+                                    <option value="True">Yes</option>
+                                    <option value="False">No</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date_of_vaccination">Date of Vaccination</label>
+                                <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
+                            </div>
+
+                            <!-- Dynamic Course Selection -->
+                            <div class="form-group">
+                                <label for="course">Course</label>
+                                <select class="form-control" name="course" id="course">
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Dynamic Session Selection -->
+                            <div class="form-group">
+                                <label for="staff">Session</label>
+                                <select class="form-control" name="staff" id="staff">
+                                    {% for session in sessions %}
+                                        <option value="{{ session.id }}">{{ session.session_start_year }} - {{ staff.session_end_year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Profile Picture -->
+                            <div class="form-group">
+                                <label for="profile_pic">Profile Picture</label>
+                                <input type="file" class="form-control" name="profile_pic" id="profile_pic">
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Student</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+{% endblock main_content %}
