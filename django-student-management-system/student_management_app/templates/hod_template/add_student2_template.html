@@ -48,129 +48,245 @@
                         {% endif %}
 
                         <div class="card-body">
-                            <!-- Form Fields -->
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
-                            </div>
 
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
-                            </div>
+                            <!-- Tabs Navigation -->
+                            <ul class="nav nav-tabs" id="studentFormTabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="basic-info-tab" data-toggle="tab" href="#basic-info" role="tab" aria-controls="basic-info" aria-selected="true">Basic Student Information</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="parent-info-tab" data-toggle="tab" href="#parent-info" role="tab" aria-controls="parent-info" aria-selected="false">Parent/Guardian Information</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="previous-school-tab" data-toggle="tab" href="#previous-school" role="tab" aria-controls="previous-school" aria-selected="false">Previous School Information</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="emergency-contact-tab" data-toggle="tab" href="#emergency-contact" role="tab" aria-controls="emergency-contact" aria-selected="false">Emergency Contact Information</a>
+                                </li>
+                            </ul>
 
-                            <div class="form-group">
-                                <label for="first_name">First Name</label>
-                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
-                            </div>
+                            <div class="tab-content" id="studentFormContent">
 
-                            <div class="form-group">
-                                <label for="last_name">Last Name</label>
-                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
-                            </div>
+                                <!-- Basic Student Information -->
+                                <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-info-tab">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="gender">Gender</label>
-                                <select class="form-control" name="gender" id="gender">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="first_name">First Name</label>
+                                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="address">Address</label>
-                                <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="last_name">Last Name</label>
+                                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="age">Age</label>
-                                <input type="number" class="form-control" name="age" id="age" placeholder="Enter Age">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="date_of_birth">Date of Birth</label>
-                                <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="gender">Gender</label>
+                                        <select class="form-control" name="gender" id="gender">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="place_of_birth">Place of Birth</label>
-                                <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="address">Address</label>
+                                        <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="nationality">Nationality</label>
-                                <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="age">Age</label>
+                                        <input type="number" class="form-control" name="age" id="age" placeholder="Enter Age">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="religion">Religion</label>
-                                <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="date_of_birth">Date of Birth</label>
+                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="rank_in_family">Rank in the Family</label>
-                                <input type="number" class="form-control" name="rank_in_family" id="rank_in_family" placeholder="Enter Rank in Family">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="place_of_birth">Place of Birth</label>
+                                        <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="telephone_nos">Telephone Nos</label>
-                                <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="nationality">Nationality</label>
+                                        <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="mobile_phone_nos">Mobile Phone Nos</label>
-                                <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="religion">Religion</label>
+                                        <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
-                                <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
-                                    <option value="True">Yes</option>
-                                    <option value="False">No</option>
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="rank_in_family">Rank in the Family</label>
+                                        <input type="number" class="form-control" name="rank_in_family" id="rank_in_family" placeholder="Enter Rank in Family">
+                                    </div>
 
-                            <div class="form-group">
-                                <label for="date_of_vaccination">Date of Vaccination</label>
-                                <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="telephone_nos">Telephone Nos</label>
+                                        <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
+                                    </div>
 
-                            <!-- Dynamic Course Selection -->
-                            <div class="form-group">
-                                <label for="course">Course</label>
-                                <select class="form-control" name="course" id="course">
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="mobile_phone_nos">Mobile Phone Nos</label>
+                                        <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
+                                    </div>
 
-                            <!-- Dynamic Session Selection -->
-                            <div class="form-group">
-                                <label for="staff">Session</label>
-                                <select class="form-control" name="staff" id="staff">
-                                    {% for session in sessions %}
-                                        <option value="{{ session.id }}">{{ session.session_start_year }} - {{ staff.session_end_year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
+                                        <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
+                                            <option value="True">Yes</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
 
-                            <!-- Profile Picture -->
-                            <div class="form-group">
-                                <label for="profile_pic">Profile Picture</label>
-                                <input type="file" class="form-control" name="profile_pic" id="profile_pic">
+                                    <div class="form-group">
+                                        <label for="date_of_vaccination">Date of Vaccination</label>
+                                        <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
+                                    </div>
+
+                                    <!-- Dynamic Course Selection -->
+                                    <div class="form-group">
+                                        <label for="course">Course</label>
+                                        <select class="form-control" name="course_id" id="course_id">
+                                            <option value="">Select a Course</option> <!-- Optional placeholder -->
+                                            {% for course in courses %}
+                                                <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Dynamic Session Selection -->
+                                    <div class="form-group">
+                                        <label for="staff">Session</label>
+                                        <select class="form-control" name="session_year_id" id="session_year_id">
+                                            <option value="">Select a Session</option> <!-- Optional placeholder -->
+                                            {% for session in sessions %}
+                                                <option value="{{ session.id }}">{{ session.session_start_year }} - {{ session.session_end_year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <!-- Profile Picture -->
+                                    <div class="form-group">
+                                        <label for="profile_pic">Profile Picture</label>
+                                        <input type="file" class="form-control" name="profile_pic" id="profile_pic">
+                                    </div>
+                                </div>
+
+                                
+                                <!-- Parent/Guardian Information -->
+                                <div class="tab-pane fade" id="parent-info" role="tabpanel" aria-labelledby="parent-info-tab">
+                                    <div class="form-group">
+                                        <label for="father_name">Father's Name</label>
+                                        <input type="text" class="form-control" name="father_name" id="father_name" placeholder="Enter Father's Name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="father_occupation">Father's Occupation</label>
+                                        <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="mother_name">Mother's Name</label>
+                                        <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="Enter Mother's Name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="mother_occupation">Mother's Occupation</label>
+                                        <input type="text" class="form-control" name="mother_occupation" id="mother_occupation" placeholder="Enter Mother's Occupation">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="guardian_name">Guardian's Name</label>
+                                        <input type="text" class="form-control" name="guardian_name" id="guardian_name" placeholder="Enter Guardian's Name">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="guardian_occupation">Guardian's Occupation</label>
+                                        <input type="text" class="form-control" name="guardian_occupation" id="guardian_occupation" placeholder="Enter Guardian's Occupation">
+                                    </div>
+                                </div>
+
+                                <!-- Previous School Information -->
+                                <div class="tab-pane fade" id="previous-school" role="tabpanel" aria-labelledby="previous-school-tab">
+                                    <div class="form-group">
+                                        <label for="school_name">School Name</label>
+                                        <input type="text" class="form-control" name="school_name" id="school_name" placeholder="Enter School Name">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="school_address">School Address</label>
+                                        <input type="text" class="form-control" name="school_address" id="school_address" placeholder="Enter School Address">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="grade_level">Grade/Level</label>
+                                        <input type="text" class="form-control" name="grade_level" id="grade_level" placeholder="Enter Grade/Level">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="sy_attended">School Year Attended</label>
+                                        <input type="text" class="form-control" name="school_year_attended" id="school_year_attended" placeholder="Enter School Year Attended">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="teacher_name">Teacher's Name</label>
+                                        <input type="text" class="form-control" name="teacher_name" id="teacher_name" placeholder="Enter Teacher's Name">
+                                    </div>
+                                </div>
+
+                                <!-- Emergency Contact Information -->
+                                <div class="tab-pane fade" id="emergency-contact" role="tabpanel" aria-labelledby="emergency-contact-tab">
+                                    <div class="form-group">
+                                        <label for="contact_name">Name</label>
+                                        <input type="text" class="form-control" name="contact_name" id="contact_name" placeholder="Enter Name">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contact_relation">Relation</label>
+                                        <input type="text" class="form-control" name="contact_relation" id="contact_relation" placeholder="Enter Relation">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contact_address">Address</label>
+                                        <input type="text" class="form-control" name="contact_address" id="contact_address" placeholder="Enter Address">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contact_telephone">Telephone Nos</label>
+                                        <input type="text" class="form-control" name="contact_telephone" id="contact_telephone" placeholder="Enter Telephone Nos">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="contact_referred_by">Referred By</label>
+                                        <input type="text" class="form-control" name="contact_referred_by" id="contact_referred_by" placeholder="Enter Referred By">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Add Student</button>
+                            <button id="scrollUpButton" class="btn btn-secondary"> UP </button>
                         </div>
+                        
                     </form>
                 </div>
                 <!-- /.card -->
@@ -180,3 +296,93 @@
 </section>
 
 {% endblock main_content %}
+
+{% block custom_js %}
+    {% comment %} Checking if email and username already exists or not usin Ajax {% endcomment %}
+
+<script>
+    $(document).ready(function(){
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) {
+                $('#scrollUpButton').fadeIn();
+            } else {
+                $('#scrollUpButton').fadeOut();
+            }
+        });
+
+        // Scroll to the top when the button is clicked
+        $('#scrollUpButton').click(function () {
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+            return false;
+        });
+
+        // keyup event will be triggered when user leaves keyboard
+        $("#id_email").keyup(function(){
+            var email = $(this).val();
+
+            if(email!=""){
+                $.ajax({
+                    url : '{% url 'check_email_exist' %}',
+                    type : 'POST',
+                    data : {email:email}
+                })
+                .done(function(response){
+                    //console.log(response);
+
+                    if(response == "True"){
+                        $(".email_error").remove();
+                        $("<span class='email_error' style='color: red; padding: 5px; font-weight: bold;'> Email Not Available. </span>").insertAfter("#id_email")
+                    }
+                    else{
+                        $(".email_error").remove();
+                        $("<span class='email_error' style='color: green; padding: 5px; font-weight: bold;'> Email Available. </span>").insertAfter("#id_email")
+                    }
+                })
+
+                .fail(function(){
+                    console.log("Failed");
+                })
+            }
+            else{
+                $(".email_error").remove();
+            }
+            
+        })
+
+        $("#id_username").keyup(function(){
+            var username = $(this).val();
+            
+            if(username!=""){
+                $.ajax({
+                    url : '{% url 'check_username_exist' %}',
+                    type : 'POST',
+                    data : {username:username}
+                })
+                .done(function(response){
+                    //console.log(response);
+
+                    if(response == "True"){
+                        $(".username_error").remove();
+                        $("<span class='username_error' style='color: red; padding: 5px; font-weight: bold;'> Username Not Available. </span>").insertAfter("#id_username")
+                    }
+                    else{
+                        $(".username_error").remove();
+                        $("<span class='username_error' style='color: green; padding: 5px; font-weight: bold;'> Username Available. </span>").insertAfter("#id_username")
+                    }
+                })
+
+                .fail(function(){
+                    console.log("Failed");
+                })
+            }
+            else{
+                $(".username_error").remove();
+            }
+            
+        })
+    });
+</script>
+
+
+{% endblock custom_js %}

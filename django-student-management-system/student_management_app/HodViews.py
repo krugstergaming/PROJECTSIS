@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration
+from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import AddStudentForm, EditStudentForm, AddScheduleForm, EditScheduleForm, ParentGuardianForm, PreviousSchoolForm, EmergencyContactForm
 
 
@@ -104,7 +104,12 @@ def add_staff_save(request):
         address = request.POST.get('address')
 
         try:
-            user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=2)
+            user = CustomUser.objects.create_user(username=username, 
+                                                  password=password, 
+                                                  email=email, 
+                                                  first_name=first_name, 
+                                                  last_name=last_name, 
+                                                  user_type=2)
             user.staffs.address = address
             user.save()
             messages.success(request, "Staff Added Successfully!")
@@ -185,8 +190,6 @@ def delete_staff(request, staff_id):
     except:
         messages.error(request, "Failed to Delete Staff.")
         return redirect('manage_staff')
-
-
 
 
 def add_course(request):
@@ -346,92 +349,145 @@ def delete_session(request, session_id):
         return redirect('manage_session')
 
 
+# def add_staff_save(request):
+#     if request.method != "POST":
+#         messages.error(request, "Invalid Method ")
+#         return redirect('add_staff')
+#     else:
+#         first_name = request.POST.get('first_name')
+#         last_name = request.POST.get('last_name')
+#         username = request.POST.get('username')
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+#         address = request.POST.get('address')
 
+#         try:
+#             user = CustomUser.objects.create_user(username=username, 
+#                                                   password=password, 
+#                                                   email=email, 
+#                                                   first_name=first_name, 
+#                                                   last_name=last_name, 
+#                                                   user_type=2)
+#             user.staffs.address = address
+#             user.save()
+#             messages.success(request, "Staff Added Successfully!")
+#             return redirect('add_staff')
+#         except:
+#             messages.error(request, "Failed to Add Staff!")
+#             return redirect('add_staff')
 
 def add_student(request):
-    form = AddStudentForm()
-    form2 = ParentGuardianForm() 
+    courses = Courses.objects.all()
+    sessions = SessionYearModel.objects.all()
     context = {
-        "form": form,
-        "form2": form2
+        "courses": courses,
+        "sessions": sessions
     }
-    return render(request, 'hod_template/add_student_template.html', context)
-
+    return render(request, 'hod_template/add_student2_template.html', context)
 
 def add_student_save(request):
     if request.method != "POST":
-        messages.error(request, "Invalid Method")
+        messages.error(request, "Method Not Allowed!")
         return redirect('add_student')
-    else:
-        form = AddStudentForm(request.POST, request.FILES)
-       
 
-        if form.is_valid():
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            address = form.cleaned_data['address']
-            session_year_id = form.cleaned_data['session_year_id']
-            course_id = form.cleaned_data['course_id']
-            gender = form.cleaned_data['gender']
-            age = form.cleaned_data['age']
-            date_of_birth = form.cleaned_data['date_of_birth']
-            place_of_birth = form.cleaned_data['place_of_birth']
-            nationality = form.cleaned_data['nationality']
-            religion = form.cleaned_data['religion']
-            rank_in_family = form.cleaned_data['rank_in_family']
-            telephone_nos = form.cleaned_data['telephone_nos']
-            mobile_phone_nos = form.cleaned_data['mobile_phone_nos']
-            is_covid_vaccinated = form.cleaned_data['is_covid_vaccinated']
-            date_of_vaccination = form.cleaned_data['date_of_vaccination']
-
-            
-
-            # Getting Profile Pic first
-            # First Check whether the file is selected or not
-            # Upload only if file is selected
-            if len(request.FILES) != 0:
-                profile_pic = request.FILES['profile_pic']
-                fs = FileSystemStorage()
-                filename = fs.save(profile_pic.name, profile_pic)
-                profile_pic_url = fs.url(filename)
-            else:
-                profile_pic_url = None
+    try:
+        # Extract data from request.POST
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        address = request.POST.get('address')
+        session_year_id = request.POST.get('session_year_id')
+        course_id = request.POST.get('course_id')
+        gender = request.POST.get('gender')
+        age = request.POST.get('age')
+        date_of_birth = request.POST.get('date_of_birth')
+        place_of_birth = request.POST.get('place_of_birth')
+        nationality = request.POST.get('nationality')
+        religion = request.POST.get('religion')
+        rank_in_family = request.POST.get('rank_in_family')
+        telephone_nos = request.POST.get('telephone_nos')
+        mobile_phone_nos = request.POST.get('mobile_phone_nos')
+        is_covid_vaccinated = request.POST.get('is_covid_vaccinated')
+        date_of_vaccination = request.POST.get('date_of_vaccination')
 
 
-            try:
-                user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=3)
-                user.students.address = address
 
-                course_obj = Courses.objects.get(id=course_id)
-                user.students.course_id = course_obj
+        # Handle file upload for profile picture
+        profile_pic_url = None
+        if 'profile_pic' in request.FILES:
+            profile_pic = request.FILES['profile_pic']
+            fs = FileSystemStorage()
+            filename = fs.save(profile_pic.name, profile_pic)
+            profile_pic_url = fs.url(filename)
 
-                session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-                user.students.session_year_id = session_year_obj
+        # Create Student User
+        user = CustomUser.objects.create_user(
+            username=username, password=password, email=email,
+            first_name=first_name, last_name=last_name, user_type=3
+        )
+        user.students.address = address
 
-                user.students.gender = gender
-                user.students.profile_pic = profile_pic_url
-                user.students.age = age
-                user.students.date_of_birth = date_of_birth
-                user.students.place_of_birth = place_of_birth
-                user.students.nationality = nationality
-                user.students.religion = religion
-                user.students.rank_in_family = rank_in_family
-                user.students.telephone_nos = telephone_nos
-                user.students.mobile_phone_nos = mobile_phone_nos
-                user.students.is_covid_vaccinated = is_covid_vaccinated
-                user.students.date_of_vaccination = date_of_vaccination
+        # Assign Course and Session Year
+        course_obj = Courses.objects.get(id=course_id)
+        session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+        user.students.course_id = course_obj
+        user.students.session_year_id = session_year_obj
 
-                user.save()
-                messages.success(request, "Student Added Successfully!")
-                return redirect('add_student')
-            except:
-                messages.error(request, "Failed to Add Student!")
-                return redirect('add_student')
-        else:
-            return redirect('add_student')
+        # Additional Student Details
+        user.students.gender = gender
+        user.students.profile_pic = profile_pic_url
+        user.students.age = age
+        user.students.date_of_birth = date_of_birth
+        user.students.place_of_birth = place_of_birth
+        user.students.nationality = nationality
+        user.students.religion = religion
+        user.students.rank_in_family = rank_in_family
+        user.students.telephone_nos = telephone_nos
+        user.students.mobile_phone_nos = mobile_phone_nos
+        user.students.is_covid_vaccinated = is_covid_vaccinated
+        user.students.date_of_vaccination = date_of_vaccination
+        user.save()
+
+        # Save Parent/Guardian Information
+        ParentGuardian.objects.create(
+            students_id=user.students,
+            father_name=request.POST.get('father_name'),
+            father_occupation=request.POST.get('father_occupation'),
+            mother_name=request.POST.get('mother_name'),
+            mother_occupation=request.POST.get('mother_occupation'),
+            guardian_name=request.POST.get('guardian_name'),
+            guardian_occupation=request.POST.get('guardian_occupation')
+        )
+
+        # Save Previous School Information
+        PreviousSchool.objects.create(
+            students_id=user.students,
+            school_name=request.POST.get('school_name'),
+            school_address=request.POST.get('school_address'),
+            grade_level=request.POST.get('grade_level'),
+            school_year_attended=request.POST.get('school_year_attended'),
+            teacher_name=request.POST.get('teacher_name')
+        )
+
+        # Save Emergency Contact Information
+        EmergencyContact.objects.create(
+            students_id=user.students,
+            name=request.POST.get('contact_name'),
+            relation=request.POST.get('contact_relation'),
+            address=request.POST.get('contact_address'),
+            telephone_nos=request.POST.get('contact_telephone'),
+            enrolling_teacher=request.POST.get('contact_referred_by'),
+            referred_by=request.POST.get('referred_by')
+        )
+
+        messages.success(request, "Student Added Successfully!")
+        return redirect('add_student')
+
+    except Exception as e:
+        messages.error(request, f"Failed to Add Student! Error: {str(e)}")
+        return redirect('add_student')
 
 
 def manage_student(request):
