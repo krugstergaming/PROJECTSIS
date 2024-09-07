@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import Form
-from student_management_app.models import Courses, SessionYearModel, Subjects, Staffs
+from student_management_app.models import GradeLevel, SessionYearModel, Subjects, Staffs
 
 
 class DateInput(forms.DateInput):
@@ -31,12 +31,12 @@ class AddStudentForm(forms.Form):
     is_covid_vaccinated = forms.ChoiceField(label="Is COVID Vaccinated?", choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={"class": "form-control"}))
     date_of_vaccination = forms.DateField(label="Date of Vaccination", required=False, widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}))
 
-    #For Displaying Courses
+    #For Displaying GradeLevel
     try:
-        courses = Courses.objects.all()
-        course_list = [(course.id, course.course_name) for course in courses]
+        gradelevels = GradeLevel.objects.all()
+        course_list = [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in gradelevels]
     except Exception as e:
-        print("Error fetching courses:", e)
+        print("Error fetching gradelevels:", e)
         course_list = []
     
     #For Displaying Session Years
@@ -47,14 +47,14 @@ class AddStudentForm(forms.Form):
         print("Error fetching session years:", e)
         session_year_list = []
 
-    course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}), error_messages={'required': 'Please select a valid course.'})
+    GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}), error_messages={'required': 'Please select a valid gradelevel.'})
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
 
     def __init__(self, *args, **kwargs):
         super(AddStudentForm, self).__init__(*args, **kwargs)
         
         # Add a placeholder choice at the beginning
-        self.fields['course_id'].choices = [('', 'Select a Course')] + [(course.id, course.course_name) for course in Courses.objects.all()]
+        self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in GradeLevel.objects.all()]
         self.fields['session_year_id'].choices = [('', 'Select a Session Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
 
     
@@ -114,12 +114,12 @@ class EditStudentForm(forms.Form):
     date_of_vaccination = forms.DateField(label="Date of Vaccination", required=False, widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}))
 
 
-    #For Displaying Courses
+    #For Displaying GradeLevel
     try:
-        courses = Courses.objects.all()
+        gradelevels = GradeLevel.objects.all()
         course_list = []
-        for course in courses:
-            single_course = (course.id, course.course_name)
+        for gradelevel in gradelevels:
+            single_course = (gradelevel.id, gradelevel.GradeLevel_name)
             course_list.append(single_course)
     except:
         course_list = []
@@ -135,7 +135,7 @@ class EditStudentForm(forms.Form):
     except:
         session_year_list = []
     
-    course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
+    GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}))
     
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
     # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
@@ -144,16 +144,16 @@ class EditStudentForm(forms.Form):
 
 
 class AddScheduleForm(forms.Form):
-    # Select the Course
+    # Select the GradeLevel
     try:
-        courses = Courses.objects.all()
-        course_list = [(course.id, course.course_name) for course in courses]
+        gradelevels = GradeLevel.objects.all()
+        course_list = [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in gradelevels]
     except Exception as e:
-        print("Error fetching courses:", e)
+        print("Error fetching gradelevels:", e)
         course_list = []
     
-    course_id = forms.ChoiceField(
-        label="Course", 
+    GradeLevel_id = forms.ChoiceField(
+        label="GradeLevel", 
         choices=course_list, 
         widget=forms.Select(attrs={"class": "form-control"})
     )
@@ -161,7 +161,7 @@ class AddScheduleForm(forms.Form):
     # Select the Subject
     try:
         subjects = Subjects.objects.all()
-        subject_list = [(subject.id, subject.subject_name) for subject in subjects]
+        subject_list = [(subject.id, subject.subject_one) for subject in subjects]
     except Exception as e:
         print("Error fetching subjects:", e)
         subject_list = []
@@ -229,17 +229,17 @@ class AddScheduleForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(AddScheduleForm, self).__init__(*args, **kwargs)
         # Placeholder choices
-        self.fields['course_id'].choices = [('', 'Select a Course')] + [(course.id, course.course_name) for course in Courses.objects.all()]
-        self.fields['subject_id'].choices = [('', 'Select a Subject')] + [(subject.id, subject.subject_name) for subject in Subjects.objects.all()]
+        self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in GradeLevel.objects.all()]
+        self.fields['subject_id'].choices = [('', 'Select a Subject')] + [(subject.id, subject.subject_one) for subject in Subjects.objects.all()]
         self.fields['staff_id'].choices = [('', 'Select a Staff Member')] + [(staff.id, f"{staff.admin.first_name} {staff.admin.last_name}") for staff in Staffs.objects.all()]
         self.fields['session_year_id'].choices = [('', 'Select a Session Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
 
 
 class EditScheduleForm(forms.Form):
-    # For Displaying Courses
+    # For Displaying GradeLevel
     try:
-        courses = Courses.objects.all()
-        course_list = [(course.id, course.course_name) for course in courses]
+        gradelevels = GradeLevel.objects.all()
+        course_list = [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in gradelevels]
     except:
         course_list = []
 
@@ -276,7 +276,7 @@ class EditScheduleForm(forms.Form):
     ]
 
     # Form Fields
-    course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class": "form-control"}))
+    GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=course_list, widget=forms.Select(attrs={"class": "form-control"}))
     subject_id = forms.ChoiceField(label="Subject", choices=subject_list, widget=forms.Select(attrs={"class": "form-control"}))
     staff_id = forms.ChoiceField(label="Staff", choices=staff_list, widget=forms.Select(attrs={"class": "form-control"}))
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class": "form-control"}))

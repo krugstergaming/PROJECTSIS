@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Manage Staff
+    Manage Faculty
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,18 +11,26 @@
 <section class="content">
     <div class="container-fluid">
         <!-- Add Staff Button -->
-        <a class="btn btn-primary" href="{% url 'add_staff' %}" role="button">+ Add Staff</a> 
-        <br/>&nbsp;
+        <div class="row">
+            <!-- Add Staff Button -->
+            <div class="col-12 mb-3">
+                <a class="btn btn-primary" href="{% url 'add_staff' %}" role="button">+ Add Faculty</a>
+            </div>
+        </div>
 
         <!-- Activate/Deactivate Grading Button -->
-        <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
-            {% if grading_config.is_grading_active %}
-                Deactivate Grading
-            {% else %}
-                Activate Grading
-            {% endif %}
-        </a> 
-        <br/>&nbsp;
+        <div class="row">
+            <!-- Activate/Deactivate Grading Button -->
+            <div class="col-12 mb-3">
+                <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
+                    {% if grading_config.is_grading_active %}
+                        Deactivate Grading
+                    {% else %}
+                        Activate Grading
+                    {% endif %}
+                </a>
+            </div>
+        </div>
 
         {% if messages %}
         <div class="form-group">
@@ -53,7 +61,7 @@
                 <!-- General form elements -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Staff Details</h3>
+                        <h3 class="card-title">Faculty Details</h3>
 
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -69,7 +77,7 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <!-- <th>ID</th> -->
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>Username</th>
@@ -83,7 +91,7 @@
                             <tbody>
                                 {% for staff in staffs %}
                                 <tr>
-                                    <td>{{ staff.admin.id }}</td>
+                                    <!-- <td>{{ staff.admin.id }}</td> -->
                                     <td>{{ staff.admin.first_name }}</td>
                                     <td>{{ staff.admin.last_name }}</td>
                                     <td>{{ staff.admin.username }}</td>

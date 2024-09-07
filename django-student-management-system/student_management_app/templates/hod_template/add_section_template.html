@@ -58,9 +58,9 @@
 
                             <div class="form-group">
                                 <label>Grade level </label>
-                                <select class="form-control" name="course">
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                <select class="form-control" name="gradelevel">
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

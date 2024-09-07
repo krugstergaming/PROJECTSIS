@@ -8,7 +8,7 @@ from django.core import serializers
 import json
 from django.shortcuts import get_object_or_404
 
-from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
+from student_management_app.models import CustomUser, Staffs, GradeLevel, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
 
 
 
@@ -16,18 +16,18 @@ def staff_home(request):
     # Fetching All Students under Staff
 
     subjects = Subjects.objects.filter(staff_id=request.user.id)
-    course_id_list = []
+    GradeLevel_id_list = []
     for subject in subjects:
-        course = Courses.objects.get(id=subject.course_id.id)
-        course_id_list.append(course.id)
+        gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
+        GradeLevel_id_list.append(gradelevel.id)
     
     final_course = []
-    # Removing Duplicate Course Id
-    for course_id in course_id_list:
-        if course_id not in final_course:
-            final_course.append(course_id)
+    # Removing Duplicate GradeLevel Id
+    for GradeLevel_id in GradeLevel_id_list:
+        if GradeLevel_id not in final_course:
+            final_course.append(GradeLevel_id)
     
-    students_count = Students.objects.filter(course_id__in=final_course).count()
+    students_count = Students.objects.filter(GradeLevel_id__in=final_course).count()
     subject_count = subjects.count()
 
     # Fetch All Attendance Count
@@ -44,7 +44,7 @@ def staff_home(request):
         subject_list.append(subject.subject_name)
         attendance_list.append(attendance_count1)
 
-    students_attendance = Students.objects.filter(course_id__in=final_course)
+    students_attendance = Students.objects.filter(GradeLevel_id__in=final_course)
     student_list = []
     student_list_attendance_present = []
     student_list_attendance_absent = []
@@ -142,13 +142,13 @@ def get_students(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year")
 
-    # Students enroll to Course, Course has Subjects
+    # Students enroll to GradeLevel, GradeLevel has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
 
-    students = Students.objects.filter(course_id=subject_model.course_id, session_year_id=session_model)
+    students = Students.objects.filter(GradeLevel_id=subject_model.GradeLevel_id, session_year_id=session_model)
 
     student_results = StudentResult.objects.filter(subject_id=subject_model)
 
@@ -229,13 +229,13 @@ def get_attendance_dates(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year_id")
 
-    # Students enroll to Course, Course has Subjects
+    # Students enroll to GradeLevel, GradeLevel has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
 
-    # students = Students.objects.filter(course_id=subject_model.course_id, session_year_id=session_model)
+    # students = Students.objects.filter(GradeLevel_id=subject_model.GradeLevel_id, session_year_id=session_model)
     attendance = Attendance.objects.filter(subject_id=subject_model, session_year_id=session_model)
 
     # Only Passing Student Id and Student Name Only
@@ -384,9 +384,11 @@ def staff_add_result_save(request):
             final_grade = (first_quarter + second_quarter + third_quarter + fourth_quarter) / 4
 
             # Check if Students Result Already Exists or not
-            check_exist = StudentResult.objects.filter(subject_id=subject_obj, student_id=student_obj).exists()
+            check_exist = StudentResult.objects.filter(subject_id=subject_obj, 
+                                                       student_id=student_obj).exists()
             if check_exist:
-                result = StudentResult.objects.get(subject_id=subject_obj, student_id=student_obj)
+                result = StudentResult.objects.get(subject_id=subject_obj, 
+                student_id=student_obj)
                 # result.subject_assignment_marks = assignment_marks
                 # result.subject_exam_marks = exam_marks
 

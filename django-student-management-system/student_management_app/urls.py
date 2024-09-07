@@ -21,13 +21,21 @@ urlpatterns = [
     path('edit_staff/<staff_id>/', HodViews.edit_staff, name="edit_staff"),
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
-    path('add_course/', HodViews.add_course, name="add_course"),
 
-    path('add_course_save/', HodViews.add_course_save, name="add_course_save"),
-    path('manage_course/', HodViews.manage_course, name="manage_course"),
-    path('edit_course/<course_id>/', HodViews.edit_course, name="edit_course"),
-    path('edit_course_save/', HodViews.edit_course_save, name="edit_course_save"),
-    path('delete_course/<course_id>/', HodViews.delete_course, name="delete_course"),
+
+    path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
+    path('add_curriculum_save/', HodViews.add_curriculum_save, name="add_curriculum_save"),
+    path('manage_curriculum/', HodViews.manage_curriculum, name="manage_curriculum"),
+    # path('edit_curriculum/<curriculum_id>/', HodViews.edit_curriculum, name="edit_curriculum"),
+    # path('edit_curriculum_save/', HodViews.edit_curriculum_save, name="edit_curriculum_save"),
+    # path('delete_curriculum/<curriculum_id>/', HodViews.delete_curriculum, name="delete_curriculum"),
+
+    path('add_gradelevel/', HodViews.add_gradelevel, name="add_gradelevel"),
+    path('add_gradelevel_save/', HodViews.add_gradelevel_save, name="add_gradelevel_save"),
+    path('manage_gradelevel/', HodViews.manage_gradelevel, name="manage_gradelevel"),
+    path('edit_gradelevel/<GradeLevel_id>/', HodViews.edit_gradelevel, name="edit_gradelevel"),
+    path('edit_gradelevel_save/', HodViews.edit_gradelevel_save, name="edit_gradelevel_save"),
+    path('delete_gradelevel/<GradeLevel_id>/', HodViews.delete_gradelevel, name="delete_gradelevel"),
 
     path('manage_session/', HodViews.manage_session, name="manage_session"),
     path('add_session/', HodViews.add_session, name="add_session"),

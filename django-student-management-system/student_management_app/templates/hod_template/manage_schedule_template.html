@@ -61,7 +61,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Course</th>
+                                    <th>GradeLevel</th>
                                     <th>Subject</th>
                                     <th>Staff</th>
                                     <th>Session Start Year</th>
@@ -76,7 +76,7 @@
                                 {% for schedule in schedules %}
                                 <tr>
                                     <td>{{ schedule.id }}</td>
-                                    <td>{{ schedule.course_id.course_name }}</td>
+                                    <td>{{ schedule.GradeLevel_id.GradeLevel_name }}</td>
                                     <td>{{ schedule.subject_id.subject_name }}</td>
                                     <td>{{ schedule.staff_id.admin.first_name }} {{ schedule.staff_id.admin.last_name }}</td>
                                     <td>{{ schedule.session_year_id.session_start_year }}</td>

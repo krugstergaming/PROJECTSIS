@@ -64,36 +64,45 @@
                                     <a class="nav-link" id="emergency-contact-tab" data-toggle="tab" href="#emergency-contact" role="tab" aria-controls="emergency-contact" aria-selected="false">Emergency Contact Information</a>
                                 </li>
                             </ul>
-
+                        
                             <div class="tab-content" id="studentFormContent">
-
                                 <!-- Basic Student Information -->
                                 <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-info-tab">
                                     <div class="form-group">
                                         <label for="email">Email</label>
                                         <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="password">Password</label>
                                         <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="first_name">First Name</label>
                                         <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="last_name">Last Name</label>
                                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
                                     </div>
-
+                        
+                                    <div class="form-group">
+                                        <label for="middle_name">Middle Name</label>
+                                        <input type="text" class="form-control" name="middle_name" id="middle_name" placeholder="Enter Middle Name (optional)">
+                                    </div>
+                        
+                                    <div class="form-group">
+                                        <label for="suffix">Suffix</label>
+                                        <input type="text" class="form-control" name="suffix" id="suffix" placeholder="Enter Suffix (optional)">
+                                    </div>
+                        
                                     <div class="form-group">
                                         <label for="username">Username</label>
                                         <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="gender">Gender</label>
                                         <select class="form-control" name="gender" id="gender">
@@ -101,52 +110,52 @@
                                             <option value="Female">Female</option>
                                         </select>
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="address">Address</label>
                                         <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="age">Age</label>
-                                        <input type="number" class="form-control" name="age" id="age" placeholder="Enter Age">
-                                    </div>
-
-                                    <div class="form-group">
                                         <label for="date_of_birth">Date of Birth</label>
-                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
+                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="Select your date of birth" onchange="calculateAge()">
                                     </div>
-
+                                    
+                                    <div class="form-group">
+                                        <label for="age">Age</label>
+                                        <input type="number" class="form-control" name="age" id="age" placeholder="Age will be calculated automatically" readonly>
+                                    </div>
+                        
                                     <div class="form-group">
                                         <label for="place_of_birth">Place of Birth</label>
                                         <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="nationality">Nationality</label>
                                         <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="religion">Religion</label>
                                         <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="rank_in_family">Rank in the Family</label>
                                         <input type="number" class="form-control" name="rank_in_family" id="rank_in_family" placeholder="Enter Rank in Family">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="telephone_nos">Telephone Nos</label>
                                         <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="mobile_phone_nos">Mobile Phone Nos</label>
                                         <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
                                         <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
@@ -154,26 +163,26 @@
                                             <option value="False">No</option>
                                         </select>
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="date_of_vaccination">Date of Vaccination</label>
                                         <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
                                     </div>
-
-                                    <!-- Dynamic Course Selection -->
+                        
+                                    <!-- Dynamic GradeLevel Selection -->
                                     <div class="form-group">
-                                        <label for="course">Course</label>
-                                        <select class="form-control" name="course_id" id="course_id">
-                                            <option value="">Select a Course</option> <!-- Optional placeholder -->
-                                            {% for course in courses %}
-                                                <option value="{{ course.id }}">{{ course.course_name }}</option>
+                                        <label for="gradelevel">GradeLevel</label>
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id">
+                                            <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
+                                            {% for gradelevel in gradelevels %}
+                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
-                                    
+                        
                                     <!-- Dynamic Session Selection -->
                                     <div class="form-group">
-                                        <label for="staff">Session</label>
+                                        <label for="session">Session</label>
                                         <select class="form-control" name="session_year_id" id="session_year_id">
                                             <option value="">Select a Session</option> <!-- Optional placeholder -->
                                             {% for session in sessions %}
@@ -181,105 +190,99 @@
                                             {% endfor %}
                                         </select>
                                     </div>
-
+                        
                                     <!-- Profile Picture -->
                                     <div class="form-group">
                                         <label for="profile_pic">Profile Picture</label>
                                         <input type="file" class="form-control" name="profile_pic" id="profile_pic">
                                     </div>
                                 </div>
-
-                                
+                        
                                 <!-- Parent/Guardian Information -->
                                 <div class="tab-pane fade" id="parent-info" role="tabpanel" aria-labelledby="parent-info-tab">
                                     <div class="form-group">
                                         <label for="father_name">Father's Name</label>
                                         <input type="text" class="form-control" name="father_name" id="father_name" placeholder="Enter Father's Name">
                                     </div>
-                                    
+                        
                                     <div class="form-group">
                                         <label for="father_occupation">Father's Occupation</label>
                                         <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation" required>
                                     </div>
-                                    
+                        
                                     <div class="form-group">
                                         <label for="mother_name">Mother's Name</label>
                                         <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="Enter Mother's Name">
                                     </div>
-                                    
+                        
                                     <div class="form-group">
                                         <label for="mother_occupation">Mother's Occupation</label>
                                         <input type="text" class="form-control" name="mother_occupation" id="mother_occupation" placeholder="Enter Mother's Occupation">
                                     </div>
-                                    
+                        
                                     <div class="form-group">
                                         <label for="guardian_name">Guardian's Name</label>
                                         <input type="text" class="form-control" name="guardian_name" id="guardian_name" placeholder="Enter Guardian's Name">
                                     </div>
-                                    
+                        
                                     <div class="form-group">
                                         <label for="guardian_occupation">Guardian's Occupation</label>
                                         <input type="text" class="form-control" name="guardian_occupation" id="guardian_occupation" placeholder="Enter Guardian's Occupation">
                                     </div>
                                 </div>
-
+                        
                                 <!-- Previous School Information -->
                                 <div class="tab-pane fade" id="previous-school" role="tabpanel" aria-labelledby="previous-school-tab">
                                     <div class="form-group">
-                                        <label for="school_name">School Name</label>
-                                        <input type="text" class="form-control" name="school_name" id="school_name" placeholder="Enter School Name">
+                                        <label for="previous_school">Previous School</label>
+                                        <input type="text" class="form-control" name="previous_school" id="previous_school" placeholder="Enter Previous School">
                                     </div>
-
+                        
                                     <div class="form-group">
                                         <label for="school_address">School Address</label>
                                         <input type="text" class="form-control" name="school_address" id="school_address" placeholder="Enter School Address">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="grade_level">Grade/Level</label>
-                                        <input type="text" class="form-control" name="grade_level" id="grade_level" placeholder="Enter Grade/Level">
+                                        <label for="school_contact">School Contact Number</label>
+                                        <input type="text" class="form-control" name="school_contact" id="school_contact" placeholder="Enter School Contact Number">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="sy_attended">School Year Attended</label>
-                                        <input type="text" class="form-control" name="school_year_attended" id="school_year_attended" placeholder="Enter School Year Attended">
+                                        <label for="school_last_grade">Last Grade Completed</label>
+                                        <input type="text" class="form-control" name="school_last_grade" id="school_last_grade" placeholder="Enter Last Grade Completed">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="teacher_name">Teacher's Name</label>
-                                        <input type="text" class="form-control" name="teacher_name" id="teacher_name" placeholder="Enter Teacher's Name">
+                                        <label for="school_year_graduated">Year Graduated</label>
+                                        <input type="number" class="form-control" name="school_year_graduated" id="school_year_graduated" placeholder="Enter Year Graduated">
                                     </div>
                                 </div>
-
+                        
                                 <!-- Emergency Contact Information -->
                                 <div class="tab-pane fade" id="emergency-contact" role="tabpanel" aria-labelledby="emergency-contact-tab">
                                     <div class="form-group">
-                                        <label for="contact_name">Name</label>
-                                        <input type="text" class="form-control" name="contact_name" id="contact_name" placeholder="Enter Name">
+                                        <label for="emergency_contact_name">Contact Name</label>
+                                        <input type="text" class="form-control" name="emergency_contact_name" id="emergency_contact_name" placeholder="Enter Contact Name">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="contact_relation">Relation</label>
-                                        <input type="text" class="form-control" name="contact_relation" id="contact_relation" placeholder="Enter Relation">
+                                        <label for="emergency_contact_relationship">Relationship</label>
+                                        <input type="text" class="form-control" name="emergency_contact_relationship" id="emergency_contact_relationship" placeholder="Enter Relationship">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="contact_address">Address</label>
-                                        <input type="text" class="form-control" name="contact_address" id="contact_address" placeholder="Enter Address">
+                                        <label for="emergency_contact_phone">Contact Phone</label>
+                                        <input type="text" class="form-control" name="emergency_contact_phone" id="emergency_contact_phone" placeholder="Enter Contact Phone">
                                     </div>
-
+                        
                                     <div class="form-group">
-                                        <label for="contact_telephone">Telephone Nos</label>
-                                        <input type="text" class="form-control" name="contact_telephone" id="contact_telephone" placeholder="Enter Telephone Nos">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="contact_referred_by">Referred By</label>
-                                        <input type="text" class="form-control" name="contact_referred_by" id="contact_referred_by" placeholder="Enter Referred By">
+                                        <label for="emergency_contact_email">Contact Email</label>
+                                        <input type="email" class="form-control" name="emergency_contact_email" id="emergency_contact_email" placeholder="Enter Contact Email">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div> <!-- Closing tab-content div -->
+                        </div> <!-- Closing card-body div -->
                         <!-- /.card-body -->
 
                         <div class="card-footer">
@@ -382,6 +385,22 @@
             
         })
     });
+
+    function calculateAge() {
+        const dobInput = document.getElementById('date_of_birth').value;
+        if (dobInput) {
+            const dob = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            document.getElementById('age').value = age;
+        } else {
+            document.getElementById('age').value = '';
+        }
+    }
 </script>
 
 
