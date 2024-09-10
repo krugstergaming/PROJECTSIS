@@ -149,7 +149,6 @@ def add_staff_save(request):
             user.staffs.telephone_no = telephone_no
             user.staffs.cellphone_no = cellphone_no
             user.staffs.email_address = email_address
-            
             user.save()
             messages.success(request, "Staff Added Successfully!")
             return redirect('add_staff')

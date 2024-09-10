@@ -49,7 +49,7 @@
                     <!-- form start -->
                     <form role="form" method="POST" action="{% url 'add_staff_save' %}">
                         {% csrf_token %}
-
+                    
                         <!-- Display Messages -->
                         {% if messages %}
                         <div class="container">
@@ -63,33 +63,33 @@
                             {% endfor %}
                         </div>
                         {% endif %}
-
+                    
                         <!-- Form Container -->
                         <div class="form-container">
                             <div class="form-title">I. PERSONAL INFORMATION</div>
-
+                    
                             <!-- Surname, First Name, Middle Name -->
                             <div class="form-group row">
-                                <label for="surname" class="col-sm-3 col-form-label form-label">Last Name</label>
+                                <label for="last_name" class="col-sm-3 col-form-label form-label">Last Name</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="surname" name="surname" placeholder="Enter your last name">
+                                    <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter your last name">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="first_name" class="col-sm-3 col-form-label form-label">First Name</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter your first name">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="middle_name" class="col-sm-3 col-form-label form-label">Middle Name</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="middle_name" name="middle_name" placeholder="Enter your middle name">
                                 </div>
                             </div>
-
+                    
                             <!-- Date of Birth -->
                             <div class="form-group row">
                                 <label for="dob" class="col-sm-3 col-form-label form-label">Date of Birth</label>
@@ -97,7 +97,7 @@
                                     <input type="date" class="form-control" id="dob" name="dob" placeholder="Select your date of birth" onchange="calculateAge()">
                                 </div>
                             </div>
-
+                    
                             <!-- Age -->
                             <div class="form-group row">
                                 <label for="age" class="col-sm-3 col-form-label form-label">Age</label>
@@ -105,48 +105,48 @@
                                     <input type="text" class="form-control" id="age" name="age" placeholder="Age will be calculated automatically" readonly>
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="pob" class="col-sm-3 col-form-label form-label">Place of Birth</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="pob" name="pob" placeholder="Enter your place of birth">
                                 </div>
                             </div>
-
+                    
                             <!-- Sex -->
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label form-label">Sex</label>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="male" name="sex">
+                                        <input class="form-check-input" type="radio" id="male" name="sex" value="Male">
                                         <label class="form-check-label" for="male">Male</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="female" name="sex">
+                                        <input class="form-check-input" type="radio" id="female" name="sex" value="Female">
                                         <label class="form-check-label" for="female">Female</label>
                                     </div>
                                 </div>
                             </div>
-
+                    
                             <!-- Civil Status -->
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label form-label">Civil Status</label>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="single" name="civil_status">
+                                        <input class="form-check-input" type="radio" id="single" name="civil_status" value="Single">
                                         <label class="form-check-label" for="single">Single</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="married" name="civil_status">
+                                        <input class="form-check-input" type="radio" id="married" name="civil_status" value="Married">
                                         <label class="form-check-label" for="married">Married</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="other" name="civil_status">
+                                        <input class="form-check-input" type="radio" id="other" name="civil_status" value="Other">
                                         <label class="form-check-label" for="other">Other</label>
                                     </div>
                                 </div>
                             </div>
-
+                    
                             <!-- Height, Weight, Blood Type -->
                             <div class="form-group row">
                                 <label for="height" class="col-sm-3 col-form-label form-label">Height (m)</label>
@@ -154,21 +154,21 @@
                                     <input type="text" class="form-control" id="height" name="height" placeholder="Enter your height in meters">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="weight" class="col-sm-3 col-form-label form-label">Weight (kg)</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="weight" name="weight" placeholder="Enter your weight in kilograms">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="blood_type" class="col-sm-3 col-form-label form-label">Blood Type</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="blood_type" name="blood_type" placeholder="Enter your blood type">
                                 </div>
                             </div>
-
+                    
                             <!-- GSIS, PAG-IBIG, PHILHEALTH, SSS -->
                             <div class="form-group row">
                                 <label for="gsis_id" class="col-sm-3 col-form-label form-label">GSIS ID No.</label>
@@ -176,45 +176,45 @@
                                     <input type="text" class="form-control" id="gsis_id" name="gsis_id" placeholder="Enter your GSIS ID number">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="pagibig_id" class="col-sm-3 col-form-label form-label">PAG-IBIG ID No.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="pagibig_id" name="pagibig_id" placeholder="Enter your PAG-IBIG ID number">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="philhealth_id" class="col-sm-3 col-form-label form-label">PHILHEALTH No.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="philhealth_id" name="philhealth_id" placeholder="Enter your PHILHEALTH number">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="sss_id" class="col-sm-3 col-form-label form-label">SSS No.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="sss_id" name="sss_id" placeholder="Enter your SSS number">
                                 </div>
                             </div>
-
-                            <div class="form-group row"></div>
-                                <label for="sss_id" class="col-sm-3 col-form-label form-label">TIN No.</label>
+                    
+                            <div class="form-group row">
+                                <label for="tin_id" class="col-sm-3 col-form-label form-label">TIN No.</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" id="sss_id" name="tin_id" placeholder="Enter your TIN number">
+                                    <input type="text" class="form-control" id="tin_id" name="tin_id" placeholder="Enter your TIN number">
                                 </div>
                             </div>
-
+                    
                             <!-- Citizenship -->
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label form-label">Citizenship</label>
                                 <div class="col-sm-9">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="filipino" name="citizenship">
+                                        <input class="form-check-input" type="radio" id="filipino" name="citizenship" value="Filipino" onchange="toggleDualCountry(false)">
                                         <label class="form-check-label" for="filipino">Filipino</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="dual" name="citizenship">
+                                        <input class="form-check-input" type="radio" id="dual" name="citizenship" value="Dual" onchange="toggleDualCountry(true)">
                                         <label class="form-check-label" for="dual">Dual Citizenship</label>
                                     </div>
                                     <div class="form-check" id="dual_country_container" style="display: none;">
@@ -222,7 +222,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                    
                             <!-- Permanent Address -->
                             <div class="form-group row">
                                 <label for="permanent_address" class="col-sm-3 col-form-label form-label">Permanent Address</label>
@@ -230,7 +230,7 @@
                                     <textarea class="form-control" id="permanent_address" name="permanent_address" rows="3" placeholder="Enter your permanent address"></textarea>
                                 </div>
                             </div>
-
+                    
                             <!-- Contact Numbers -->
                             <div class="form-group row">
                                 <label for="telephone_no" class="col-sm-3 col-form-label form-label">Telephone No.</label>
@@ -238,19 +238,26 @@
                                     <input type="text" class="form-control" id="telephone_no" name="telephone_no" placeholder="Enter your telephone number">
                                 </div>
                             </div>
-
+                    
                             <div class="form-group row">
                                 <label for="cellphone_no" class="col-sm-3 col-form-label form-label">Cellphone No.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" id="cellphone_no" name="cellphone_no" placeholder="Enter your cellphone number">
                                 </div>
                             </div>
-
+                    
                             <!-- Email Address -->
                             <div class="form-group row">
                                 <label for="email_address" class="col-sm-3 col-form-label form-label">Email Address</label>
                                 <div class="col-sm-9">
-                                    <input type="email" class="form-control" id="email_address" name="email_address" placeholder="Enter your email address">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="email_address" class="col-sm-3 col-form-label form-label">Password</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                                 </div>
                             </div>
 

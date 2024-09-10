@@ -48,14 +48,14 @@ class AddStudentForm(forms.Form):
         session_year_list = []
 
     GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}), error_messages={'required': 'Please select a valid gradelevel.'})
-    session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
+    session_year_id = forms.ChoiceField(label="School Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
 
     def __init__(self, *args, **kwargs):
         super(AddStudentForm, self).__init__(*args, **kwargs)
         
         # Add a placeholder choice at the beginning
         self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in GradeLevel.objects.all()]
-        self.fields['session_year_id'].choices = [('', 'Select a Session Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
+        self.fields['session_year_id'].choices = [('', 'Select a School Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
 
     
     # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
@@ -195,7 +195,7 @@ class AddScheduleForm(forms.Form):
         session_year_list = []
 
     session_year_id = forms.ChoiceField(
-        label="Session Year", 
+        label="School Year", 
         choices=session_year_list, 
         widget=forms.Select(attrs={"class": "form-control"})
     )
@@ -232,7 +232,7 @@ class AddScheduleForm(forms.Form):
         self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in GradeLevel.objects.all()]
         self.fields['subject_id'].choices = [('', 'Select a Subject')] + [(subject.id, subject.subject_one) for subject in Subjects.objects.all()]
         self.fields['staff_id'].choices = [('', 'Select a Staff Member')] + [(staff.id, f"{staff.admin.first_name} {staff.admin.last_name}") for staff in Staffs.objects.all()]
-        self.fields['session_year_id'].choices = [('', 'Select a Session Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
+        self.fields['session_year_id'].choices = [('', 'Select a School Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
 
 
 class EditScheduleForm(forms.Form):
@@ -246,7 +246,7 @@ class EditScheduleForm(forms.Form):
     # For Displaying Subjects
     try:
         subjects = Subjects.objects.all()
-        subject_list = [(subject.id, subject.subject_name) for subject in subjects]
+        subject_list = [(subject.id, subject.subject_one) for subject in subjects]
     except:
         subject_list = []
 
@@ -279,7 +279,7 @@ class EditScheduleForm(forms.Form):
     GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=course_list, widget=forms.Select(attrs={"class": "form-control"}))
     subject_id = forms.ChoiceField(label="Subject", choices=subject_list, widget=forms.Select(attrs={"class": "form-control"}))
     staff_id = forms.ChoiceField(label="Staff", choices=staff_list, widget=forms.Select(attrs={"class": "form-control"}))
-    session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class": "form-control"}))
+    session_year_id = forms.ChoiceField(label="School Year", choices=session_year_list, widget=forms.Select(attrs={"class": "form-control"}))
     day_of_week = forms.ChoiceField(label="Day of Week", choices=day_of_week_choices, widget=forms.Select(attrs={"class": "form-control"}))
     start_time = forms.TimeField(label="Start Time", widget=forms.TimeInput(attrs={"class": "form-control", "type": "time"}))
     end_time = forms.TimeField(label="End Time", widget=forms.TimeInput(attrs={"class": "form-control", "type": "time"}))
