@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime
 
 from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
@@ -430,9 +431,32 @@ def delete_session(request, session_id):
 def add_student(request):
     gradelevels = GradeLevel.objects.all()
     sessions = SessionYearModel.objects.all()
+    year = datetime.now().year
+
+    # Debug print to check current year
+    print(f"Current Year: {year}")
+
+    # Fetch the last student number starting with the current year
+    last_student = Students.objects.filter(student_number__startswith=f"{year}-").order_by('-student_number').first()
+
+    if last_student:
+        # Debug print to check the last student number fetched
+        print(f"Last Student Number: {last_student.student_number}")
+        
+        # Extract the last four digits after the dash, convert to an integer, and increment by 1
+        last_number = int(last_student.student_number.split('-')[1])
+        new_number = f"{year}-{str(last_number + 1).zfill(4)}"
+    else:
+        # Start with 0001 if no student exists for the current year
+        new_number = f"{year}-0001"
+
+    # Debug print to check the new student number
+    print(f"New Student Number: {new_number}")
+
     context = {
         "gradelevels": gradelevels,
-        "sessions": sessions
+        "sessions": sessions,
+        "student_number": new_number
     }
     return render(request, 'hod_template/add_student2_template.html', context)
 
@@ -446,6 +470,11 @@ def add_student_save(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         username = request.POST.get('username')
+        middlename = request.POST.get('middle_name')
+
+        suffix = request.POST.get("suffix")
+        nickname = request.POST.get("nickname")
+
         email = request.POST.get('email')
         password = request.POST.get('password')
         address = request.POST.get('address')
@@ -462,8 +491,6 @@ def add_student_save(request):
         mobile_phone_nos = request.POST.get('mobile_phone_nos')
         is_covid_vaccinated = request.POST.get('is_covid_vaccinated')
         date_of_vaccination = request.POST.get('date_of_vaccination')
-
-
 
         # Handle file upload for profile picture
         profile_pic_url = None
@@ -487,6 +514,9 @@ def add_student_save(request):
         user.students.session_year_id = session_year_obj
 
         # Additional Student Details
+        user.students.middle_name = middlename
+        user.students.suffix = suffix
+        user.students.nickname = nickname
         user.students.gender = gender
         user.students.profile_pic = profile_pic_url
         user.students.age = age
@@ -515,22 +545,23 @@ def add_student_save(request):
         # Save Previous School Information
         PreviousSchool.objects.create(
             students_id=user.students,
-            school_name=request.POST.get('school_name'),
-            school_address=request.POST.get('school_address'),
-            grade_level=request.POST.get('grade_level'),
-            school_year_attended=request.POST.get('school_year_attended'),
-            teacher_name=request.POST.get('teacher_name')
+            previous_school_name=request.POST.get('previous_school_name'),
+            previous_school_address=request.POST.get('previous_school_address'),
+            previous_grade_level=request.POST.get('previous_grade_level'),
+            previous_school_year_attended=request.POST.get('previous_school_year_attended'),
+            previous_teacher_name=request.POST.get('previous_teacher_name')
         )
 
         # Save Emergency Contact Information
         EmergencyContact.objects.create(
             students_id=user.students,
-            name=request.POST.get('contact_name'),
-            relation=request.POST.get('contact_relation'),
-            address=request.POST.get('contact_address'),
-            telephone_nos=request.POST.get('contact_telephone'),
-            enrolling_teacher=request.POST.get('contact_referred_by'),
-            referred_by=request.POST.get('referred_by')
+            emergency_contact_name=request.POST.get('emergency_contact_name'),
+            emergency_contact_relationship=request.POST.get('emergency_contact_relationship'),
+            emergency_contact_address=request.POST.get('emergency_contact_address'),
+            emergency_contact_phone=request.POST.get('emergency_contact_phone'),
+            emergency_enrolling_teacher=request.POST.get('emergency_enrolling_teacher'),
+            emergency_date=request.POST.get('emergency_date'),
+            emergency_referred_by=request.POST.get('emergency_referred_by')
         )
 
         messages.success(request, "Student Added Successfully!")

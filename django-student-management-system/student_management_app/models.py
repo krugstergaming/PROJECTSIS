@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.utils import timezone
 
 
 class SessionYearModel(models.Model):
@@ -138,9 +138,6 @@ class Students(models.Model):
     
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    grade_level = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
@@ -153,7 +150,21 @@ class Students(models.Model):
     is_covid_vaccinated = models.BooleanField(default=False)
     date_of_vaccination = models.DateField(blank=True, null=True)
     Enrollment_status = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def save(self, *args, **kwargs):
+        if not self.student_number:
+            current_year = timezone.now().year
+            last_student = Students.objects.filter(student_number__startswith=f"{current_year}-").order_by('student_number').last()
+            if last_student:
+                last_number = int(last_student.student_number.split('-')[1])
+                new_number = f"{current_year}-{last_number + 1:04d}"
+            else:
+                new_number = f"{current_year}-0001"
+            self.student_number = new_number
+        super().save(*args, **kwargs)
 
 
 class ParentGuardian(models.Model):
@@ -169,22 +180,22 @@ class ParentGuardian(models.Model):
 
 class PreviousSchool(models.Model):
     students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    school_name = models.CharField(max_length=100, blank=True, null=True)
-    school_address = models.CharField(max_length=255, blank=True, null=True)
-    grade_level = models.CharField(max_length=20, blank=True, null=True)
-    school_year_attended = models.CharField(max_length=20, blank=True, null=True)
-    teacher_name = models.CharField(max_length=100, blank=True, null=True)
+    previous_school_name = models.CharField(max_length=100, blank=True, null=True)
+    previous_school_address = models.CharField(max_length=255, blank=True, null=True)
+    previous_grade_level = models.CharField(max_length=20, blank=True, null=True)
+    previous_school_year_attended = models.CharField(max_length=255, blank=True, null=True)
+    previous_teacher_name = models.CharField(max_length=100, blank=True, null=True)
     objects = models.Manager()
 
 class EmergencyContact(models.Model):
     students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    relation = models.CharField(max_length=50, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    telephone_nos = models.CharField(max_length=20, blank=True, null=True)
-    enrolling_teacher = models.CharField(max_length=100, blank=True, null=True)
-    referred_by = models.CharField(max_length=100, blank=True, null=True)
-    date = models.DateField(auto_now_add=True)
+    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True)
+    emergency_contact_address = models.CharField(max_length=255, blank=True, null=True)
+    emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
+    emergency_enrolling_teacher = models.CharField(max_length=100, blank=True, null=True)
+    emergency_referred_by = models.CharField(max_length=100, blank=True, null=True)
+    emergency_date = models.DateField(blank=True, null=True)
     objects = models.Manager()
 
 class Schedule(models.Model):
