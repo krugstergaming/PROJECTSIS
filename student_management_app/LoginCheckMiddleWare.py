@@ -1,16 +1,25 @@
 from django.utils.deprecation import MiddlewareMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
-
 
 class LoginCheckMiddleWare(MiddlewareMixin):
     
     def process_view(self, request, view_func, view_args, view_kwargs):
         modulename = view_func.__module__
-        # print(modulename)
         user = request.user
 
-        #Check whether the user is logged in or not
+        # List of allowed paths without login
+        allowed_paths = [
+            reverse("password_reset"),
+            reverse("password_reset_done"),
+            reverse("password_reset_complete"),
+        ]
+
+        # Allow dynamic reset confirm URL
+        if 'reset' in request.path and 'password_reset_confirm' in request.resolver_match.url_name:
+            allowed_paths.append(request.path)
+
+        # Check whether the user is logged in or not
         if user.is_authenticated:
             if user.user_type == "1":
                 if modulename == "student_management_app.HodViews":
@@ -40,7 +49,10 @@ class LoginCheckMiddleWare(MiddlewareMixin):
                 return redirect("login")
 
         else:
-            if request.path == reverse("login") or request.path == reverse("doLogin"):
+            # Allow password reset views without login
+            if request.path in allowed_paths or 'reset' in request.path:
+                pass
+            elif request.path == reverse("login") or request.path == reverse("doLogin"):
                 pass
             else:
                 return redirect("login")

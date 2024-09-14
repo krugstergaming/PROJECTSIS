@@ -72,6 +72,7 @@ WSGI_APPLICATION = 'student_management_system.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+<<<<<<< Updated upstream
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'studentsis',
@@ -80,6 +81,9 @@ DATABASES = {
         'HOST': 'localhost',  # or the IP address of your PostgreSQL server
         'PORT': '5432',        # default port for PostgreSQL
     }
+=======
+    'default': dj_database_url.parse(config("DATABASE_URL"))
+>>>>>>> Stashed changes
 }
 
 # Password validation
@@ -125,10 +129,17 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+<<<<<<< Updated upstream
 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT ='/media/'
+=======
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = 'media/'
+
+>>>>>>> Stashed changes
 
 #For Custom USER
 AUTH_USER_MODEL = "student_management_app.CustomUser"
@@ -136,6 +147,18 @@ AUTH_USER_MODEL = "student_management_app.CustomUser"
 # Registering Custom Backend "EmailBackEnd"
 AUTHENTICATION_BACKENDS = ['student_management_app.EmailBackEnd.EmailBackEnd']
 
+<<<<<<< Updated upstream
+=======
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'francoluisrosel@gmail.com'
+EMAIL_HOST_PASSWORD = 'emjv vlko xivs gfph'
+
+>>>>>>> Stashed changes
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),

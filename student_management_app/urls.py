@@ -2,7 +2,13 @@
 from django.urls import path, include
 from . import views
 from .import HodViews, StaffViews, StudentViews
+<<<<<<< Updated upstream
 
+=======
+from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
+>>>>>>> Stashed changes
 
 urlpatterns = [
     path('', views.loginPage, name="login"),
@@ -119,4 +125,15 @@ urlpatterns = [
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
     path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
+<<<<<<< Updated upstream
 ]
+=======
+
+    # Password reset    
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name="password_reset"),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
+
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+>>>>>>> Stashed changes

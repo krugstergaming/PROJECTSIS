@@ -9,12 +9,21 @@
 {% load static %}
 
 <section class="content">
+<<<<<<< Updated upstream
         <div class="container-fluid">
 
             <div class="row">
                 <div class="col-md-12">
                     <!-- general form elements -->
                     <div class="card card-primary">
+=======
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+>>>>>>> Stashed changes
                     <div class="card-header">
                         <h3 class="card-title">Add Subject</h3>
                     </div>
@@ -23,6 +32,7 @@
                     <form role="form" method="POST" action="{% url 'add_subject_save' %}">
                         {% csrf_token %}
 
+<<<<<<< Updated upstream
                         
                                 {% comment %} Display Messages {% endcomment %}
                                 {% if messages %}
@@ -61,10 +71,55 @@
                                 <select class="form-control" name="course">
                                     {% for course in courses %}
                                         <option value="{{ course.id }}">{{ course.course_name }}</option>
+=======
+                        <!-- Display Messages -->
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="curriculum">Curriculums</label>
+                                <select class="form-control" name="curriculum_id" id="curriculum_id">
+                                    <option value="">Select a Curriculum</option>
+                                    {% for curriculum in curriculums %}
+                                        <option value="{{ curriculum.id }}">{{ curriculum.curriculum_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="gradelevel">Grade level</label>
+                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id">
+                                    <option value="">Select a Grade level</option>
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}" data-curriculum-id="{{ gradelevel.curriculum_id.id }}">{{ gradelevel.GradeLevel_name }}</option>
+>>>>>>> Stashed changes
                                     {% endfor %}
                                 </select>
                             </div>
 
+<<<<<<< Updated upstream
                             <div class="form-group">
                                 <label>Staff </label>
                                 <select class="form-control" name="staff">
@@ -74,10 +129,70 @@
                                 </select>
                             </div>
 
+=======
+                            <!-- Always Visible Input Fields -->
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" class="form-control" name="subject_one" placeholder="Enter Subject 1">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" class="form-control" name="subject_two" placeholder="Enter Subject 2">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" class="form-control" name="subject_three" placeholder="Enter Subject 3">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" class="form-control" name="subject_four" placeholder="Enter Subject 4">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Subject Name</label>
+                                <input type="text" class="form-control" name="subject_five" placeholder="Enter Subject 5">
+                            </div>
+
+                            <!-- Hidden Fields for Additional Subjects -->
+                            <div id="additional-subjects">
+                                <div class="form-group" style="display: none;">
+                                    <label>Subject Name</label>
+                                    <input type="text" class="form-control" name="subject_six" placeholder="Enter Subject 6">
+                                </div>
+
+                                <div class="form-group" style="display: none;">
+                                    <label>Subject Name</label>
+                                    <input type="text" class="form-control" name="subject_seven" placeholder="Enter Subject 7">
+                                </div>
+
+                                <div class="form-group" style="display: none;">
+                                    <label>Subject Name</label>
+                                    <input type="text" class="form-control" name="subject_eight" placeholder="Enter Subject 8">
+                                </div>
+
+                                <div class="form-group" style="display: none;">
+                                    <label>Subject Name</label>
+                                    <input type="text" class="form-control" name="subject_nine" placeholder="Enter Subject 9">
+                                </div>
+
+                                <div class="form-group" style="display: none;">
+                                    <label>Subject Name</label>
+                                    <input type="text" class="form-control" name="subject_ten" placeholder="Enter Subject 10">
+                                </div>
+                            </div>
+
+                            <!-- Button to Add More Subjects -->
+                            <button type="button" id="add-subject" class="btn btn-secondary">Add Another Subject</button>
+
+>>>>>>> Stashed changes
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
+<<<<<<< Updated upstream
                         <button type="submit" class="btn btn-primary">Add Subject</button>
                         </div>
                     </form>
@@ -91,3 +206,62 @@
       </section>
 
   {% endblock main_content %}
+=======
+                            <button type="submit" class="btn btn-primary">Add Subject</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- JavaScript to Show Hidden Subject Fields One by One -->
+<script>
+    document.getElementById('add-subject').addEventListener('click', function() {
+        var additionalSubjects = document.getElementById('additional-subjects').querySelectorAll('.form-group');
+        for (var i = 0; i < additionalSubjects.length; i++) {
+            if (additionalSubjects[i].style.display === 'none') {
+                additionalSubjects[i].style.display = 'block';
+                break; // Stop after showing one field
+            }
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var curriculumSelect = document.getElementById('curriculum_id');
+        var gradeLevelSelect = document.getElementById('GradeLevel_id');
+
+        function filterGradeLevels() {
+            var selectedCurriculumId = curriculumSelect.value;
+            var gradeLevelOptions = gradeLevelSelect.querySelectorAll('option');
+
+            gradeLevelOptions.forEach(function(option) {
+                var optionCurriculumId = option.getAttribute('data-curriculum-id');
+                if (selectedCurriculumId === "" || optionCurriculumId === selectedCurriculumId) {
+                    option.style.display = 'block'; // Show option
+                } else {
+                    option.style.display = 'none'; // Hide option
+                }
+            });
+
+            // Optionally, clear selection if no options are available
+            if (gradeLevelSelect.querySelector('option:visible') === null) {
+                gradeLevelSelect.value = "";
+            }
+        }
+
+        // Attach event listener to curriculum select
+        curriculumSelect.addEventListener('change', filterGradeLevels);
+
+        // Trigger initial filtering in case a curriculum is pre-selected
+        filterGradeLevels();
+    });
+</script>
+
+{% endblock main_content %}
+>>>>>>> Stashed changes

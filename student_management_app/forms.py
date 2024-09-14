@@ -1,6 +1,11 @@
 from django import forms 
 from django.forms import Form
+<<<<<<< Updated upstream
 from student_management_app.models import Courses, SessionYearModel, Subjects, Staffs
+=======
+from student_management_app.models import GradeLevel, SessionYearModel, Subjects, Staffs
+from django.core.exceptions import ValidationError
+>>>>>>> Stashed changes
 
 
 class DateInput(forms.DateInput):
@@ -13,21 +18,24 @@ class AddStudentForm(forms.Form):
     first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     last_name = forms.CharField(label="Last Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     username = forms.CharField(label="Username", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
+
     gender_list = (
-        ('Male','Male'),
-        ('Female','Female')
+        ('Male', 'Male'),
+        ('Female', 'Female'),
     )
     gender = forms.ChoiceField(label="Gender", choices=gender_list, widget=forms.Select(attrs={"class":"form-control"}))
-    
     address = forms.CharField(label="Address", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
     age = forms.IntegerField(label="Age", widget=forms.NumberInput(attrs={"class": "form-control"}))
-    date_of_birth = forms.DateField(label="Date of Birth", widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}))
+    
+    # Ensure the date fields are properly handled
+    date_of_birth = forms.DateField(label="Date of Birth", widget=forms.DateInput(attrs={"class": "form-control", "type": "date",  "placeholder": "yyyy-mm-dd"}))
     place_of_birth = forms.CharField(label="Place of Birth", max_length=100, widget=forms.TextInput(attrs={"class": "form-control"}))
     nationality = forms.CharField(label="Nationality", max_length=50, widget=forms.TextInput(attrs={"class": "form-control"}))
     religion = forms.CharField(label="Religion", max_length=50, widget=forms.TextInput(attrs={"class": "form-control"}))
     rank_in_family = forms.IntegerField(label="Rank in the Family", required=False, widget=forms.NumberInput(attrs={"class": "form-control"}))
     telephone_nos = forms.CharField(label="Telephone Nos", max_length=20, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
     mobile_phone_nos = forms.CharField(label="Mobile Phone Nos", max_length=20, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+<<<<<<< Updated upstream
     is_covid_vaccinated = forms.ChoiceField(label="Is COVID Vaccinated?", choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={"class": "form-control"}))
     date_of_vaccination = forms.DateField(label="Date of Vaccination", required=False, widget=forms.DateInput(attrs={"class": "form-control", "type": "date"}))
 
@@ -38,15 +46,13 @@ class AddStudentForm(forms.Form):
     except Exception as e:
         print("Error fetching courses:", e)
         course_list = []
+=======
+>>>>>>> Stashed changes
     
-    #For Displaying Session Years
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in session_years]
-    except Exception as e:
-        print("Error fetching session years:", e)
-        session_year_list = []
+    is_covid_vaccinated = forms.ChoiceField(label="Is COVID Vaccinated?", choices=[(True, 'Yes'), (False, 'No')], widget=forms.Select(attrs={"class": "form-control"}))
+    date_of_vaccination = forms.DateField(label="Date of Vaccination", required=False, widget=forms.DateInput(attrs={"class": "form-control", "type": "date",  "placeholder": "yyyy-mm-dd"}))
 
+<<<<<<< Updated upstream
     course_id = forms.ChoiceField(label="Course", choices=course_list, widget=forms.Select(attrs={"class":"form-control"}), error_messages={'required': 'Please select a valid course.'})
     session_year_id = forms.ChoiceField(label="Session Year", choices=session_year_list, widget=forms.Select(attrs={"class":"form-control"}))
 
@@ -56,11 +62,32 @@ class AddStudentForm(forms.Form):
         # Add a placeholder choice at the beginning
         self.fields['course_id'].choices = [('', 'Select a Course')] + [(course.id, course.course_name) for course in Courses.objects.all()]
         self.fields['session_year_id'].choices = [('', 'Select a Session Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
+=======
+    GradeLevel_id = forms.ChoiceField(label="GradeLevel", choices=[], widget=forms.Select(attrs={"class":"form-control"}), error_messages={'required': 'Please select a valid gradelevel.'})
+    session_year_id = forms.ChoiceField(label="School Year", choices=[], widget=forms.Select(attrs={"class":"form-control"}))
 
-    
-    # session_start_year = forms.DateField(label="Session Start", widget=DateInput(attrs={"class":"form-control"}))
-    # session_end_year = forms.DateField(label="Session End", widget=DateInput(attrs={"class":"form-control"}))
     profile_pic = forms.FileField(label="Profile Pic", required=False, widget=forms.FileInput(attrs={"class":"form-control"}))
+
+    def __init__(self, *args, **kwargs):
+        super(AddStudentForm, self).__init__(*args, **kwargs)
+>>>>>>> Stashed changes
+
+        # Populating choices dynamically
+        self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gl.id, gl.GradeLevel_name) for gl in GradeLevel.objects.all()]
+        self.fields['session_year_id'].choices = [('', 'Select a School Year')] + [(sy.id, f"{sy.session_start_year} to {sy.session_end_year}") for sy in SessionYearModel.objects.all()]
+
+    # Custom clean methods to handle empty dates properly
+    def clean_date_of_vaccination(self):
+        date_of_vaccination = self.cleaned_data.get('date_of_vaccination')
+        if not date_of_vaccination:  # If it's empty, return None or skip validation
+            return None
+        return date_of_vaccination
+
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if not date_of_birth:
+            raise ValidationError("Date of Birth is required and must be in the format YYYY-MM-DD.")
+        return date_of_birth
 
 
 class ParentGuardianForm(forms.Form):

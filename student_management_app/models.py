@@ -81,7 +81,13 @@ class Subjects(models.Model):
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+<<<<<<< Updated upstream
     student_number = models.CharField(max_length=8, unique=True, editable=False, blank=True, null=True)
+=======
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    suffix = models.CharField(max_length=20, blank=True, null=True)
+    student_number = models.CharField(max_length=9, unique=True, editable=False, blank=True, null=True)
+>>>>>>> Stashed changes
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
     profile_pic = models.FileField(upload_to='media')
     address = models.TextField()

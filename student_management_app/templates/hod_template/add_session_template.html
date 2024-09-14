@@ -1,7 +1,11 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
+<<<<<<< Updated upstream
     Add Session Year
+=======
+    Add School Year
+>>>>>>> Stashed changes
 {% endblock page_title %}
 
 {% block main_content %}
@@ -9,6 +13,7 @@
 {% load static %}
 
 <section class="content">
+<<<<<<< Updated upstream
         <div class="container-fluid">
 
             <div class="row">
@@ -17,12 +22,23 @@
                     <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Add Session Year</h3>
+=======
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add School Year</h3>
+>>>>>>> Stashed changes
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
                     <form role="form" method="POST" action="{% url 'add_session_save' %}">
                         {% csrf_token %}
 
+<<<<<<< Updated upstream
                         
                                 {% comment %} Display Messages {% endcomment %}
                                 {% if messages %}
@@ -66,10 +82,52 @@
                                 <input type="text" class="form-control" name="session_limit">
                             </div>
 
+=======
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% elif message.tags == "success" %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Start Year </label>
+                                <input type="date" class="form-control" name="session_start_year" id="session_start_year">
+                            </div>
+
+                            <div class="form-group">
+                                <label>End Year </label>
+                                <input type="date" class="form-control" name="session_end_year" id="session_end_year">
+                            </div>
+
+                            <div class="form-group">
+                                <label>School Year Limit </label>
+                                <input type="text" class="form-control" name="session_limit" id="session_limit" readonly>
+                            </div>
+>>>>>>> Stashed changes
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
+<<<<<<< Updated upstream
                         <button type="submit" class="btn btn-primary">Add Session Year</button>
                         </div>
                     </form>
@@ -83,3 +141,42 @@
       </section>
 
   {% endblock main_content %}
+=======
+                            <button type="submit" class="btn btn-primary">Add Session Year</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+<script>
+    // Function to calculate the difference between two dates in days
+    function calculateSessionLimit() {
+        const startYear = new Date(document.getElementById("session_start_year").value);
+        const endYear = new Date(document.getElementById("session_end_year").value);
+
+        // Check if both dates are valid
+        if (startYear && endYear && !isNaN(startYear) && !isNaN(endYear)) {
+            const timeDiff = endYear - startYear;  // Difference in milliseconds
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+
+            if (daysDiff >= 0) {
+                document.getElementById("session_limit").value = daysDiff;
+            } else {
+                document.getElementById("session_limit").value = "";
+            }
+        }
+    }
+
+    // Add event listeners to automatically calculate the limit when dates change
+    document.getElementById("session_start_year").addEventListener("change", calculateSessionLimit);
+    document.getElementById("session_end_year").addEventListener("change", calculateSessionLimit);
+</script>
+
+{% endblock main_content %}
+>>>>>>> Stashed changes
