@@ -34,7 +34,7 @@ class Staffs(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
     
     middle_name = models.CharField(max_length=255, blank=True, null=True)
-    dob = models.DateField()  # Assuming Date of Birth is a date
+    dob = models.DateField(blank=True, null=True)  # Assuming Date of Birth is a date
     age = models.CharField(max_length=15, blank=True, null=True)
     pob = models.CharField(max_length=255)
     sex = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
@@ -57,7 +57,6 @@ class Staffs(models.Model):
 
     telephone_no = models.CharField(max_length=20, blank=True, null=True)
     cellphone_no = models.CharField(max_length=20, blank=True, null=True)
-    email_address = models.EmailField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -67,10 +66,18 @@ class Staffs(models.Model):
     # def __str__(self):
 	#     return self.GradeLevel_name
 
+class FacultyLoad(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    Load_Limit = models.CharField(max_length=255, blank=True, null=True)
+    objects = models.Manager()
+
+
 
 class Curriculums(models.Model):
     id = models.AutoField(primary_key=True)
     curriculum_name = models.CharField(max_length=255)
+    curriculum_status = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -79,27 +86,6 @@ class GradeLevel(models.Model):
     id = models.AutoField(primary_key=True)
     GradeLevel_name = models.CharField(max_length=255)
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE, default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-class Subjects(models.Model):
-    id = models.AutoField(primary_key=True)
-    subject_one = models.CharField(max_length=255, blank=True, null=True)
-    subject_two = models.CharField(max_length=255, blank=True, null=True)
-    subject_three = models.CharField(max_length=255, blank=True, null=True)
-    subject_four = models.CharField(max_length=255, blank=True, null=True)
-    subject_five = models.CharField(max_length=255, blank=True, null=True)
-    subject_six = models.CharField(max_length=255, blank=True, null=True)
-    subject_seven = models.CharField(max_length=255, blank=True, null=True)
-    subject_eight = models.CharField(max_length=255, blank=True, null=True)
-    subject_nine = models.CharField(max_length=255, blank=True, null=True)
-    subject_ten = models.CharField(max_length=255, blank=True, null=True)
-
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-
-    curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -113,17 +99,51 @@ class Section(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Subjects(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    
+    subject_name = models.CharField(max_length=255, blank=True, null=True)
+    subject_description = models.CharField(max_length=255, blank=True, null=True)
+    subject_code = models.CharField(max_length=255, blank=True, null=True)
+    subject_hours = models.CharField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Load(models.Model):
     id = models.AutoField(primary_key=True)
+
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     section_id = models.ForeignKey(Section, on_delete=models.CASCADE)
+
+    load_status = models.CharField(max_length=10)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Schedule(models.Model):
+    id = models.AutoField(primary_key=True)
+    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
+    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    load_id = models.ForeignKey(Load, on_delete=models.CASCADE)  
+    day_of_week = models.CharField(max_length=10)                       # The day of the week (e.g., "Monday")
+    start_time = models.TimeField()                                     # The start time of the class
+    end_time = models.TimeField()                                       # The end time of the class
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+    def __str__(self):
+        return f"{self.load_id.subject_id.subject_name} - {self.load_id.GradeLevel_id.GradeLevel_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
+    
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -198,21 +218,6 @@ class EmergencyContact(models.Model):
     emergency_date = models.DateField(blank=True, null=True)
     objects = models.Manager()
 
-class Schedule(models.Model):
-    id = models.AutoField(primary_key=True)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)  # The subject being scheduled
-    staff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)      # The staff assigned to the subject
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)    # The gradelevel the subject belongs to
-    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)  # The session year
-    day_of_week = models.CharField(max_length=10)                       # The day of the week (e.g., "Monday")
-    start_time = models.TimeField()                                     # The start time of the class
-    end_time = models.TimeField()                                       # The end time of the class
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-    def __str__(self):
-        return f"{self.subject_id.subject_name} - {self.GradeLevel_id.GradeLevel_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
 
 
 class Attendance(models.Model):

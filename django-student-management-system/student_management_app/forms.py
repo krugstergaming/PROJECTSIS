@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import Form
-from student_management_app.models import GradeLevel, SessionYearModel, Subjects, Staffs
+from student_management_app.models import GradeLevel, SessionYearModel, Subjects, Staffs, Curriculums, Section
 
 
 class DateInput(forms.DateInput):
@@ -63,31 +63,6 @@ class AddStudentForm(forms.Form):
     profile_pic = forms.FileField(label="Profile Pic", required=False, widget=forms.FileInput(attrs={"class":"form-control"}))
 
 
-class ParentGuardianForm(forms.Form):
-    father_name = forms.CharField(label="Father's Name", max_length=100, widget=forms.TextInput(attrs={"class": "form-control"}))
-    father_occupation = forms.CharField(label="Father's Occupation", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-    mother_name = forms.CharField(label="Mother's Name", max_length=100, widget=forms.TextInput(attrs={"class": "form-control"}))
-    mother_occupation = forms.CharField(label="Mother's Occupation", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-    guardian_name = forms.CharField(label="Guardian's Name", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-    guardian_occupation = forms.CharField(label="Guardian's Occupation", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-
-
-class PreviousSchoolForm(forms.Form):
-    school_name = forms.CharField(label="School Name", max_length=100, widget=forms.TextInput(attrs={"class": "form-control"}))
-    school_address = forms.CharField(label="School Address", max_length=255, widget=forms.TextInput(attrs={"class": "form-control"}))
-    grade_level = forms.CharField(label="Grade/Level", max_length=20, widget=forms.TextInput(attrs={"class": "form-control"}))
-    sy_attended = forms.CharField(label="School Year Attended", max_length=20, widget=forms.TextInput(attrs={"class": "form-control"}))
-    teacher_name = forms.CharField(label="Teacher's Name", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-
-
-class EmergencyContactForm(forms.Form):
-    contact_name = forms.CharField(label="Name", max_length=100, widget=forms.TextInput(attrs={"class": "form-control"}))
-    contact_relation = forms.CharField(label="Relation", max_length=50, widget=forms.TextInput(attrs={"class": "form-control"}))
-    contact_address = forms.CharField(label="Address", max_length=255, widget=forms.TextInput(attrs={"class": "form-control"}))
-    contact_telephone = forms.CharField(label="Telephone Nos", max_length=20, widget=forms.TextInput(attrs={"class": "form-control"}))
-    contact_referred_by = forms.CharField(label="Referred By", max_length=100, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-
-
 class EditStudentForm(forms.Form):
     email = forms.EmailField(label="Email", max_length=50, widget=forms.EmailInput(attrs={"class":"form-control"}))
     first_name = forms.CharField(label="First Name", max_length=50, widget=forms.TextInput(attrs={"class":"form-control"}))
@@ -145,6 +120,20 @@ class EditStudentForm(forms.Form):
 
 class AddScheduleForm(forms.Form):
     # Select the GradeLevel
+
+    try:
+        curriculums = Curriculums.objects.all()
+        curriculums_list = [(curriculum.id, curriculum.curriculum_name) for curriculum in curriculums]
+    except Exception as e:
+        print("Error fetching Curriculums:", e)
+        curriculums_list = []
+
+    curriculum_id = forms.ChoiceField(
+        label="Curriculum", 
+        choices=curriculums_list, 
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+
     try:
         gradelevels = GradeLevel.objects.all()
         course_list = [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in gradelevels]

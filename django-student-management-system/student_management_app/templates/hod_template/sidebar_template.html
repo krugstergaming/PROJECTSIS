@@ -91,6 +91,16 @@
             </li>
 
             <li class="nav-item">
+              {% url 'add_load' as add_load %}
+              <a href="{{ add_load }}" class="nav-link {% if request.path == add_load %} active {% endif %}">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                  Add Load
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
               {% url 'add_schedule' as add_schedule %}
               <a href="{{ add_schedule }}" class="nav-link {% if request.path == add_schedule %} active {% endif %}">
                 <i class="nav-icon fas fa-th"></i>
@@ -157,6 +167,7 @@
                           <p>Add Curriculum</p>
                       </a>
                   </li>
+                  
                   <li class="nav-item">
                       {% url 'add_gradelevel' as add_gradelevel %}
                       <a href="{{ add_gradelevel }}" class="nav-link {% if request.path == add_gradelevel %} active {% endif %}">
@@ -164,6 +175,15 @@
                           <p>Add Grade Level</p>
                       </a>
                   </li>
+
+                  <li class="nav-item">
+                    {% url 'add_section' as add_section %}
+                    <a href="{{ add_section }}" class="nav-link {% if request.path == add_section %} active {% endif %}">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>Add Section</p>
+                    </a>
+                  </li>
+
                   <li class="nav-item">
                       {% url 'add_subject' as add_subject %}
                       <a href="{{ add_subject }}" class="nav-link {% if request.path == add_subject %} active {% endif %}">
@@ -171,13 +191,7 @@
                           <p>Add Subject</p>
                       </a>
                   </li>
-                  <li class="nav-item">
-                      {% url 'add_section' as add_section %}
-                      <a href="{{ add_section }}" class="nav-link {% if request.path == add_section %} active {% endif %}">
-                          <i class="nav-icon fas fa-th"></i>
-                          <p>Add Section</p>
-                      </a>
-                  </li>
+                  
               </ul>
           </li>
 

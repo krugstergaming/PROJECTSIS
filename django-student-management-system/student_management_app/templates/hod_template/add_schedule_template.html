@@ -9,36 +9,149 @@
 {% load static %}
 
 <section class="content">
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Add Schedule</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    {% url 'add_schedule_save' as action_path %}
-                    {% include 'hod_template/form_template.html' with messages=messages form=form action_path=action_path button_text="Add Schedule" %}
 
-                    </div>
-                    <!-- /.card -->
+                    <form role="form" method="POST" action="{% url 'add_schedule_save' %}">
+                        {% csrf_token %}
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label>School Year</label>
+                                <select class="form-control" name="session_year_id">
+                                    {% for session_year in session_years %}
+                                        <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Faculty</label>
+                                <select class="form-control" id="staff_id" name="staff_id">
+                                    <option value="">Select a Faculty</option>
+                                    {% for staff in staffs %}
+                                        <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Load</label>
+                                <select class="form-control" id="load_id" name="load_id">
+                                    <option value="">Select a Load</option>
+                                    {% for load in loads %}
+                                        <option value="{{ load.id }}" data-staff-id="{{ load.staff_id.id }}">
+                                            {{ load.GradeLevel_id.GradeLevel_name }} - {{ load.section_id.section_name }} - {{ load.subject_id.subject_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Day of the Week</label>
+                                <select class="form-control" name="day_of_week">
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Start Time</label>
+                                <input type="time" class="form-control" name="start_time" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>End Time</label>
+                                <input type="time" class="form-control" name="end_time" required>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Schedule</button>
+                        </div>
+                    </form>
 
                 </div>
+                <!-- /.card -->
             </div>
+        </div>
 
-        </div><!-- /.container-fluid -->
-      </section>
+    </div><!-- /.container-fluid -->
+</section>
 
-  {% endblock main_content %}
+{% endblock main_content %}
 
-  {% block custom_js %}
-    {% comment %} Checking if email and username already exists or not usin Ajax {% endcomment %}
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var staffSelect = document.getElementById('staff_id');
+        var loadSelect = document.getElementById('load_id');
 
-    <script>
-        
-    </script>
+        function filterLoads() {
+            var selectedStaffId = staffSelect.value;
+            var loadOptions = loadSelect.querySelectorAll('option');
 
-  {% endblock custom_js %}
+            // Filter Load options based on the selected staff
+            loadOptions.forEach(function(option) {
+                var optionStaffId = option.getAttribute('data-staff-id');
+                if (optionStaffId === selectedStaffId || selectedStaffId === "") {
+                    option.style.display = 'block'; // Show matching options
+                } else {
+                    option.style.display = 'none'; // Hide non-matching options
+                }
+            });
+
+            // Optionally, clear the selection if no options are available
+            if (loadSelect.querySelector('option:visible') === null) {
+                loadSelect.value = "";
+            }
+        }
+
+        // Attach event listener to staff select
+        staffSelect.addEventListener('change', filterLoads);
+
+        // Trigger initial filtering in case a staff is pre-selected
+        filterLoads();
+    });
+</script>
+{% endblock custom_js %}

@@ -8,16 +8,16 @@ from django.core import serializers
 import json
 from django.shortcuts import get_object_or_404
 
-from student_management_app.models import CustomUser, Staffs, GradeLevel, Subjects, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
+from student_management_app.models import CustomUser, Staffs, GradeLevel, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
 
 
 
 def staff_home(request):
     # Fetching All Students under Staff
 
-    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    loads = Load.objects.filter(staff_id=request.user.id)
     GradeLevel_id_list = []
-    for subject in subjects:
+    for subject in loads:
         gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
         GradeLevel_id_list.append(gradelevel.id)
     
@@ -28,10 +28,10 @@ def staff_home(request):
             final_course.append(GradeLevel_id)
     
     students_count = Students.objects.filter(GradeLevel_id__in=final_course).count()
-    subject_count = subjects.count()
+    load_count = loads.count() 
 
     # Fetch All Attendance Count
-    attendance_count = Attendance.objects.filter(subject_id__in=subjects).count()
+    attendance_count = Attendance.objects.filter(subject_id__in=loads).count()
     # Fetch All Approve Leave
     staff = Staffs.objects.get(admin=request.user.id)
     leave_count = LeaveReportStaff.objects.filter(staff_id=staff.id, leave_status=1).count()
@@ -39,7 +39,7 @@ def staff_home(request):
     #Fetch Attendance Data by Subjects
     subject_list = []
     attendance_list = []
-    for subject in subjects:
+    for subject in loads:
         attendance_count1 = Attendance.objects.filter(subject_id=subject.id).count()
         subject_list.append(subject.subject_name)
         attendance_list.append(attendance_count1)
@@ -59,7 +59,7 @@ def staff_home(request):
         "students_count": students_count,
         "attendance_count": attendance_count,
         "leave_count": leave_count,
-        "subject_count": subject_count,
+        "load_count": load_count,
         "subject_list": subject_list,
         "attendance_list": attendance_list,
         "student_list": student_list,

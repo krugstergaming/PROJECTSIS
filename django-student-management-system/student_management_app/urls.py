@@ -52,13 +52,18 @@ urlpatterns = [
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
 
+    path('add_load/', HodViews.add_load, name="add_load"),
+    path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
+    # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
+    # path('edit_load_save/', HodViews.edit_load_save, name="edit_load_save"),
+    # path('manage_load/', HodViews.manage_load, name="manage_load"),
+
+
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
     path('edit_schedule_save/', HodViews.edit_schedule_save, name="edit_schedule_save"),
     path('manage_schedule/', HodViews.manage_schedule, name="manage_schedule"),
-
-
 
 
     path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),

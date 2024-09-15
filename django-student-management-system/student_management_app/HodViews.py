@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
 
-from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -36,7 +36,7 @@ def admin_home(request):
     for subject in subject_all:
         gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
         student_count = Students.objects.filter(GradeLevel_id=gradelevel.id).count()
-        subject_list.append(subject.subject_one)
+        subject_list.append(subject.subject_name)
         student_count_list_in_subject.append(student_count)
     
     # For Saffs
@@ -96,11 +96,13 @@ def add_staff_save(request):
         messages.error(request, "Invalid Method ")
         return redirect('add_staff')
     else:
+
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+
         middle_name = request.POST.get('middle_name')
         dob = request.POST.get('dob')
         age = request.POST.get('age')
@@ -110,17 +112,16 @@ def add_staff_save(request):
         height = request.POST.get('height')
         weight = request.POST.get('weight')
         blood_type = request.POST.get('blood_type')
-        gsis_id = request.POST.get('gsis_id', 'N/A')
-        pagibig_id = request.POST.get('pagibig_id', 'N/A')
-        philhealth_id = request.POST.get('philhealth_id', 'N/A')
-        sss_id = request.POST.get('sss_id', 'N/A')
-        tin_id = request.POST.get('tin_id', 'N/A')
+        gsis_id = request.POST.get('gsis_id')
+        pagibig_id = request.POST.get('pagibig_id')
+        philhealth_id = request.POST.get('philhealth_id')
+        sss_id = request.POST.get('sss_id')
+        tin_id = request.POST.get('tin_id')
         citizenship = request.POST.get('citizenship')
         dual_country = request.POST.get('dual_country')
         permanent_address = request.POST.get('permanent_address')
         telephone_no = request.POST.get('telephone_no')
         cellphone_no = request.POST.get('cellphone_no')
-        email_address = request.POST.get('email_address')
 
         try:
             user = CustomUser.objects.create_user(username=username, 
@@ -129,7 +130,6 @@ def add_staff_save(request):
                                                   first_name=first_name, 
                                                   last_name=last_name, 
                                                   user_type=2)
-            
             user.staffs.middle_name = middle_name
             user.staffs.dob = dob
             user.staffs.age = age
@@ -149,12 +149,12 @@ def add_staff_save(request):
             user.staffs.permanent_address = permanent_address
             user.staffs.telephone_no = telephone_no
             user.staffs.cellphone_no = cellphone_no
-            user.staffs.email_address = email_address
             user.save()
+            
             messages.success(request, "Staff Added Successfully!")
             return redirect('add_staff')
-        except:
-            messages.error(request, "Failed to Add Staff!")
+        except Exception as e:
+            messages.error(request, f"Failed to Add Staff: {str(e)}")
             return redirect('add_staff')
 
 def toggle_grading_state(request):
@@ -217,7 +217,6 @@ def edit_staff_save(request):
         except:
             messages.error(request, "Failed to Update Staff.")
             return redirect('/edit_staff/'+staff_id)
-
 
 
 def delete_staff(request, staff_id):
@@ -712,31 +711,24 @@ def add_section_save(request):
             return redirect('add_section')
 
 def add_subject(request):
-    gradelevels = GradeLevel.objects.all()
     curriculums = Curriculums.objects.all()
+    gradelevels = GradeLevel.objects.all()
     context = {
-        "gradelevels": gradelevels,
-        "curriculums": curriculums
+        "curriculums": curriculums,
+        "gradelevels": gradelevels
+        
     }
     return render(request, 'hod_template/add_subject_template.html', context)
-
-
 
 def add_subject_save(request):
     if request.method != "POST":
         messages.error(request, "Method Not Allowed!")
         return redirect('add_subject')
     else:
-        subject_one = request.POST.get('subject_one')
-        subject_two = request.POST.get('subject_two')
-        subject_three = request.POST.get('subject_three')
-        subject_four = request.POST.get('subject_four')
-        subject_five = request.POST.get('subject_five')
-        subject_six = request.POST.get('subject_six')
-        subject_seven = request.POST.get('subject_seven')
-        subject_eight = request.POST.get('subject_eight')
-        subject_nine = request.POST.get('subject_nine')
-        subject_ten = request.POST.get('subject_ten')
+        subject_name = request.POST.get('subject_name')
+        subject_description = request.POST.get('subject_description')
+        subject_code = request.POST.get('subject_code')
+        subject_hours = request.POST.get('subject_hours')
 
         curriculum_id = request.POST.get('curriculum_id')
         curriculum_id = Curriculums.objects.get(id=curriculum_id)
@@ -745,16 +737,10 @@ def add_subject_save(request):
         GradeLevel_id = GradeLevel.objects.get(id=GradeLevel_id)
         
         try:
-            subject = Subjects(subject_one=subject_one,
-                               subject_two=subject_two,
-                               subject_three=subject_three,
-                               subject_four=subject_four,
-                               subject_five=subject_five,
-                               subject_six=subject_six,
-                               subject_seven=subject_seven,
-                               subject_eight=subject_eight,
-                               subject_nine=subject_nine,
-                               subject_ten=subject_ten, 
+            subject = Subjects(subject_name=subject_name,
+                               subject_description=subject_description,
+                               subject_code=subject_code,
+                               subject_hours=subject_hours,
                                GradeLevel_id=GradeLevel_id, 
                                curriculum_id = curriculum_id)
             subject.save()
@@ -764,14 +750,12 @@ def add_subject_save(request):
             messages.error(request, "Failed to Add Subject!")
             return redirect('add_subject')
 
-
 def manage_subject(request):
     subjects = Subjects.objects.all()
     context = {
         "subjects": subjects
     }
     return render(request, 'hod_template/manage_subject_template.html', context)
-
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
@@ -784,7 +768,6 @@ def edit_subject(request, subject_id):
         "id": subject_id
     }
     return render(request, 'hod_template/edit_subject_template.html', context)
-
 
 def edit_subject_save(request):
     if request.method != "POST":
@@ -816,8 +799,6 @@ def edit_subject_save(request):
             return HttpResponseRedirect(reverse("edit_subject", kwargs={"subject_id":subject_id}))
             # return redirect('/edit_subject/'+subject_id)
 
-
-
 def delete_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
     try:
@@ -829,12 +810,67 @@ def delete_subject(request, subject_id):
         return redirect('manage_subject')
 
 
+def add_load(request):
+    curriculums = Curriculums.objects.all()
+    gradelevels = GradeLevel.objects.all()
+    sections = Section.objects.all()
+    subjects = Subjects.objects.all()
+    staffs = CustomUser.objects.filter(user_type='2')
+    context = {
+        "curriculums": curriculums,
+        "gradelevels": gradelevels,
+        "sections": sections,
+        "subjects": subjects,
+        "staffs": staffs,
+    }
+    return render(request, 'hod_template/add_load_template.html', context)
 
+def add_load_save(request):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('add_load')
+    else:
+        try:
+            curriculum_id = request.POST.get('curriculum_id')
+            curriculum = Curriculums.objects.get(id=curriculum_id)
+
+            gradelevel_id = request.POST.get('GradeLevel_id')
+            gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+
+            section_id = request.POST.get('section_id')
+            section = Section.objects.get(id=section_id)
+
+            subject_id = request.POST.get('subject_id')
+            subject = Subjects.objects.get(id=subject_id)
+
+            staff_id = request.POST.get('staff_id')
+            staff_id = CustomUser.objects.get(id=staff_id)
+
+            # Saving the load
+            load = Load(      
+                        curriculum_id=curriculum,
+                        GradeLevel_id=gradelevel, 
+                        section_id=section,
+                        subject_id=subject,
+                        staff_id=staff_id
+                        )
+            load.save()
+
+            messages.success(request, "Load Added Successfully!")
+            return redirect('add_load')
+
+        except Exception as e:
+            messages.error(request, f"Failed to Add Load! Error: {e}")
+            return redirect('add_load')
 
 def add_schedule(request):
-    form = AddScheduleForm()
+    session_years = SessionYearModel.objects.all()
+    staffs = CustomUser.objects.filter(user_type='2')
+    loads = Load.objects.all()
     context = {
-        "form": form
+        "session_years": session_years,
+        "staffs": staffs,
+        "loads": loads,
     }
     return render(request, 'hod_template/add_schedule_template.html', context)
 
@@ -844,43 +880,39 @@ def add_schedule_save(request):
         messages.error(request, "Invalid Method")
         return redirect('add_schedule')
     else:
-        form = AddScheduleForm(request.POST)
+        
+        try:
 
-        if form.is_valid():
-            GradeLevel_id = form.cleaned_data['GradeLevel_id']
-            subject_id = form.cleaned_data['subject_id']
-            staff_id = form.cleaned_data['staff_id']
-            session_year_id = form.cleaned_data['session_year_id']
-            day_of_week = form.cleaned_data['day_of_week']
-            start_time = form.cleaned_data['start_time']
-            end_time = form.cleaned_data['end_time']
+            session_year_id = request.POST.get('session_year_id')
+            session_id = SessionYearModel.objects.get(id=session_year_id)
+            
+            staff_id = request.POST.get('staff_id')
+            staff_id = CustomUser.objects.get(id=staff_id)
 
-            try:
-                gradelevel_obj = GradeLevel.objects.get(id=GradeLevel_id)
-                subject_obj = Subjects.objects.get(id=subject_id)
-                staff_obj = Staffs.objects.get(id=staff_id)
-                session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+            load_id = request.POST.get('load_id')
+            load_id = Load.objects.get(id=load_id)
 
-                # Creating the schedule entry
-                schedule = Schedule.objects.create(
-                    GradeLevel_id=gradelevel_obj,
-                    subject_id=subject_obj,
-                    staff_id=staff_obj,
-                    session_year_id=session_year_obj,
-                    day_of_week=day_of_week,
-                    start_time=start_time,
-                    end_time=end_time
-                )
-                schedule.save()
+            day_of_week = request.POST.get('day_of_week')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            
+            # Saving the load
+            schedule = Schedule(      
+                        session_year_id=session_id,
+                        staff_id=staff_id, 
+                        load_id=load_id,
+                        day_of_week=day_of_week,
+                        start_time=start_time,
+                        end_time=end_time
+                        )
+            schedule.save()
 
-                messages.success(request, "Schedule Added Successfully!")
-                return redirect('add_schedule')
-            except Exception as e:
-                print(e)  # Print the exception for debugging purposes
-                messages.error(request, "Failed to Add Schedule!")
-                return redirect('add_schedule')
-        else:
-            messages.error(request, "Invalid Form Submission!")
+            messages.success(request, "Schedule Added Successfully!")
+            return redirect('add_schedule')
+        
+        except Exception as e:
+            print(e)  # Print the exception for debugging purposes
+            messages.error(request, f"Failed to Add Schedule! Erro: {e}" )
             return redirect('add_schedule')
 
 def manage_schedule(request):
