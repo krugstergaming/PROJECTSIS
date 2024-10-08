@@ -1,0 +1,150 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Assign Section
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Assign Section</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+
+                    <form role="form" method="POST" action="{% url 'add_assignsection_save' %}">
+                        {% csrf_token %}
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label for="gradelevel">Grade level</label>
+                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                    <option value="">Select a Grade level</option>
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Section</label>
+                                <select class="form-control" name="section_id" id="section_id" required disabled>
+                                    <option value="" disabled selected>Select a Section</option>
+                                    {% for section in sections %}
+                                        <option value="{{ section.id }}" data-gradelevel-id="{{ section.GradeLevel_id.id }}">{{ section.section_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Student</label>
+                                <select class="form-control" name="student_id" id="student_id" required disabled>
+                                    <option value="" disabled selected>Select a Student</option>
+                                    {% for student in students %}
+                                        <option value="{{ student.id }}" data-gradelevel-id="{{ student.GradeLevel_id.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Assign Section</button>
+                        </div>
+                    </form>
+
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var gradeLevelSelect = document.getElementById('GradeLevel_id');
+        var sectionSelect = document.getElementById('section_id');
+        var studentSelect = document.getElementById('student_id');
+
+        gradeLevelSelect.addEventListener('change', function() {
+            var selectedGradeLevelId = gradeLevelSelect.value;
+
+            if (!selectedGradeLevelId) {
+                sectionSelect.setAttribute('disabled', true);
+                sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                
+                studentSelect.setAttribute('disabled', true);
+                studentSelect.innerHTML = '<option value="" disabled selected>Select a Student</option>';
+                return;
+            }
+
+            // Enable both dropdowns
+            sectionSelect.removeAttribute('disabled');
+            studentSelect.removeAttribute('disabled');
+
+            fetch(`/load_sections_and_students/?gradelevel_id=` + selectedGradeLevelId)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate section dropdown
+                    sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                    data.sections.forEach(function(section) {
+                        var option = document.createElement('option');
+                        option.value = section.id;
+                        option.textContent = section.name;
+                        sectionSelect.appendChild(option);
+                    });
+
+                    // Populate student dropdown
+                    studentSelect.innerHTML = '<option value="" disabled selected>Select a Student</option>';
+                    data.students.forEach(function(student) {
+                        var option = document.createElement('option');
+                        option.value = student.id;
+                        option.textContent = student.name;
+                        studentSelect.appendChild(option);
+                    });
+                });
+        });
+    });
+</script>
+
+
+
+{% endblock custom_js %}

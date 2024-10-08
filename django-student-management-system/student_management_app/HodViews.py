@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage #To upload Profile Picture
@@ -6,8 +6,10 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
+from django.utils.timezone import now
+from django.contrib.auth.hashers import make_password
 
-from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -96,40 +98,45 @@ def add_staff_save(request):
         messages.error(request, "Invalid Method ")
         return redirect('add_staff')
     else:
-
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        middle_name = request.POST.get('middle_name')
-        dob = request.POST.get('dob')
-        age = request.POST.get('age')
-        pob = request.POST.get('pob')
-        sex = request.POST.get('sex')
-        civil_status = request.POST.get('civil_status')
-        height = request.POST.get('height')
-        weight = request.POST.get('weight')
-        blood_type = request.POST.get('blood_type')
-        gsis_id = request.POST.get('gsis_id')
-        pagibig_id = request.POST.get('pagibig_id')
-        philhealth_id = request.POST.get('philhealth_id')
-        sss_id = request.POST.get('sss_id')
-        tin_id = request.POST.get('tin_id')
-        citizenship = request.POST.get('citizenship')
-        dual_country = request.POST.get('dual_country')
-        permanent_address = request.POST.get('permanent_address')
-        telephone_no = request.POST.get('telephone_no')
-        cellphone_no = request.POST.get('cellphone_no')
-
         try:
-            user = CustomUser.objects.create_user(username=username, 
-                                                  password=password, 
-                                                  email=email, 
-                                                  first_name=first_name, 
-                                                  last_name=last_name, 
-                                                  user_type=2)
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+
+            middle_name = request.POST.get('middle_name')
+            dob = request.POST.get('dob')
+            age = request.POST.get('age')
+            pob = request.POST.get('pob')
+            sex = request.POST.get('sex')
+            civil_status = request.POST.get('civil_status')
+            height = request.POST.get('height')
+            weight = request.POST.get('weight')
+            blood_type = request.POST.get('blood_type')
+            gsis_id = request.POST.get('gsis_id')
+            pagibig_id = request.POST.get('pagibig_id')
+            philhealth_id = request.POST.get('philhealth_id')
+            sss_id = request.POST.get('sss_id')
+            tin_id = request.POST.get('tin_id')
+            citizenship = request.POST.get('citizenship')
+            dual_country = request.POST.get('dual_country')
+            permanent_address = request.POST.get('permanent_address')
+            telephone_no = request.POST.get('telephone_no')
+            cellphone_no = request.POST.get('cellphone_no')
+
+            # Generate a predefined password based on staff details
+            current_year = now().year
+            predefined_password = f"{first_name.lower()}.{last_name.lower()}.{current_year}"
+
+            # Create Staff User
+            user = CustomUser.objects.create_user(
+                username=username,
+                password=make_password(predefined_password),  # Use hashed password
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                user_type=2
+            )
             user.staffs.middle_name = middle_name
             user.staffs.dob = dob
             user.staffs.age = age
@@ -151,7 +158,7 @@ def add_staff_save(request):
             user.staffs.cellphone_no = cellphone_no
             user.save()
             
-            messages.success(request, "Staff Added Successfully!")
+            messages.success(request, "Faculty Added Successfully! Password: " + predefined_password)
             return redirect('add_staff')
         except Exception as e:
             messages.error(request, f"Failed to Add Staff: {str(e)}")
@@ -233,16 +240,19 @@ def delete_staff(request, staff_id):
 def add_curriculum(request):
     return render(request, "hod_template/add_curriculum_template.html")
 
-
 def add_curriculum_save(request):
     if request.method != "POST":
         messages.error(request, "Invalid Method!")
         return redirect('add_curriculum')
     else:
         curriculum_name = request.POST.get('curriculum_name')
+        curriculum_description = request.POST.get('curriculum_description')
+        curriculum_status = request.POST.get('curriculum_status')
         try:
             curriculum = Curriculums(
                 curriculum_name=curriculum_name,
+                curriculum_description=curriculum_description,
+                curriculum_status=curriculum_status
                 )
             curriculum.save()
             messages.success(request, "Curriculum Added Successfully!")
@@ -250,14 +260,68 @@ def add_curriculum_save(request):
         except:
             messages.error(request, "Failed to Add Curriculum!")
             return redirect('add_curriculum')
-        
 
 def manage_curriculum(request):
-    curriculums = Curriculums.objects.all()
+    curriculums = Curriculums.objects.filter(is_archived=False)
     context = {
         "curriculums": curriculums
     }
     return render(request, 'hod_template/manage_curriculum_template.html', context)
+
+def edit_curriculum(request, curriculum_id):
+    curriculum = Curriculums.objects.get(id=curriculum_id)
+    context = {
+        "curriculum": curriculum,
+        "id": curriculum_id
+    }
+    return render(request, 'hod_template/edit_curriculum_template.html', context)
+
+def edit_curriculum_save(request):
+    if request.method != "POST":
+        HttpResponse("Invalid Method")
+    else:
+        curriculum_id = request.POST.get('curriculum_id')
+        curriculum_name = request.POST.get('curriculum_name')
+        curriculum_description = request.POST.get('curriculum_description')
+        curriculum_status = request.POST.get('curriculum_status')
+
+        try:
+            curriculum = Curriculums.objects.get(id=curriculum_id)
+            curriculum.curriculum_name = curriculum_name
+            curriculum.curriculum_description = curriculum_description
+            curriculum.curriculum_status = curriculum_status
+            curriculum.save()
+
+            messages.success(request, "Curriculum Updated Successfully.")
+            return redirect('/manage_curriculum/')
+
+        except:
+            messages.error(request, "Failed to Update GradeLevel.")
+            return redirect('/manage_curriculum/')
+
+def archived_curriculums(request):
+    # Filter curriculums with status 'Archived'
+    curriculums = Curriculums.objects.filter(is_archived=True)
+    context = {
+        "curriculums": curriculums
+    }
+    return render(request, 'hod_template/archived_curriculum_template.html', context)
+
+def archive_curriculum(request, curriculum_id):
+    curriculum = get_object_or_404(Curriculums, id=curriculum_id)
+    curriculum.is_archived = True
+    curriculum.curriculum_status = "Inactive"
+    curriculum.save()
+    messages.success(request, "Curriculum archived successfully!")
+    return redirect('/manage_curriculum/')  
+
+def unarchive_curriculum(request, curriculum_id):
+    curriculum = get_object_or_404(Curriculums, id=curriculum_id)
+    curriculum.is_archived = False
+    curriculum.curriculum_status = "Active"
+    curriculum.save()
+    messages.success(request, "Curriculum unarchived successfully!")
+    return redirect('/manage_curriculum/')  
 
 def add_gradelevel(request):
     curriculums = Curriculums.objects.all()
@@ -289,14 +353,12 @@ def add_gradelevel_save(request):
             messages.error(request, "Failed to Add GradeLevel!")
             return redirect('add_gradelevel')
 
-
 def manage_gradelevel(request):
     gradelevels = GradeLevel.objects.all()
     context = {
         "gradelevels": gradelevels
     }
     return render(request, 'hod_template/manage_gradelevel_template.html', context)
-
 
 def edit_gradelevel(request, GradeLevel_id):
     gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
@@ -305,7 +367,6 @@ def edit_gradelevel(request, GradeLevel_id):
         "id": GradeLevel_id
     }
     return render(request, 'hod_template/edit_gradelevel_template.html', context)
-
 
 def edit_gradelevel_save(request):
     if request.method != "POST":
@@ -358,12 +419,15 @@ def add_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
         session_limit = request.POST.get('session_limit')
+        session_status = request.pOST.get('session_status')
 
         try:
             sessionyear = SessionYearModel(
                 session_start_year = session_start_year, 
                 session_end_year = session_end_year,
-                session_limit = session_limit)
+                session_limit = session_limit,
+                session_status = session_status
+                )
             sessionyear.save()
             messages.success(request, "Session Year added Successfully!")
             return redirect("add_session")
@@ -475,14 +539,13 @@ def add_student_save(request):
         nickname = request.POST.get("nickname")
 
         email = request.POST.get('email')
-        password = request.POST.get('password')
         address = request.POST.get('address')
         session_year_id = request.POST.get('session_year_id')
         GradeLevel_id = request.POST.get('GradeLevel_id')
-        gender = request.POST.get('gender')
+        sex = request.POST.get('sex')
         age = request.POST.get('age')
-        date_of_birth = request.POST.get('date_of_birth')
-        place_of_birth = request.POST.get('place_of_birth')
+        dob = request.POST.get('dob')
+        pob = request.POST.get('pob')
         nationality = request.POST.get('nationality')
         religion = request.POST.get('religion')
         rank_in_family = request.POST.get('rank_in_family')
@@ -499,11 +562,29 @@ def add_student_save(request):
             filename = fs.save(profile_pic.name, profile_pic)
             profile_pic_url = fs.url(filename)
 
+        # Generate a predefined password based on the student's details
+        current_year = now().year
+        predefined_password = f"{first_name.lower()}.{last_name.lower()}.{current_year}"
+
+        # Generate student_number
+        last_student = Students.objects.filter(student_number__startswith=str(current_year)).order_by('-id').first()
+        if last_student:
+            last_number = int(last_student.student_number.split('-')[1])
+            new_number = last_number + 1
+        else:
+            new_number = 1
+        student_number = f"{current_year}-{new_number:04d}"
+
         # Create Student User
         user = CustomUser.objects.create_user(
-            username=username, password=password, email=email,
-            first_name=first_name, last_name=last_name, user_type=3
+            username=username, 
+            password=make_password(predefined_password),  # Use hashed password
+            email=email,
+            first_name=first_name, 
+            last_name=last_name, 
+            user_type=3
         )
+        user.students.student_number = student_number  # Set student_number
         user.students.address = address
 
         # Assign GradeLevel and Session Year
@@ -516,11 +597,11 @@ def add_student_save(request):
         user.students.middle_name = middlename
         user.students.suffix = suffix
         user.students.nickname = nickname
-        user.students.gender = gender
+        user.students.sex = sex
         user.students.profile_pic = profile_pic_url
         user.students.age = age
-        user.students.date_of_birth = date_of_birth
-        user.students.place_of_birth = place_of_birth
+        user.students.dob = dob
+        user.students.pob = pob
         user.students.nationality = nationality
         user.students.religion = religion
         user.students.rank_in_family = rank_in_family
@@ -563,7 +644,7 @@ def add_student_save(request):
             emergency_referred_by=request.POST.get('emergency_referred_by')
         )
 
-        messages.success(request, "Student Added Successfully!")
+        messages.success(request, "Student Added Successfully! Password: " + predefined_password)
         return redirect('add_student')
 
     except Exception as e:
@@ -592,7 +673,7 @@ def edit_student(request, student_id):
     form.fields['last_name'].initial = student.admin.last_name
     form.fields['address'].initial = student.address
     form.fields['GradeLevel_id'].initial = student.GradeLevel_id.id
-    form.fields['gender'].initial = student.gender
+    form.fields['sex'].initial = student.sex
     form.fields['session_year_id'].initial = student.session_year_id.id
 
     context = {
@@ -605,67 +686,122 @@ def edit_student(request, student_id):
 
 def edit_student_save(request):
     if request.method != "POST":
-        return HttpResponse("Invalid Method!")
-    else:
-        student_id = request.session.get('student_id')
-        if student_id == None:
-            return redirect('/manage_student')
+        messages.error(request, "Method Not Allowed!")
+        return redirect('/manage_student')
 
-        form = EditStudentForm(request.POST, request.FILES)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            username = form.cleaned_data['username']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
-            address = form.cleaned_data['address']
-            GradeLevel_id = form.cleaned_data['GradeLevel_id']
-            gender = form.cleaned_data['gender']
-            session_year_id = form.cleaned_data['session_year_id']
+    student_id = request.session.get('student_id')
+    if student_id is None:
+        messages.error(request, "Student ID Missing!")
+        return redirect('/manage_student')
 
-            # Getting Profile Pic first
-            # First Check whether the file is selected or not
-            # Upload only if file is selected
-            if len(request.FILES) != 0:
-                profile_pic = request.FILES['profile_pic']
-                fs = FileSystemStorage()
-                filename = fs.save(profile_pic.name, profile_pic)
-                profile_pic_url = fs.url(filename)
-            else:
-                profile_pic_url = None
+    try:
+        # Extract data from request.POST
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        middlename = request.POST.get('middle_name')
 
-            try:
-                # First Update into Custom User Model
-                user = CustomUser.objects.get(id=student_id)
-                user.first_name = first_name
-                user.last_name = last_name
-                user.email = email
-                user.username = username
-                user.save()
+        suffix = request.POST.get("suffix")
+        nickname = request.POST.get("nickname")
 
-                # Then Update Students Table
-                student_model = Students.objects.get(admin=student_id)
-                student_model.address = address
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        session_year_id = request.POST.get('session_year_id')
+        GradeLevel_id = request.POST.get('GradeLevel_id')
+        sex = request.POST.get('sex')
+        age = request.POST.get('age')
+        dob = request.POST.get('dob')
+        pob = request.POST.get('pob')
+        nationality = request.POST.get('nationality')
+        religion = request.POST.get('religion')
+        rank_in_family = request.POST.get('rank_in_family')
+        telephone_nos = request.POST.get('telephone_nos')
+        mobile_phone_nos = request.POST.get('mobile_phone_nos')
+        is_covid_vaccinated = request.POST.get('is_covid_vaccinated')
+        date_of_vaccination = request.POST.get('date_of_vaccination')
 
-                gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
-                student_model.GradeLevel_id = gradelevel
+        # Handle file upload for profile picture
+        profile_pic_url = None
+        if 'profile_pic' in request.FILES:
+            profile_pic = request.FILES['profile_pic']
+            fs = FileSystemStorage()
+            filename = fs.save(profile_pic.name, profile_pic)
+            profile_pic_url = fs.url(filename)
 
-                session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-                student_model.session_year_id = session_year_obj
+        # Create Student User
+        user = CustomUser.objects.create_user(
+            username=username, 
+            password=password, 
+            email=email,
+            first_name=first_name, 
+            last_name=last_name, 
+            user_type=3
+        )
+        user.students.address = address
 
-                student_model.gender = gender
-                if profile_pic_url != None:
-                    student_model.profile_pic = profile_pic_url
-                student_model.save()
-                # Delete student_id SESSION after the data is updated
-                del request.session['student_id']
+        # Assign GradeLevel and Session Year
+        gradelevel_obj = GradeLevel.objects.get(id=GradeLevel_id)
+        session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+        user.students.GradeLevel_id = gradelevel_obj
+        user.students.session_year_id = session_year_obj
 
-                messages.success(request, "Student Updated Successfully!")
-                return redirect('/edit_student/'+student_id)
-            except:
-                messages.success(request, "Failed to Uupdate Student.")
-                return redirect('/edit_student/'+student_id)
-        else:
-            return redirect('/edit_student/'+student_id)
+        # Additional Student Details
+        user.students.middle_name = middlename
+        user.students.suffix = suffix
+        user.students.nickname = nickname
+        user.students.sex = sex
+        user.students.profile_pic = profile_pic_url
+        user.students.age = age
+        user.students.dob = dob
+        user.students.pob = pob
+        user.students.nationality = nationality
+        user.students.religion = religion
+        user.students.rank_in_family = rank_in_family
+        user.students.telephone_nos = telephone_nos
+        user.students.mobile_phone_nos = mobile_phone_nos
+        user.students.is_covid_vaccinated = is_covid_vaccinated
+        user.students.date_of_vaccination = date_of_vaccination
+        user.save()
+
+        # Update Parent/Guardian Information
+        parent_guardian = ParentGuardian.objects.get(students_id=student)
+        parent_guardian.father_name = request.POST.get('father_name')
+        parent_guardian.father_occupation = request.POST.get('father_occupation')
+        parent_guardian.mother_name = request.POST.get('mother_name')
+        parent_guardian.mother_occupation = request.POST.get('mother_occupation')
+        parent_guardian.guardian_name = request.POST.get('guardian_name')
+        parent_guardian.guardian_occupation = request.POST.get('guardian_occupation')
+        parent_guardian.save()
+
+        # Update Previous School Information
+        previous_school = PreviousSchool.objects.get(students_id=student)
+        previous_school.previous_school_name = request.POST.get('previous_school_name')
+        previous_school.previous_school_address = request.POST.get('previous_school_address')
+        previous_school.previous_grade_level = request.POST.get('previous_grade_level')
+        previous_school.previous_school_year_attended = request.POST.get('previous_school_year_attended')
+        previous_school.previous_teacher_name = request.POST.get('previous_teacher_name')
+        previous_school.save()
+
+        # Update Emergency Contact Information
+        emergency_contact = EmergencyContact.objects.get(students_id=student)
+        emergency_contact.emergency_contact_name = request.POST.get('emergency_contact_name')
+        emergency_contact.emergency_contact_relationship = request.POST.get('emergency_contact_relationship')
+        emergency_contact.emergency_contact_address = request.POST.get('emergency_contact_address')
+        emergency_contact.emergency_contact_phone = request.POST.get('emergency_contact_phone')
+        emergency_contact.emergency_enrolling_teacher = request.POST.get('emergency_enrolling_teacher')
+        emergency_contact.emergency_date = request.POST.get('emergency_date')
+        emergency_contact.emergency_referred_by = request.POST.get('emergency_referred_by')
+        emergency_contact.save()
+
+        # Clear the student_id session after updating
+        del request.session['student_id']
+
+        messages.success(request, "Student Updated Successfully!")
+        return redirect('/edit_student/' + student_id)
+
+    except Exception as e:
+        messages.error(request, f"Failed to Update Student! Error: {str(e)}")
+        return redirect('/edit_student/' + student_id)
 
 
 def delete_student(request, student_id):
@@ -809,15 +945,70 @@ def delete_subject(request, subject_id):
         messages.error(request, "Failed to Delete Subject.")
         return redirect('manage_subject')
 
+def add_assignsection(request):
+    gradelevels = GradeLevel.objects.filter(id__in=Students.objects.values_list('GradeLevel_id', flat=True))
+    context = {
+        "gradelevels": gradelevels,
+    }
+    return render(request, 'hod_template/add_assignsection_template.html', context)
+
+def load_sections_and_students(request):
+    gradelevel_id = request.GET.get('gradelevel_id')
+    
+    # Fetch sections and students filtered by GradeLevel
+    sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
+    students = Students.objects.filter(GradeLevel_id=gradelevel_id)
+    
+    # Prepare data for response
+    section_list = [{"id": section.id, "name": section.section_name} for section in sections]
+    student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
+    
+    return JsonResponse({'sections': section_list, 'students': student_list})
+
+
+def add_assignsection_save(request):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('add_assignsection')
+    else:
+        try:
+
+            gradelevel_id = request.POST.get('GradeLevel_id')
+            gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+
+            section_id = request.POST.get('section_id')
+            section = Section.objects.get(id=section_id)
+
+            student_id = request.POST.get('student_id')
+            student = Students.objects.get(id=student_id)
+
+            # Saving the load
+            assignsection = AssignSection(   
+                        GradeLevel_id=gradelevel, 
+                        section_id=section,
+                        Student_id=student
+                        )
+            assignsection.save()
+
+            messages.success(request, "Assign Section Added Successfully!")
+            return redirect('add_assignsection')
+
+        except Exception as e:
+            messages.error(request, f"Failed to Assign Section! Error: {e}")
+            return redirect('add_assignsection')
+
 
 def add_load(request):
     curriculums = Curriculums.objects.all()
+    assignsections = AssignSection.objects.select_related('GradeLevel_id', 'section_id').distinct('GradeLevel_id', 'section_id')
     gradelevels = GradeLevel.objects.all()
     sections = Section.objects.all()
     subjects = Subjects.objects.all()
+    
     staffs = CustomUser.objects.filter(user_type='2')
     context = {
         "curriculums": curriculums,
+        "assignsections": assignsections,
         "gradelevels": gradelevels,
         "sections": sections,
         "subjects": subjects,

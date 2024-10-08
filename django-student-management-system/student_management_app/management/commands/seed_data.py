@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
-from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, CustomUser
-from datetime import datetime
+from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, CustomUser
+from datetime import datetime, date
 
 class Command(BaseCommand):
-    help = 'Seeds the Curriculums, GradeLevel, Section, and Subject tables with initial data'
+    help = 'Seeds the Curriculums, GradeLevel, Section, Subject, and Student tables with initial data'
 
     def handle(self, *args, **kwargs):
         # Delete existing data (optional)
@@ -13,18 +13,24 @@ class Command(BaseCommand):
         SessionYearModel.objects.all().delete()
         Subjects.objects.all().delete()
         Staffs.objects.all().delete()
+        Students.objects.all().delete()
         CustomUser.objects.filter(user_type=2).delete()
+        CustomUser.objects.filter(user_type=3).delete()
 
         # Seed SessionYearModel
-        SessionYearModel.objects.create(
+        session_year = SessionYearModel.objects.create(
             session_start_year=datetime.strptime('13-09-2024', '%d-%m-%Y').date(),
             session_end_year=datetime.strptime('13-09-2025', '%d-%m-%Y').date(),
-            session_limit='120'
+            session_limit='120',
+            session_status='Active'
         )
 
         # Seed Curriculums
-        curriculum1 = Curriculums.objects.create(curriculum_name='matatag')
-        # curriculum2 = Curriculums.objects.create(curriculum_name='new_curriculum')   # New Curriculum
+        curriculum1 = Curriculums.objects.create(
+            curriculum_name='matatag',
+            curriculum_description='A well-rounded curriculum focused on strengthening foundational skills.',
+            curriculum_status='active'
+        )
 
         # Seed GradeLevel for the first curriculum
         grade_levels1 = [
@@ -41,9 +47,10 @@ class Command(BaseCommand):
             grade_levels.append(grade_level)
 
         # Seed Sections for each GradeLevel
-        for grade_level in grade_levels:
-            # Create multiple sections for each grade level
-            for section_number in range(1, 4):  # For example, create 3 sections per grade level
+        for index, grade_level in enumerate(grade_levels):
+            # Create sections based on the grade level number
+            section_count = index + 1  # Grade 1 has 1 section, Grade 2 has 2 sections, etc.
+            for section_number in range(1, section_count + 1):
                 Section.objects.create(
                     section_name=f'Section {section_number}',
                     GradeLevel_id=grade_level
@@ -95,6 +102,11 @@ class Command(BaseCommand):
                     curriculum_id=grade_level.curriculum_id
                 )
 
+        # Helper function to calculate age based on DOB
+        def calculate_age(dob):
+            today = date.today()
+            return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        
         # Seed Faculty
         faculty_data = [
             {
@@ -224,9 +236,12 @@ class Command(BaseCommand):
             }
         ]
 
-
         for staff in faculty_data:
             try:
+
+                # Calculate age based on dob
+                age = calculate_age(staff['dob'])
+
                 # Create CustomUser instance
                 user = CustomUser.objects.create_user(
                     username=staff['username'],
@@ -237,33 +252,211 @@ class Command(BaseCommand):
                     user_type=2  # Staff
                 )
                 
-                # Create Staffs instance and associate it with the CustomUser instance
-                Staffs.objects.create(
-                    admin=user,
-                    middle_name=staff['middle_name'],
-                    dob=staff['dob'],
-                    age=staff['age'],
-                    pob=staff['pob'],
-                    sex=staff['sex'],
-                    civil_status=staff['civil_status'],
-                    height=staff['height'],
-                    weight=staff['weight'],
-                    blood_type=staff['blood_type'],
-                    gsis_id=staff['gsis_id'],
-                    pagibig_id=staff['pagibig_id'],
-                    philhealth_id=staff['philhealth_id'],
-                    sss_id=staff['sss_id'],
-                    tin_id=staff['tin_id'],
-                    citizenship=staff['citizenship'],
-                    dual_country=staff['dual_country'],
-                    permanent_address=staff['permanent_address'],
-                    telephone_no=staff['telephone_no'],
-                    cellphone_no=staff['cellphone_no']
-                )
+                # Update Staffs fields via the related CustomUser instance
+                user.staffs.middle_name = staff['middle_name']
+                user.staffs.dob = staff['dob']
+                user.staffs.age = age  # Dynamically calculated age
+                user.staffs.pob = staff['pob']
+                user.staffs.sex = staff['sex']
+                user.staffs.civil_status = staff['civil_status']
+                user.staffs.height = staff['height']
+                user.staffs.weight = staff['weight']
+                user.staffs.blood_type = staff['blood_type']
+                user.staffs.gsis_id = staff['gsis_id']
+                user.staffs.pagibig_id = staff['pagibig_id']
+                user.staffs.philhealth_id = staff['philhealth_id']
+                user.staffs.sss_id = staff['sss_id']
+                user.staffs.tin_id = staff['tin_id']
+                user.staffs.citizenship = staff['citizenship']
+                user.staffs.dual_country = staff['dual_country']
+                user.staffs.permanent_address = staff['permanent_address']
+                user.staffs.telephone_no = staff['telephone_no']
+                user.staffs.cellphone_no = staff['cellphone_no']
+
+                # Save user to ensure the Staffs model is correctly updated
+                user.save()
+
                 self.stdout.write(self.style.SUCCESS(f'Successfully added staff: {staff["username"]}'))
+
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Error adding staff {staff["username"]}: {str(e)}'))
 
-        
+        # Seed Student
+        # Define the student data with correct GradeLevel references
+        student_data = [
+            {
+                'username': 'student1',
+                'email': 'student1@gmail.com',
+                'password': 'std1',
+                'last_name': 'Santos',
+                'first_name': 'Juan',
+                'middle_name': 'A',
+                'suffix': '',
+                'student_number': '2024-0001',
+                'nickname': 'joe',
+                'sex': 'Male',
+                'address': '123 Main St, City, Country',
+                'dob': datetime.strptime('2005-01-01', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '2',
+                'telephone_nos': '123-456-7890',
+                'mobile_phone_nos': '098-765-4321',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 1
+                'session_year_id': session_year,
+            },
+            {
+                'username': 'student2',
+                'email': 'student2@gmail.com',
+                'password': 'std2',
+                'last_name': 'Delos Reyes',
+                'first_name': 'Maria',
+                'middle_name': 'B',
+                'suffix': 'Jr.',
+                'student_number': '2024-0002',
+                'nickname': 'mary',
+                'sex': 'Female',
+                'address': '456 Secondary St, City, Country',
+                'dob': datetime.strptime('2006-02-02', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '1',
+                'telephone_nos': '234-567-8901',
+                'mobile_phone_nos': '987-654-3210',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 2
+                'session_year_id': session_year,
+            },
+            {
+                'username': 'student3',
+                'email': 'student3@gmail.com',
+                'password': 'std3',
+                'last_name': 'Fernandez',
+                'first_name': 'Carlos',
+                'middle_name': 'C',
+                'suffix': '',
+                'student_number': '2024-0003',
+                'nickname': 'carl',
+                'sex': 'Male',
+                'address': '789 Tertiary St, City, Country',
+                'dob': datetime.strptime('2007-03-03', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '3',
+                'telephone_nos': '345-678-9012',
+                'mobile_phone_nos': '876-543-2109',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 3
+                'session_year_id': session_year,
+            },
+            {
+                'username': 'student4',
+                'email': 'student4@gmail.com',
+                'password': 'std4',
+                'last_name': 'Gonzales',
+                'first_name': 'Ana',
+                'middle_name': 'D',
+                'suffix': '',
+                'student_number': '2024-0004',
+                'nickname': 'anita',
+                'sex': 'Female',
+                'address': '321 Quaternary St, City, Country',
+                'dob': datetime.strptime('2008-04-04', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '4',
+                'telephone_nos': '456-789-0123',
+                'mobile_phone_nos': '765-432-1098',
+                'GradeLevel_id': grade_levels[3],  # Assign to Grade 4
+                'session_year_id': session_year,
+            },
+            {
+                'username': 'student5',
+                'email': 'student5@gmail.com',
+                'password': 'std5',
+                'last_name': 'Lazaro',
+                'first_name': 'Pedro',
+                'middle_name': 'E',
+                'suffix': 'Sr.',
+                'student_number': '2024-0005',
+                'nickname': 'pedy',
+                'sex': 'Male',
+                'address': '654 Quinary St, City, Country',
+                'dob': datetime.strptime('2009-05-05', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '5',
+                'telephone_nos': '567-890-1234',
+                'mobile_phone_nos': '654-321-0987',
+                'GradeLevel_id': grade_levels[4],  # Assign to Grade 5
+                'session_year_id': session_year,
+            },
+            {
+                'username': 'student6',
+                'email': 'student6@gmail.com',
+                'password': 'std6',
+                'last_name': 'Marquez',
+                'first_name': 'Isabella',
+                'middle_name': 'F',
+                'suffix': '',
+                'student_number': '2024-0006',
+                'nickname': 'bella',
+                'sex': 'Female',
+                'address': '987 Senary St, City, Country',
+                'dob': datetime.strptime('2010-06-06', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '6',
+                'telephone_nos': '678-901-2345',
+                'mobile_phone_nos': '543-210-9876',
+                'GradeLevel_id': grade_levels[5],  # Assign to Grade 6
+                'session_year_id': session_year,
+            },
+        ]
+        for student in student_data:
+            try:
+
+                # Calculate age based on dob
+                age = calculate_age(student['dob'])
+
+                # Create CustomUser instance
+                user = CustomUser.objects.create_user(
+                    username=student['username'],
+                    password=student['password'],
+                    email=student['email'],
+                    first_name=student['first_name'],
+                    last_name=student['last_name'],
+                    user_type=3  
+                )
+                
+                # Update Staffs fields via the related CustomUser instance
+                user.students.middle_name = student['middle_name']
+                user.students.suffix = student['suffix']
+                user.students.student_number = student['student_number']
+                user.students.GradeLevel_id = student['GradeLevel_id']
+                user.students.session_year_id = student['session_year_id']
+                user.students.nickname = student['nickname']
+                user.students.dob = student['dob']
+                user.students.age = age  # Dynamically calculated age
+                user.students.pob = student['pob']
+                user.students.sex = student['sex']
+                user.students.nationality = student['nationality']
+                user.students.religion = student['religion']
+                user.students.rank_in_family = student['rank_in_family']
+                user.students.address = student['address']
+                user.students.telephone_nos = student['telephone_nos']
+                user.students.mobile_phone_nos = student['mobile_phone_nos']
+
+                
+                user.save()
+
+                self.stdout.write(self.style.SUCCESS(f'Successfully added Student: {student["username"]}'))
+
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Error adding Student {student["username"]}: {str(e)}'))
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded the tables with initial data'))

@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Edit GradeLevel | #ID : {{ gradelevel.id }}
+    Edit Grade Level | #ID : {{ gradelevel.id }}
 {% endblock page_title %}
 
 {% block main_content %}
@@ -16,38 +16,37 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Edit GradeLevel</h3>
+                        <h3 class="card-title">Edit Grade Level</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form role="form" method="POST" action="{% url 'edit_course_save' %}">
+                    <form role="form" method="POST" action="{% url 'edit_gradelevel_save' %}">
                         {% csrf_token %}
 
-                        
                                 {% comment %} Display Messages {% endcomment %}
                                 {% if messages %}
                                 <div class="form-group">
-                                <div class="col-12">
-                                    {% for message in messages %}
-                                    {% if message.tags == "error" %}
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% elif message.tags == "success" %}
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% endif %}
-                                    {% endfor %}
+                                    <div class="col-12">
+                                        {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                            </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
                                 </div>
-                                </div>
-                                {% endif %}
+                                {% endif %} 
                             
 
                         <div class="card-body">
@@ -61,7 +60,7 @@
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Update GradeLevel</button>
+                        <button type="submit" class="btn btn-primary">Update Grade Level</button>
                         </div>
                     </form>
                     </div>

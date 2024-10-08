@@ -17,18 +17,18 @@ def staff_home(request):
 
     loads = Load.objects.filter(staff_id=request.user.id)
     GradeLevel_id_list = []
-    for subject in loads:
+    for load in loads:
         gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
         GradeLevel_id_list.append(gradelevel.id)
     
-    final_course = []
-    # Removing Duplicate GradeLevel Id
+    final_GradeLevel = []
+    # Removing Duplicate Course Id
     for GradeLevel_id in GradeLevel_id_list:
-        if GradeLevel_id not in final_course:
-            final_course.append(GradeLevel_id)
+        if GradeLevel_id not in final_GradeLevel:
+            final_GradeLevel.append(GradeLevel_id)
     
-    students_count = Students.objects.filter(GradeLevel_id__in=final_course).count()
-    load_count = loads.count() 
+    students_count = Students.objects.filter(GradeLevel_id__in=final_GradeLevel).count()
+    subject_count = loads.count()
 
     # Fetch All Attendance Count
     attendance_count = Attendance.objects.filter(subject_id__in=loads).count()
@@ -39,12 +39,12 @@ def staff_home(request):
     #Fetch Attendance Data by Subjects
     subject_list = []
     attendance_list = []
-    for subject in loads:
+    for subject in subjects:
         attendance_count1 = Attendance.objects.filter(subject_id=subject.id).count()
         subject_list.append(subject.subject_name)
         attendance_list.append(attendance_count1)
 
-    students_attendance = Students.objects.filter(GradeLevel_id__in=final_course)
+    students_attendance = Students.objects.filter(course_id__in=final_course)
     student_list = []
     student_list_attendance_present = []
     student_list_attendance_absent = []
@@ -59,7 +59,7 @@ def staff_home(request):
         "students_count": students_count,
         "attendance_count": attendance_count,
         "leave_count": leave_count,
-        "load_count": load_count,
+        "subject_count": subject_count,
         "subject_list": subject_list,
         "attendance_list": attendance_list,
         "student_list": student_list,
@@ -67,6 +67,7 @@ def staff_home(request):
         "attendance_absent_list": student_list_attendance_absent
     }
     return render(request, "staff_template/staff_home_template.html", context)
+
 
 
 

@@ -52,18 +52,30 @@
                             
                             <div class="form-group">
                                 <label for="curriculum">Curriculums</label>
-                                <select class="form-control" name="curriculum_id" id="curriculum_id">
+                                <select class="form-control" name="curriculum_id" id="curriculum_id" required>
                                     <option value="">Select a Curriculum</option>
                                     {% for curriculum in curriculums %}
                                         <option value="{{ curriculum.id }}">{{ curriculum.curriculum_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for ="assignsection">Assigned Section</label>
+                                <select class="form-control" id="AssignSection_id" name="AssignSection_id">
+                                    <option value="">Select Assigned Section</option>
+                                    {% for assignsection in assignsections %}
+                                        <option value="{{ assignsection.id }}">
+                                            {{ assignsection.GradeLevel_id.GradeLevel_name }} - {{ assignsection.section_id.section_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div> 
                             
                             <div class="form-group">
                                 <label for="gradelevel">Grade level</label>
-                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id">
-                                    <option value="">Select a Grade level</option>
+                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required disabled>
+                                    <option value="" disabled selected>Select a Grade level</option>
                                     {% for gradelevel in gradelevels %}
                                         <option value="{{ gradelevel.id }}" data-curriculum-id="{{ gradelevel.curriculum_id.id }}">{{ gradelevel.GradeLevel_name }}</option>
                                     {% endfor %}
@@ -72,8 +84,8 @@
 
                             <div class="form-group">
                                 <label>Section</label>
-                                <select class="form-control" name="section_id" id="section_id">
-                                    <option value="">Select a Section</option>
+                                <select class="form-control" name="section_id" id="section_id" required disabled>
+                                    <option value="" disabled selected>Select a Section</option>
                                     {% for section in sections %}
                                         <option value="{{ section.id }}" data-gradelevel-id="{{ section.GradeLevel_id.id }}">{{ section.section_name }}</option>
                                     {% endfor %}
@@ -82,8 +94,8 @@
 
                             <div class="form-group">
                                 <label>Subject</label>
-                                <select class="form-control" name="subject_id">
-                                    <option value="">Select a Subject</option>
+                                <select class="form-control" name="subject_id" id="subject_id" required disabled>
+                                    <option value="" disabled selected>Select a Subject</option>
                                     {% for subject in subjects %}
                                         <option value="{{ subject.id }}" data-gradelevel-id="{{ subject.GradeLevel_id.id }}">{{ subject.subject_name }}</option>
                                     {% endfor %}
@@ -92,7 +104,7 @@
 
                             <div class="form-group">
                                 <label>Faculty </label>
-                                <select class="form-control" name="staff_id">
+                                <select class="form-control" name="staff_id" id="staff_id" required>
                                     <option value="">Select a Faculty</option>
                                     {% for staff in staffs %}
                                         <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
@@ -124,66 +136,66 @@
         var gradeLevelSelect = document.getElementById('GradeLevel_id');
         var sectionSelect = document.getElementById('section_id');
         var subjectSelect = document.querySelector('select[name="subject_id"]');
+        var gradeLevelOptions = gradeLevelSelect.querySelectorAll('option');
+        var sectionOptions = sectionSelect.querySelectorAll('option');
+        var subjectOptions = subjectSelect.querySelectorAll('option');
+
 
         function filterGradeLevels() {
-            var selectedCurriculumId = curriculumSelect.value;
-            var gradeLevelOptions = gradeLevelSelect.querySelectorAll('option');
+        var selectedCurriculumId = curriculumSelect.value;
 
-            // Filter GradeLevel options based on the selected curriculum
+        if (!selectedCurriculumId) {
+            gradeLevelSelect.setAttribute('disabled', true);
+            gradeLevelSelect.value = "";
+            disableSectionAndSubject();
+        } else {
+            gradeLevelSelect.removeAttribute('disabled');
             gradeLevelOptions.forEach(function(option) {
                 var optionCurriculumId = option.getAttribute('data-curriculum-id');
-                if (optionCurriculumId === selectedCurriculumId || selectedCurriculumId === "") {
-                    option.style.display = 'block'; // Show matching options
-                } else {
-                    option.style.display = 'none'; // Hide non-matching options
-                }
+                option.style.display = optionCurriculumId === selectedCurriculumId ? 'block' : 'none';
             });
-
-            // Reset Section and Subject filtering
-            filterSectionsAndSubjects();
+            disableSectionAndSubject(); // Ensure section and subject are disabled when curriculum changes
         }
+    }
 
-        function filterSectionsAndSubjects() {
-            var selectedGradeLevelId = gradeLevelSelect.value;
+    function filterSectionsAndSubjects() {
+        var selectedGradeLevelId = gradeLevelSelect.value;
+
+        if (!selectedGradeLevelId) {
+            disableSectionAndSubject();
+        } else {
+            sectionSelect.removeAttribute('disabled');
+            subjectSelect.removeAttribute('disabled');
 
             // Filter sections based on selected grade level
-            var sectionOptions = sectionSelect.querySelectorAll('option');
             sectionOptions.forEach(function(option) {
                 var optionGradeLevelId = option.getAttribute('data-gradelevel-id');
-                if (selectedGradeLevelId === "" || optionGradeLevelId === selectedGradeLevelId) {
-                    option.style.display = 'block'; // Show matching options
-                } else {
-                    option.style.display = 'none'; // Hide non-matching options
-                }
+                option.style.display = optionGradeLevelId === selectedGradeLevelId ? 'block' : 'none';
             });
 
             // Filter subjects based on selected grade level
-            var subjectOptions = subjectSelect.querySelectorAll('option');
             subjectOptions.forEach(function(option) {
                 var optionGradeLevelId = option.getAttribute('data-gradelevel-id');
-                if (selectedGradeLevelId === "" || optionGradeLevelId === selectedGradeLevelId) {
-                    option.style.display = 'block'; // Show matching options
-                } else {
-                    option.style.display = 'none'; // Hide non-matching options
-                }
+                option.style.display = optionGradeLevelId === selectedGradeLevelId ? 'block' : 'none';
             });
-
-            // Optionally, clear the selection if no options are available for sections and subjects
-            if (sectionSelect.querySelector('option:visible') === null) {
-                sectionSelect.value = "";
-            }
-            if (subjectSelect.querySelector('option:visible') === null) {
-                subjectSelect.value = "";
-            }
         }
+    }
 
-        // Attach event listener to curriculum and grade level selects
-        curriculumSelect.addEventListener('change', filterGradeLevels);
-        gradeLevelSelect.addEventListener('change', filterSectionsAndSubjects);
+    function disableSectionAndSubject() {
+        // Disable Section and Subject dropdowns and reset their values
+        sectionSelect.setAttribute('disabled', true);
+        sectionSelect.value = "";
+        subjectSelect.setAttribute('disabled', true);
+        subjectSelect.value = "";
+    }
 
-        // Trigger initial filtering in case a curriculum or grade level is pre-selected
-        filterGradeLevels();
-        filterSectionsAndSubjects();
+    // Attach event listeners to curriculum and grade level selects
+    curriculumSelect.addEventListener('change', filterGradeLevels);
+    gradeLevelSelect.addEventListener('change', filterSectionsAndSubjects);
+
+    // Trigger initial filtering to set the initial state
+    filterGradeLevels();
+    filterSectionsAndSubjects();
     });
 </script>
 

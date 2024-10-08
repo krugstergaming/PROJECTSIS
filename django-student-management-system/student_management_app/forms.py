@@ -150,7 +150,7 @@ class AddScheduleForm(forms.Form):
     # Select the Subject
     try:
         subjects = Subjects.objects.all()
-        subject_list = [(subject.id, subject.subject_one) for subject in subjects]
+        subject_list = [(subject.id, subject.subject_name) for subject in subjects]
     except Exception as e:
         print("Error fetching subjects:", e)
         subject_list = []
@@ -219,7 +219,7 @@ class AddScheduleForm(forms.Form):
         super(AddScheduleForm, self).__init__(*args, **kwargs)
         # Placeholder choices
         self.fields['GradeLevel_id'].choices = [('', 'Select a GradeLevel')] + [(gradelevel.id, gradelevel.GradeLevel_name) for gradelevel in GradeLevel.objects.all()]
-        self.fields['subject_id'].choices = [('', 'Select a Subject')] + [(subject.id, subject.subject_one) for subject in Subjects.objects.all()]
+        self.fields['subject_id'].choices = [('', 'Select a Subject')] + [(subject.id, subject.subject_name) for subject in Subjects.objects.all()]
         self.fields['staff_id'].choices = [('', 'Select a Staff Member')] + [(staff.id, f"{staff.admin.first_name} {staff.admin.last_name}") for staff in Staffs.objects.all()]
         self.fields['session_year_id'].choices = [('', 'Select a School Year')] + [(session_year.id, f"{session_year.session_start_year} to {session_year.session_end_year}") for session_year in SessionYearModel.objects.all()]
 
@@ -235,7 +235,7 @@ class EditScheduleForm(forms.Form):
     # For Displaying Subjects
     try:
         subjects = Subjects.objects.all()
-        subject_list = [(subject.id, subject.subject_one) for subject in subjects]
+        subject_list = [(subject.id, subject.subject_name) for subject in subjects]
     except:
         subject_list = []
 

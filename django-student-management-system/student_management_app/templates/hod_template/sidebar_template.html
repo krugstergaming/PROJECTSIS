@@ -91,6 +91,37 @@
             </li>
 
             <li class="nav-item">
+              {% url 'manage_curriculum' as manage_curriculum %}
+              {% url 'edit_curriculum' curriculum_id=id as edit_curriculum %}
+              <a href="{{ manage_curriculum }}" class="nav-link {% if request.path == manage_curriculum %} active {% endif %} {% if request.path == edit_curriculum %} active {% endif %}">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <p>
+                  Manage Curriculum
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'archived_curriculums' as archived_curriculums %}
+              <a href="{{ archived_curriculums }}" class="nav-link {% if request.path == archived_curriculums %} active {% endif %}">
+                  <i class="nav-icon fas fa-user-graduate"></i>
+                  <p>
+                      Archived Curriculum
+                  </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'add_assignsection' as add_assignsection %}
+              <a href="{{ add_assignsection }}" class="nav-link {% if request.path == add_assignsection %} active {% endif %}">
+                <i class="nav-icon fas fa-th"></i>
+                <p>
+                  Add Assign Section
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
               {% url 'add_load' as add_load %}
               <a href="{{ add_load }}" class="nav-link {% if request.path == add_load %} active {% endif %}">
                 <i class="nav-icon fas fa-th"></i>

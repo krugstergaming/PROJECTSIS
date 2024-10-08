@@ -26,8 +26,13 @@ urlpatterns = [
     path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
     path('add_curriculum_save/', HodViews.add_curriculum_save, name="add_curriculum_save"),
     path('manage_curriculum/', HodViews.manage_curriculum, name="manage_curriculum"),
-    # path('edit_curriculum/<curriculum_id>/', HodViews.edit_curriculum, name="edit_curriculum"),
-    # path('edit_curriculum_save/', HodViews.edit_curriculum_save, name="edit_curriculum_save"),
+    path('edit_curriculum/<curriculum_id>/', HodViews.edit_curriculum, name="edit_curriculum"),
+    path('edit_curriculum_save/', HodViews.edit_curriculum_save, name="edit_curriculum_save"),
+    path('archive_curriculum/<curriculum_id>/', HodViews.archive_curriculum, name="archive_curriculum"),
+    path('unarchive_curriculum/<curriculum_id>/', HodViews.unarchive_curriculum, name="unarchive_curriculum"),
+    path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
+
+    
     # path('delete_curriculum/<curriculum_id>/', HodViews.delete_curriculum, name="delete_curriculum"),
 
     path('add_gradelevel/', HodViews.add_gradelevel, name="add_gradelevel"),
@@ -57,6 +62,10 @@ urlpatterns = [
     # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
     # path('edit_load_save/', HodViews.edit_load_save, name="edit_load_save"),
     # path('manage_load/', HodViews.manage_load, name="manage_load"),
+
+    path('add_assignsection/', HodViews.add_assignsection, name="add_assignsection"),
+    path('load_sections_and_students/', HodViews.load_sections_and_students, name='load_sections_and_students'),
+    path('add_assignsection_save/', HodViews.add_assignsection_save, name="add_assignsection_save"),
 
 
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),

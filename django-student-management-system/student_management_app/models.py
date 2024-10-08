@@ -7,9 +7,12 @@ from django.utils import timezone
 
 class SessionYearModel(models.Model):
     id = models.AutoField(primary_key=True)
-    session_start_year = models.DateField()
-    session_end_year = models.DateField()
+    session_start_year = models.DateField(blank=True, null=True)
+    session_end_year = models.DateField(blank=True, null=True)
     session_limit = models.IntegerField(blank=True, null=True)
+    session_status = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 
@@ -34,6 +37,7 @@ class Staffs(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
     
     middle_name = models.CharField(max_length=255, blank=True, null=True)
+    suffix = models.CharField(max_length=20, blank=True, null=True)
     dob = models.DateField(blank=True, null=True)  # Assuming Date of Birth is a date
     age = models.CharField(max_length=15, blank=True, null=True)
     pob = models.CharField(max_length=255)
@@ -49,35 +53,22 @@ class Staffs(models.Model):
     tin_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     citizenship = models.CharField(max_length=20, choices=[('filipino', 'Filipino'), ('dual', 'Dual Citizenship')])
     dual_country = models.CharField(max_length=255, blank=True, null=True)  # For specifying the country if dual citizenship
-    
     # permanent_address
     permanent_address = models.TextField(blank=True, null=True)
-    
     # Residential address
-
     telephone_no = models.CharField(max_length=20, blank=True, null=True)
     cellphone_no = models.CharField(max_length=20, blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 
-    # def __str__(self):
-	#     return self.GradeLevel_name
-
-class FacultyLoad(models.Model):
-    id = models.AutoField(primary_key=True)
-    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    Load_Limit = models.CharField(max_length=255, blank=True, null=True)
-    objects = models.Manager()
-
-
-
 class Curriculums(models.Model):
     id = models.AutoField(primary_key=True)
     curriculum_name = models.CharField(max_length=255)
+    curriculum_description = models.TextField(max_length=255)
     curriculum_status = models.CharField(max_length=255)
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -90,11 +81,46 @@ class GradeLevel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Students(models.Model):
+    id = models.AutoField(primary_key=True)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    student_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
+
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
+
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    suffix = models.CharField(max_length=20, blank=True, null=True)
+    nickname = models.CharField(max_length=50, blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    pob = models.CharField(max_length=100, blank=True, null=True)
+    sex = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
+    address = models.TextField()
+    nationality = models.CharField(max_length=50, blank=True, null=True)
+    religion = models.CharField(max_length=50, blank=True, null=True)
+    rank_in_family = models.IntegerField(blank=True, null=True)
+    telephone_nos = models.CharField(max_length=20, blank=True, null=True)
+    mobile_phone_nos = models.CharField(max_length=20, blank=True, null=True)
+    is_covid_vaccinated = models.BooleanField(default=False)
+    date_of_vaccination = models.DateField(blank=True, null=True)
+
+    student_status = models.CharField(max_length=255, blank=True, null=True)
+
+    profile_pic = models.FileField(upload_to='profile_pics/', blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
+
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+
     section_name = models.CharField(max_length=255)
     section_limit = models.IntegerField(blank=True, null=True)
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -114,17 +140,34 @@ class Subjects(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class FacultyLoad(models.Model):
+    id = models.AutoField(primary_key=True)
+    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    Load_Limit = models.CharField(max_length=255, blank=True, null=True)
+    objects = models.Manager()
+
+class AssignSection(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    section_id = models.ForeignKey(Section, on_delete=models.CASCADE)
+    Student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Load(models.Model):
     id = models.AutoField(primary_key=True)
 
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    section_id = models.ForeignKey(Section, on_delete=models.CASCADE)
 
     load_status = models.CharField(max_length=10)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -144,47 +187,7 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.load_id.subject_id.subject_name} - {self.load_id.GradeLevel_id.GradeLevel_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
     
-class Students(models.Model):
-    id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)
-    suffix = models.CharField(max_length=20, blank=True, null=True)
-    student_number = models.CharField(max_length=8, unique=True, editable=False, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
-    profile_pic = models.FileField(upload_to='profile_pics/', blank=True, null=True)
-    address = models.TextField()
 
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.DO_NOTHING, default=1)
-    
-    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-
-    nickname = models.CharField(max_length=50, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
-    place_of_birth = models.CharField(max_length=100, blank=True, null=True)
-    nationality = models.CharField(max_length=50, blank=True, null=True)
-    religion = models.CharField(max_length=50, blank=True, null=True)
-    rank_in_family = models.IntegerField(blank=True, null=True)
-    telephone_nos = models.CharField(max_length=20, blank=True, null=True)
-    mobile_phone_nos = models.CharField(max_length=20, blank=True, null=True)
-    is_covid_vaccinated = models.BooleanField(default=False)
-    date_of_vaccination = models.DateField(blank=True, null=True)
-    Enrollment_status = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-    def save(self, *args, **kwargs):
-        if not self.student_number:
-            current_year = timezone.now().year
-            last_student = Students.objects.filter(student_number__startswith=f"{current_year}-").order_by('student_number').last()
-            if last_student:
-                last_number = int(last_student.student_number.split('-')[1])
-                new_number = f"{current_year}-{last_number + 1:04d}"
-            else:
-                new_number = f"{current_year}-0001"
-            self.student_number = new_number
-        super().save(*args, **kwargs)
 
 
 class ParentGuardian(models.Model):
@@ -196,7 +199,6 @@ class ParentGuardian(models.Model):
     guardian_name = models.CharField(max_length=100, blank=True, null=True)
     guardian_occupation = models.CharField(max_length=100, blank=True, null=True)
     objects = models.Manager()
-
 
 class PreviousSchool(models.Model):
     students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
@@ -344,7 +346,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 2:
             Staffs.objects.create(admin=instance)
         if instance.user_type == 3:
-            Students.objects.create(admin=instance, GradeLevel_id=GradeLevel.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", gender="")
+            Students.objects.create(admin=instance, GradeLevel_id=GradeLevel.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", sex="")
     
 
 @receiver(post_save, sender=CustomUser)
