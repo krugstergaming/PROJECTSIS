@@ -10,17 +10,58 @@
 
 <section class="content">
     <div class="container-fluid">
-
         <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
+            <!-- Table to display existing loads -->
+            <div class="col-md-7">  <!-- Changed from col-md-6 to col-md-7 -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Existing Loads</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Curriculum</th>
+                                    <th>Assigned Section</th>
+                                    <th>Subject</th>
+                                    <th>Faculty</th>
+                                    <th>Is Advisory</th>
+                                    <th> Action </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for load in loads %}
+                                    <tr>
+                                        <td>{{ load.curriculum_id.curriculum_name }}</td>
+                                        <td>{{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
+                                        <td>{{ load.subject_id.subject_name }}</td>
+                                        <td>{{ load.staff_id.first_name }} {{ load.staff.last_name }}</td>
+                                        <td>
+                                            {% if load.is_advisory %}
+                                                Yes
+                                            {% else %}
+                                                No
+                                            {% endif %}
+                                        </td>
+                                        <td>  </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No loads available.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form to add a new load -->
+            <div class="col-md-5">  <!-- Changed from col-md-6 to col-md-5 -->
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Add Load</h3>
                     </div>
-                    <!-- /.card-header -->
-                    <!-- form start -->
-
                     <form role="form" method="POST" action="{% url 'add_load_save' %}">
                         {% csrf_token %}
                         {% comment %} Display Messages {% endcomment %}
@@ -49,7 +90,6 @@
                         {% endif %}
 
                         <div class="card-body">
-                            
                             <div class="form-group">
                                 <label for="curriculum">Curriculums</label>
                                 <select class="form-control" name="curriculum_id" id="curriculum_id" required>
@@ -61,37 +101,17 @@
                             </div>
 
                             <div class="form-group">
-                                <label for ="assignsection">Assigned Section</label>
-                                <select class="form-control" id="AssignSection_id" name="AssignSection_id">
+                                <label for="assignsection">Assigned Section</label>
+                                <select class="form-control" id="AssignSection_id" name="AssignSection_id" required>
                                     <option value="">Select Assigned Section</option>
                                     {% for assignsection in assignsections %}
-                                        <option value="{{ assignsection.id }}">
+                                        <option value="{{ assignsection.id }}" data-gradelevel-id="{{ assignsection.GradeLevel_id.id }}">
                                             {{ assignsection.GradeLevel_id.GradeLevel_name }} - {{ assignsection.section_id.section_name }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div> 
                             
-                            <div class="form-group">
-                                <label for="gradelevel">Grade level</label>
-                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required disabled>
-                                    <option value="" disabled selected>Select a Grade level</option>
-                                    {% for gradelevel in gradelevels %}
-                                        <option value="{{ gradelevel.id }}" data-curriculum-id="{{ gradelevel.curriculum_id.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Section</label>
-                                <select class="form-control" name="section_id" id="section_id" required disabled>
-                                    <option value="" disabled selected>Select a Section</option>
-                                    {% for section in sections %}
-                                        <option value="{{ section.id }}" data-gradelevel-id="{{ section.GradeLevel_id.id }}">{{ section.section_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
                             <div class="form-group">
                                 <label>Subject</label>
                                 <select class="form-control" name="subject_id" id="subject_id" required disabled>
@@ -111,19 +131,24 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                        </div>
-                        <!-- /.card-body -->
 
+                            <div class="form-group">
+                                <label for="is_advisory">Is Advisory?</label>
+                                <select class="form-control" name="is_advisory" id="is_advisory" required>
+                                    <option value="False">No</option>
+                                    <option value="True">Yes</option>
+                                </select>
+                            </div>
+
+                        </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Add Load</button>
                         </div>
                     </form>
-
                 </div>
                 <!-- /.card -->
             </div>
         </div>
-
     </div><!-- /.container-fluid -->
 </section>
 
@@ -133,72 +158,38 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var curriculumSelect = document.getElementById('curriculum_id');
-        var gradeLevelSelect = document.getElementById('GradeLevel_id');
-        var sectionSelect = document.getElementById('section_id');
+        var sectionSelect = document.getElementById('AssignSection_id');
         var subjectSelect = document.querySelector('select[name="subject_id"]');
-        var gradeLevelOptions = gradeLevelSelect.querySelectorAll('option');
-        var sectionOptions = sectionSelect.querySelectorAll('option');
         var subjectOptions = subjectSelect.querySelectorAll('option');
 
+        function filterSubjects() {
+            var selectedSection = sectionSelect.value;
+            var selectedGradeLevelId = sectionSelect.options[sectionSelect.selectedIndex].getAttribute('data-gradelevel-id');
 
-        function filterGradeLevels() {
-        var selectedCurriculumId = curriculumSelect.value;
+            if (!selectedSection) {
+                disableSubject();
+            } else {
+                subjectSelect.removeAttribute('disabled');
 
-        if (!selectedCurriculumId) {
-            gradeLevelSelect.setAttribute('disabled', true);
-            gradeLevelSelect.value = "";
-            disableSectionAndSubject();
-        } else {
-            gradeLevelSelect.removeAttribute('disabled');
-            gradeLevelOptions.forEach(function(option) {
-                var optionCurriculumId = option.getAttribute('data-curriculum-id');
-                option.style.display = optionCurriculumId === selectedCurriculumId ? 'block' : 'none';
-            });
-            disableSectionAndSubject(); // Ensure section and subject are disabled when curriculum changes
+                // Filter subjects based on selected section's grade level
+                subjectOptions.forEach(function(option) {
+                    var optionGradeLevelId = option.getAttribute('data-gradelevel-id');
+                    option.style.display = optionGradeLevelId === selectedGradeLevelId ? 'block' : 'none';
+                });
+            }
         }
-    }
 
-    function filterSectionsAndSubjects() {
-        var selectedGradeLevelId = gradeLevelSelect.value;
-
-        if (!selectedGradeLevelId) {
-            disableSectionAndSubject();
-        } else {
-            sectionSelect.removeAttribute('disabled');
-            subjectSelect.removeAttribute('disabled');
-
-            // Filter sections based on selected grade level
-            sectionOptions.forEach(function(option) {
-                var optionGradeLevelId = option.getAttribute('data-gradelevel-id');
-                option.style.display = optionGradeLevelId === selectedGradeLevelId ? 'block' : 'none';
-            });
-
-            // Filter subjects based on selected grade level
-            subjectOptions.forEach(function(option) {
-                var optionGradeLevelId = option.getAttribute('data-gradelevel-id');
-                option.style.display = optionGradeLevelId === selectedGradeLevelId ? 'block' : 'none';
-            });
+        function disableSubject() {
+            // Disable Subject dropdown and reset its value
+            subjectSelect.setAttribute('disabled', true);
+            subjectSelect.value = "";
         }
-    }
 
-    function disableSectionAndSubject() {
-        // Disable Section and Subject dropdowns and reset their values
-        sectionSelect.setAttribute('disabled', true);
-        sectionSelect.value = "";
-        subjectSelect.setAttribute('disabled', true);
-        subjectSelect.value = "";
-    }
+        // Attach event listeners to curriculum and section selects
+        sectionSelect.addEventListener('change', filterSubjects);
 
-    // Attach event listeners to curriculum and grade level selects
-    curriculumSelect.addEventListener('change', filterGradeLevels);
-    gradeLevelSelect.addEventListener('change', filterSectionsAndSubjects);
-
-    // Trigger initial filtering to set the initial state
-    filterGradeLevels();
-    filterSectionsAndSubjects();
+        // Trigger initial filtering to set the initial state
+        filterSubjects();
     });
 </script>
-
-
-
 {% endblock custom_js %}

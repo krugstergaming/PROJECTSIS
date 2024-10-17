@@ -60,6 +60,9 @@ class Staffs(models.Model):
     cellphone_no = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    max_load = models.IntegerField(blank=True, null=True)
+
     objects = models.Manager()
 
 
@@ -113,6 +116,16 @@ class Students(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class StudentPromotionHistory(models.Model):
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    previous_grade = models.ForeignKey(GradeLevel, related_name='previous_grade', on_delete=models.SET_NULL, null=True)
+    new_grade = models.ForeignKey(GradeLevel, related_name='new_grade', on_delete=models.SET_NULL, null=True)
+    promotion_date = models.DateField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.student} promoted from {self.previous_grade} to {self.new_grade} on {self.promotion_date}"
+
+
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
 
@@ -161,12 +174,11 @@ class Load(models.Model):
     id = models.AutoField(primary_key=True)
 
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
+    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
-    load_status = models.CharField(max_length=10)
+    is_advisory = models.BooleanField(default=False)  # BooleanField with True/False for Yes/No
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

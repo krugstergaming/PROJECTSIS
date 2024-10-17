@@ -9,7 +9,7 @@ from datetime import datetime
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 
-from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -103,7 +103,7 @@ def add_staff_save(request):
             last_name = request.POST.get('last_name')
             username = request.POST.get('username')
             email = request.POST.get('email')
-
+            max_laod = request.poST.get('max_load')
             middle_name = request.POST.get('middle_name')
             dob = request.POST.get('dob')
             age = request.POST.get('age')
@@ -137,6 +137,7 @@ def add_staff_save(request):
                 last_name=last_name,
                 user_type=2
             )
+            user.staffs.max_laod = max_laod
             user.staffs.middle_name = middle_name
             user.staffs.dob = dob
             user.staffs.age = age
@@ -652,6 +653,41 @@ def add_student_save(request):
         return redirect('add_student')
 
 
+# def promote_students(request):
+#     if request.method == "POST":
+#         current_grade_id = request.POST.get('current_grade')
+#         next_grade_id = request.POST.get('next_grade')
+        
+#         try:
+#             current_grade = GradeLevel.objects.get(id=current_grade_id)
+#             next_grade = GradeLevel.objects.get(id=next_grade_id)
+            
+#             # Get all students in the current grade
+#             students_to_promote = Students.objects.filter(GradeLevel_id=current_grade)
+            
+#             # Create a promotion history for each student
+#             for student in students_to_promote:
+#                 StudentPromotionHistory.objects.create(
+#                     student=student,
+#                     previous_grade=current_grade,
+#                     new_grade=next_grade,
+#                     promotion_date=timezone.now()
+#                 )
+
+#             # Promote students to the next grade
+#             students_to_promote.update(GradeLevel_id=next_grade)
+            
+#             messages.success(request, f"All students have been promoted from {current_grade.name} to {next_grade.name}.")
+#         except Exception as e:
+#             messages.error(request, f"Failed to promote students. Error: {e}")
+        
+#     return redirect('students_list')
+
+# def view_promotion_history(request, student_id):
+#     promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
+#     return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
+
+
 def manage_student(request):
     students = Students.objects.all()
     context = {
@@ -955,10 +991,13 @@ def add_assignsection(request):
 def load_sections_and_students(request):
     gradelevel_id = request.GET.get('gradelevel_id')
     
-    # Fetch sections and students filtered by GradeLevel
+    # Fetch sections by GradeLevel
     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
-    students = Students.objects.filter(GradeLevel_id=gradelevel_id)
-    
+
+    # Get all students in the GradeLevel who are NOT already assigned to a section
+    assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
+    students = Students.objects.filter(GradeLevel_id=gradelevel_id).exclude(id__in=assigned_students)
+
     # Prepare data for response
     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
@@ -970,42 +1009,49 @@ def add_assignsection_save(request):
     if request.method != "POST":
         messages.error(request, "Method Not Allowed!")
         return redirect('add_assignsection')
-    else:
-        try:
+    
+    try:
+        gradelevel_id = request.POST.get('GradeLevel_id')
+        gradelevel = GradeLevel.objects.get(id=gradelevel_id)
 
-            gradelevel_id = request.POST.get('GradeLevel_id')
-            gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+        section_id = request.POST.get('section_id')
+        section = Section.objects.get(id=section_id)
 
-            section_id = request.POST.get('section_id')
-            section = Section.objects.get(id=section_id)
+        student_ids = request.POST.getlist('student_ids')  # Use getlist to get multiple values
+        print(f"Student IDs: {student_ids}")  # Debug statement
 
-            student_id = request.POST.get('student_id')
+        # Saving the load for each student
+        for student_id in student_ids:
             student = Students.objects.get(id=student_id)
 
-            # Saving the load
+            # Create and save an AssignSection entry for each student
             assignsection = AssignSection(   
-                        GradeLevel_id=gradelevel, 
-                        section_id=section,
-                        Student_id=student
-                        )
+                GradeLevel_id=gradelevel, 
+                section_id=section,
+                Student_id=student
+            )
             assignsection.save()
 
-            messages.success(request, "Assign Section Added Successfully!")
-            return redirect('add_assignsection')
+        messages.success(request, "Assign Section Added Successfully!")
+        return redirect('add_assignsection')
 
-        except Exception as e:
-            messages.error(request, f"Failed to Assign Section! Error: {e}")
-            return redirect('add_assignsection')
-
+    except Exception as e:
+        messages.error(request, f"Failed to Assign Section! Error: {e}")
+        return redirect('add_assignsection')
 
 def add_load(request):
+    # Fetch all necessary data for the context
     curriculums = Curriculums.objects.all()
     assignsections = AssignSection.objects.select_related('GradeLevel_id', 'section_id').distinct('GradeLevel_id', 'section_id')
     gradelevels = GradeLevel.objects.all()
     sections = Section.objects.all()
     subjects = Subjects.objects.all()
     
+    # Use select_related to fetch related data for loads
+    loads = Load.objects.select_related('curriculum_id', 'AssignSection_id', 'subject_id', 'staff_id').all()
+    
     staffs = CustomUser.objects.filter(user_type='2')
+
     context = {
         "curriculums": curriculums,
         "assignsections": assignsections,
@@ -1013,6 +1059,7 @@ def add_load(request):
         "sections": sections,
         "subjects": subjects,
         "staffs": staffs,
+        "loads": loads,
     }
     return render(request, 'hod_template/add_load_template.html', context)
 
@@ -1025,25 +1072,30 @@ def add_load_save(request):
             curriculum_id = request.POST.get('curriculum_id')
             curriculum = Curriculums.objects.get(id=curriculum_id)
 
-            gradelevel_id = request.POST.get('GradeLevel_id')
-            gradelevel = GradeLevel.objects.get(id=gradelevel_id)
-
-            section_id = request.POST.get('section_id')
-            section = Section.objects.get(id=section_id)
+            AssignSection_id = request.POST.get('AssignSection_id')
+            assignsection = AssignSection.objects.get(id=AssignSection_id)
 
             subject_id = request.POST.get('subject_id')
             subject = Subjects.objects.get(id=subject_id)
 
             staff_id = request.POST.get('staff_id')
-            staff_id = CustomUser.objects.get(id=staff_id)
+            staff_user = CustomUser.objects.get(id=staff_id)
+
+            # Get the related Staff instance to check the max_load
+            staff = Staffs.objects.get(admin=staff_user)
+            current_load = Load.objects.filter(staff_id=staff_user).count()
+
+            # Check if the current load exceeds or equals the staff's max_load
+            if current_load >= staff.max_load:
+                messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load}.")
+                return redirect('add_load')
 
             # Saving the load
             load = Load(      
                         curriculum_id=curriculum,
-                        GradeLevel_id=gradelevel, 
-                        section_id=section,
+                        AssignSection_id = assignsection,
                         subject_id=subject,
-                        staff_id=staff_id
+                        staff_id=staff_user
                         )
             load.save()
 

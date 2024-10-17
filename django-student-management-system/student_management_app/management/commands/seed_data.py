@@ -110,6 +110,7 @@ class Command(BaseCommand):
         # Seed Faculty
         faculty_data = [
             {
+                'max_load': '5',
                 'username': 'jdoe',
                 'email': 'jdoe@example.com',
                 'password': 'password123',
@@ -135,6 +136,7 @@ class Command(BaseCommand):
                 'cellphone_no': '098-765-4321'
             },
             {
+                'max_load': '5',
                 'username': 'asmith',
                 'email': 'asmith@example.com',
                 'password': 'password456',
@@ -160,6 +162,7 @@ class Command(BaseCommand):
                 'cellphone_no': '097-654-3210'
             },
             {
+                'max_load': '5',
                 'username': 'bjohnson',
                 'email': 'bjohnson@example.com',
                 'password': 'password789',
@@ -185,6 +188,7 @@ class Command(BaseCommand):
                 'cellphone_no': '096-543-2109'
             },
             {
+                'max_load': '5',
                 'username': 'cjones',
                 'email': 'cjones@example.com',
                 'password': 'password012',
@@ -210,6 +214,7 @@ class Command(BaseCommand):
                 'cellphone_no': '095-432-1098'
             },
             {
+                'max_load': '5',
                 'username': 'dlee',
                 'email': 'dlee@example.com',
                 'password': 'password345',
@@ -253,6 +258,7 @@ class Command(BaseCommand):
                 )
                 
                 # Update Staffs fields via the related CustomUser instance
+                user.staffs.max_load = staff['max_load']
                 user.staffs.middle_name = staff['middle_name']
                 user.staffs.dob = staff['dob']
                 user.staffs.age = age  # Dynamically calculated age
