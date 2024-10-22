@@ -76,7 +76,7 @@
                                     <option value="">Select a Load</option>
                                     {% for load in loads %}
                                         <option value="{{ load.id }}" data-staff-id="{{ load.staff_id.id }}">
-                                            {{ load.GradeLevel_id.GradeLevel_name }} - {{ load.section_id.section_name }} - {{ load.subject_id.subject_name }}
+                                            {{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }} - {{ load.subject_id.subject_name }}
                                         </option>
                                     {% endfor %}
                                 </select>

@@ -1017,10 +1017,14 @@ def add_assignsection_save(request):
         section_id = request.POST.get('section_id')
         section = Section.objects.get(id=section_id)
 
-        student_ids = request.POST.getlist('student_ids')  # Use getlist to get multiple values
-        print(f"Student IDs: {student_ids}")  # Debug statement
+        student_ids = request.POST.getlist('student_ids')  # Get multiple student IDs
 
-        # Saving the load for each student
+        # Check if student_ids is empty
+        if not student_ids:
+            messages.error(request, "No students selected! Please select students to assign to this section.")
+            return redirect('add_assignsection')
+
+        # Proceed to save the assignment for each student
         for student_id in student_ids:
             student = Students.objects.get(id=student_id)
 

@@ -133,6 +133,8 @@ urlpatterns = [
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
     path('staff_add_result_save/', StaffViews.staff_add_result_save, name="staff_add_result_save"),
 
+    path('staff_view_schedule/', StaffViews.staff_view_schedule, name="staff_view_schedule"),
+
     # URSL for Student
     path('student_home/', StudentViews.student_home, name="student_home"),
     path('student_view_attendance/', StudentViews.student_view_attendance, name="student_view_attendance"),
@@ -144,5 +146,6 @@ urlpatterns = [
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
     path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
+    path('student_view_schedule/', StudentViews.student_view_schedule, name="student_view_schedule"), 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

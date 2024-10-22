@@ -5,7 +5,7 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 import datetime # To Parse input DateTime into Python Date Time Object
 
-from student_management_app.models import CustomUser, Staffs, GradeLevel, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+from student_management_app.models import CustomUser, Staffs, GradeLevel, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
 
 
 def student_home(request):
@@ -117,7 +117,7 @@ def student_apply_leave_save(request):
         except:
             messages.error(request, "Failed to Apply Leave")
             return redirect('student_apply_leave')
-
+ 
 
 def student_feedback(request):
     student_obj = Students.objects.get(admin=request.user.id)
@@ -194,5 +194,32 @@ def student_view_result(request):
     }
     return render(request, "student_template/student_view_result.html", context)
 
+
+
+def student_view_schedule(request):
+    # Get the student object for the currently logged-in user
+    student = Students.objects.get(admin=request.user.id)
+
+    # Query the assigned section for the student
+    assign_section = AssignSection.objects.filter(Student_id=student.id).first()
+
+    # Check if the student is assigned to a section
+    if assign_section:
+        # Query the schedule based on the assigned section
+        student_schedule = Schedule.objects.filter(load_id__AssignSection_id=assign_section)
+
+        # Prepare context to pass to the template
+        context = {
+            "student_schedule": student_schedule,
+        }
+    else:
+        # If the student is not assigned to any section, return a message
+        context = {
+            "student_schedule": None,
+            "message": "You are not assigned to any section yet."
+        }
+
+    # Render the schedule template
+    return render(request, "student_template/student_view_schedule.html", context)
 
 

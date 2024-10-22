@@ -8,54 +8,52 @@ from django.core import serializers
 import json
 from django.shortcuts import get_object_or_404
 
-from student_management_app.models import CustomUser, Staffs, GradeLevel, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
+from student_management_app.models import CustomUser, Staffs, GradeLevel, Section, Schedule, AssignSection, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
 
 
 
 def staff_home(request):
-    # Fetching All Students under Staff
-
+    # Fetching subjects assigned to the staff via the Load model
     loads = Load.objects.filter(staff_id=request.user.id)
-    GradeLevel_id_list = []
-    for load in loads:
-        gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
-        GradeLevel_id_list.append(gradelevel.id)
-    
-    final_GradeLevel = []
-    # Removing Duplicate Course Id
-    for GradeLevel_id in GradeLevel_id_list:
-        if GradeLevel_id not in final_GradeLevel:
-            final_GradeLevel.append(GradeLevel_id)
-    
-    students_count = Students.objects.filter(GradeLevel_id__in=final_GradeLevel).count()
-    subject_count = loads.count()
+    subjects = Subjects.objects.filter(load__in=loads)
 
-    # Fetch All Attendance Count
-    attendance_count = Attendance.objects.filter(subject_id__in=loads).count()
-    # Fetch All Approve Leave
-    staff = Staffs.objects.get(admin=request.user.id)
-    leave_count = LeaveReportStaff.objects.filter(staff_id=staff.id, leave_status=1).count()
+    # Fetching all assignsections related to the subjects assigned to this staff
+    assignsections = AssignSection.objects.filter(section_id__in=subjects.values_list('id', flat=True)).distinct('section_id', 'GradeLevel_id')
 
-    #Fetch Attendance Data by Subjects
+    # Counting students based on the sections and grade levels assigned to the staff's subjects
+    students_count = Students.objects.filter(assignsection__in=assignsections).count()
+
+    # Counting the subjects the staff is teaching
+    subject_count = subjects.count()
+
+    # Fetching attendance count for the staff's subjects
+    attendance_count = Attendance.objects.filter(subject_id__in=subjects).count()
+
+    # Fetching approved leave count for the staff
+    leave_count = LeaveReportStaff.objects.filter(staff_id=request.user.id, leave_status=1).count()
+
+    # Fetch attendance data by subjects
     subject_list = []
     attendance_list = []
     for subject in subjects:
-        attendance_count1 = Attendance.objects.filter(subject_id=subject.id).count()
+        attendance_count_by_subject = Attendance.objects.filter(subject_id=subject.id).count()
         subject_list.append(subject.subject_name)
-        attendance_list.append(attendance_count1)
+        attendance_list.append(attendance_count_by_subject)
 
-    students_attendance = Students.objects.filter(course_id__in=final_course)
+    # Fetching attendance information for students in the sections assigned to the staff
+    students_in_sections = Students.objects.filter(assignsection__in=assignsections)
     student_list = []
     student_list_attendance_present = []
     student_list_attendance_absent = []
-    for student in students_attendance:
+    
+    for student in students_in_sections:
         attendance_present_count = AttendanceReport.objects.filter(status=True, student_id=student.id).count()
         attendance_absent_count = AttendanceReport.objects.filter(status=False, student_id=student.id).count()
-        student_list.append(student.admin.first_name+" "+ student.admin.last_name)
+        student_list.append(f"{student.admin.first_name} {student.admin.last_name}")
         student_list_attendance_present.append(attendance_present_count)
         student_list_attendance_absent.append(attendance_absent_count)
 
-    context={
+    context = {
         "students_count": students_count,
         "attendance_count": attendance_count,
         "leave_count": leave_count,
@@ -64,7 +62,7 @@ def staff_home(request):
         "attendance_list": attendance_list,
         "student_list": student_list,
         "attendance_present_list": student_list_attendance_present,
-        "attendance_absent_list": student_list_attendance_absent
+        "attendance_absent_list": student_list_attendance_absent,
     }
     return render(request, "staff_template/staff_home_template.html", context)
 
@@ -72,12 +70,20 @@ def staff_home(request):
 
 
 def staff_take_attendance(request):
-    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    # Get all the loads assigned to the current staff
+    loads = Load.objects.filter(staff_id=request.user.id)
+
+    # Get all subjects related to those loads
+    subjects = Subjects.objects.filter(load__in=loads)
+
+    # Get all session years
     session_years = SessionYearModel.objects.all()
+
     context = {
         "subjects": subjects,
         "session_years": session_years
     }
+    
     return render(request, "staff_template/take_attendance_template.html", context)
 
 
@@ -214,12 +220,19 @@ def save_attendance_data(request):
 
 
 def staff_update_attendance(request):
-    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    # Fetch the loads assigned to the current staff member
+    loads = Load.objects.filter(staff_id=request.user.id)
+    
+    # Extract the subjects from the loads
+    subjects = Subjects.objects.filter(id__in=loads.values_list('subject_id', flat=True))
+    
     session_years = SessionYearModel.objects.all()
+    
     context = {
         "subjects": subjects,
         "session_years": session_years
     }
+    
     return render(request, "staff_template/update_attendance_template.html", context)
 
 @csrf_exempt
@@ -339,8 +352,12 @@ def staff_add_result(request):
     if config and not config.is_grading_active:
         return render(request, "staff_template/close_result_template.html")
 
-    # Fetch subjects assigned to the current staff member
-    subjects = Subjects.objects.filter(staff_id=request.user.id)
+    # Fetch the loads assigned to the current staff
+    loads = Load.objects.filter(staff_id=request.user.id)
+
+    # Fetch subjects related to those loads
+    subjects = Subjects.objects.filter(load__in=loads)
+
     # Fetch all session years
     session_years = SessionYearModel.objects.all()
     
@@ -419,3 +436,14 @@ def staff_add_result_save(request):
         except Exception as e:
             messages.error(request, f"Failed to Add Result! Error: {e}")
             return redirect('staff_add_result')
+        
+
+def staff_view_schedule(request):
+    # Get the current staff member's schedules
+    schedules = Schedule.objects.filter(staff_id=request.user.id)
+    
+    context = {
+        "schedules": schedules
+    }
+    
+    return render(request, "staff_template/staff_view_schedule_template.html", context)

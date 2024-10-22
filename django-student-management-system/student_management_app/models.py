@@ -232,8 +232,6 @@ class EmergencyContact(models.Model):
     emergency_date = models.DateField(blank=True, null=True)
     objects = models.Manager()
 
-
-
 class Attendance(models.Model):
     # Subject Attendance
     id = models.AutoField(primary_key=True)
