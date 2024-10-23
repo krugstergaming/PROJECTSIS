@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Manage Schedule
+    Class Scheduling Management
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,7 +11,7 @@
 <section class="content">
     <div class="container-fluid">
 
-        <a class="btn btn-primary" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp;
+        
 
         {% if messages %}
         <div class="form-group">
@@ -36,6 +36,134 @@
             </div>
         </div>
         {% endif %}
+
+
+        <a class="btn btn-primary" href="{% url 'add_assignsection' %}" role="button">+ Add Assign Section</a> <br/>&nbsp;
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Assigned Sections</h3>
+        
+                        <div class="card-tools">
+                            <form method="GET" action="{% url 'class_search' %}">
+                                <div class="input-group input-group-sm" style="width: 150px;">
+                                    <input type="text" name="search" class="form-control float-right" placeholder="Search">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap" id="assignedSectionsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student Name</th>
+                                    <th>Grade Level</th>
+                                    <th>Section</th>
+                                    <th>Date Assigned</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assignsection in assignsections %}
+                                    <tr>
+                                        <td>{{ assignsection.id }}</td>
+                                        <td>{{ assignsection.Student_id.admin.first_name }} {{ assignsection.Student_id.admin.last_name }}</td>
+                                        <td>{{ assignsection.GradeLevel_id.GradeLevel_name }}</td>
+                                        <td>{{ assignsection.section_id.section_name }}</td>
+                                        <td>{{ assignsection.created_at }}</td>
+                                        <td>
+                                            <!-- Action buttons can go here, for example: -->
+                                            <a href="{% url 'edit_schedule' assignsection.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                            
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6">No records found.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+
+
+        <a class="btn btn-primary" href="{% url 'add_load' %}" role="button">+ Add Load</a> <br/>&nbsp;
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Loads</h3>
+        
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+        
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Curriculum</th>
+                                    <th>Assigned Section</th>
+                                    <th>Subject</th>
+                                    <th>Faculty</th>
+                                    <th>Is Advisory</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for load in loads %}
+                                    <tr>
+                                        <td>{{ load.curriculum_id.curriculum_name }}</td>
+                                        <td>{{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
+                                        <td>{{ load.subject_id.subject_name }}</td>
+                                        <td>{{ load.staff_id.first_name }} {{ load.staff_id.last_name }}</td>
+                                        <td>
+                                            {% if load.is_advisory %}
+                                                Yes
+                                            {% else %}
+                                                No
+                                            {% endif %}
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No loads available.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+
+
+        <a class="btn btn-primary" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp;
 
         <div class="row">
 
@@ -62,6 +190,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>GradeLevel</th>
+                                    <th>Section</th>
                                     <th>Subject</th>
                                     <th>Staff</th>
                                     <th>Session Start Year</th>
@@ -76,9 +205,10 @@
                                 {% for schedule in schedules %}
                                 <tr>
                                     <td>{{ schedule.id }}</td>
-                                    <td>{{ schedule.GradeLevel_id.GradeLevel_name }}</td>
-                                    <td>{{ schedule.subject_id.subject_name }}</td>
-                                    <td>{{ schedule.staff_id.admin.first_name }} {{ schedule.staff_id.admin.last_name }}</td>
+                                    <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }}</td>
+                                    <td>{{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
+                                    <td>{{ schedule.load_id.subject_id.subject_name }}</td>
+                                    <td>{{ schedule.staff_id.first_name }} {{ schedule.staff_id.last_name }}</td>
                                     <td>{{ schedule.session_year_id.session_start_year }}</td>
                                     <td>{{ schedule.session_year_id.session_end_year }}</td>
                                     <td>{{ schedule.day_of_week }}</td>
@@ -100,7 +230,29 @@
             </div>
         </div>
 
+        
+
     </div><!-- /.container-fluid -->
 </section>
+
+
+<!-- Include Bootstrap and jQuery -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#assignedSectionsTable').DataTable({
+            // Optional: Customize DataTable settings here
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+        });
+    });
+</script>
 
 {% endblock main_content %}

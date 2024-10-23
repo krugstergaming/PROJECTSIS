@@ -75,6 +75,7 @@ urlpatterns = [
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
     path('edit_schedule_save/', HodViews.edit_schedule_save, name="edit_schedule_save"),
     path('manage_schedule/', HodViews.manage_schedule, name="manage_schedule"),
+    path('manage_schedule/search/', HodViews.class_search, name="class_search"),
 
 
     path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),

@@ -1113,11 +1113,11 @@ def add_load_save(request):
 def add_schedule(request):
     session_years = SessionYearModel.objects.all()
     staffs = CustomUser.objects.filter(user_type='2')
-    loads = Load.objects.all()
+    loads = Load.objects.all()  
     context = {
         "session_years": session_years,
         "staffs": staffs,
-        "loads": loads,
+        "loads": loads,  
     }
     return render(request, 'hod_template/add_schedule_template.html', context)
 
@@ -1163,11 +1163,62 @@ def add_schedule_save(request):
             return redirect('add_schedule')
 
 def manage_schedule(request):
+    loads = Load.objects.all()
+    assignsections = AssignSection.objects.all()
     schedules = Schedule.objects.all()
     context = {
-        "schedules": schedules
+        "loads": loads,
+        "assignsections": assignsections,
+        "schedules": schedules,
+        
     }
     return render(request, 'hod_template/manage_schedule_template.html', context)
+
+
+def class_search(request):
+    search_query = request.GET.get('search', '')
+
+    # Store search results
+    assignsections = AssignSection.objects.all()
+    loads = Load.objects.all()
+    schedules = Schedule.objects.all()
+
+    # If a search query is provided, filter the results
+    if search_query:
+        assignsections = AssignSection.objects.filter(
+            Student_id__admin__first_name__icontains=search_query
+        )
+        loads = Load.objects.filter(
+            subject_id__subject_name__icontains=search_query
+        )
+        schedules = Schedule.objects.filter(
+            load_id__subject_id__subject_name__icontains=search_query
+        )
+
+        # Save the search query in the session to persist it across page loads
+        request.session['search_query'] = search_query
+    else:
+        # Clear the search query from the session if no search is provided
+        request.session.pop('search_query', None)
+
+    # Check if there is a search query in the GET request and if a search has been made
+    if 'search' in request.GET:
+        # Don't redirect on the initial search
+        return render(request, 'hod_template/manage_schedule_template.html', {
+            'assignsections': assignsections,
+            'loads': loads,
+            'schedules': schedules,
+            'search_query': search_query,  # Pass the search query to the template if needed
+        })
+
+    # Render the search results or the default page
+    return render(request, 'hod_template/manage_schedule_template.html', {
+        'assignsections': assignsections,
+        'loads': loads,
+        'schedules': schedules,
+        'search_query': search_query,  # Pass the search query to the template if needed
+    })
+
 
 def edit_schedule(request, schedule_id):
     # Adding Schedule ID into Session Variable
