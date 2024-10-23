@@ -67,15 +67,33 @@
                 </p>
               </a>
             </li>
+
+            <li class="nav-item">
+              {% url 'add_enrollment' as add_enrollment %}
+              
+              <a href="{{ add_enrollment }}" class="nav-link 
+              {% if request.path == add_enrollment %} active {% endif %}">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <p>
+                  Enrollment Management
+                </p>
+              </a>
+            </li>
+
+
       
 
             <li class="nav-item">
-              {% url 'manage_schedule' as manage_schedule %}
+              {% url 'add_assignsection' as add_assignsection %}
+              {% url 'add_load' as add_load %}
               {% url 'add_schedule' as add_schedule %}
+              {% url 'manage_schedule' as manage_schedule %}
               {% url 'edit_schedule' schedule_id=id as edit_schedule %}
               <a href="{{ manage_schedule }}" class="nav-link 
-              {% if request.path == manage_schedule %} active {% endif %} 
+              {% if request.path == add_assignsection %} active {% endif %}
+              {% if request.path == add_load %} active {% endif %}
               {% if request.path == add_schedule %} active {% endif %}
+              {% if request.path == manage_schedule %} active {% endif %}
               {% if request.path == edit_schedule %} active {% endif %}">
                 <i class="nav-icon fas fa-user-graduate"></i>
                 <p>
@@ -83,28 +101,6 @@
                 </p>
               </a>
             </li>
-
-            
-            <li class="nav-item">
-              {% url 'add_assignsection' as add_assignsection %}
-              <a href="{{ add_assignsection }}" class="nav-link {% if request.path == add_assignsection %} active {% endif %}">
-                <i class="nav-icon fas fa-th"></i>
-                <p>
-                  Add Assign Section
-                </p>
-              </a>
-            </li>
-
-            <li class="nav-item">
-              {% url 'add_load' as add_load %}
-              <a href="{{ add_load }}" class="nav-link {% if request.path == add_load %} active {% endif %}">
-                <i class="nav-icon fas fa-th"></i>
-                <p>
-                  Add Load
-                </p>
-              </a>
-            </li>
-
 
             <li class="nav-item">
               {% url 'manage_gradelevel' as manage_gradelevel %}

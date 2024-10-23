@@ -1,0 +1,226 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Enrollment
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Enrollment</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'add_enrollment_save' %}">
+                        {% csrf_token %}
+
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="student_id">Student</label>
+                                <select class="form-control" name="student_id" id="student_id" required>
+                                    <option value="">Select Student</option>
+                                    {% for student in students %}
+                                        <option value="{{ student.id }}">{{ student.admin.first_name }} {{ student.admin.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Registration Fee</label>
+                                <input type="number" class="form-control" name="registration_fee" id="registration_fee" placeholder="Enter Registration Fee" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Miscellaneous Fee</label>
+                                <input type="number" class="form-control" name="misc_fee" id="misc_fee" placeholder="Enter Miscellaneous Fee" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tuition Fee</label>
+                                <input type="number" class="form-control" name="tuition_fee" id="tuition_fee" placeholder="Enter Tuition Fee" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Total Fee</label>
+                                <input type="number" class="form-control" name="total_fee" id="total_fee" step="0.01" min="0" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Downpayment</label>
+                                <input type="number" class="form-control" name="downpayment" id="downpayment" placeholder="Enter Downpayment" step="0.01" min="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Discount (%)</label>
+                                <input type="number" class="form-control" name="discount" id="discount" placeholder="Enter Discount (e.g., 20 for 20%)" step="0.01" min="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Balance</label>
+                                <input type="number" class="form-control" name="balance" id="balance"  step="0.01" min="0" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Installment Option</label>
+                                <select class="form-control" name="installment_option" id="installment_option">
+                                    <option value="n/a">n/a</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Annually">Annually</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Installment Payment</label>
+                                <input type="number" class="form-control" name="installment_payment" id="installment_payment" step="0.01" min="0" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Assessed By</label>
+                                <input type="text" class="form-control" name="assessed_by" id="assessed_by" placeholder="Enter Assessor's Name">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Assessed Date</label>
+                                <input type="date" class="form-control" name="assessed_date" id="assessed_date">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Received By</label>
+                                <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" placeholder="Enter Name">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Amount</label>
+                                <input type="number" class="form-control" name="payment_amount" id="payment_amount" placeholder="Enter Payment Amount" step="0.01" min="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Date</label>
+                                <input type="date" class="form-control" name="payment_date" id="payment_date">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Enrollment Status</label>
+                                <select class="form-control" name="enrollment_status" id="enrollment_status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Deferred">Deferred</option>
+                                    <option value="Withdrawn">Withdrawn</option>
+                                    <option value="Not Enrolled">Not Enrolled</option>
+                                    <option value="Awaiting Payment">Awaiting Payment</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Remarks</label>
+                                <textarea class="form-control" name="remarks" id="remarks" rows="3" placeholder="Additional Remarks"></textarea>
+                            </div>
+
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Enrollment</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+<script>
+    // Function to calculate total fee, balance, and installment payment
+    function calculateTotals() {
+        const registrationFee = parseFloat(document.getElementById('registration_fee').value) || 0;
+        const miscFee = parseFloat(document.getElementById('misc_fee').value) || 0;
+        const tuitionFee = parseFloat(document.getElementById('tuition_fee').value) || 0;
+
+        // Calculate total fee
+        const totalFee = registrationFee + miscFee + tuitionFee;
+        document.getElementById('total_fee').value = totalFee.toFixed(2); // Format to 2 decimal places
+
+        // Get downpayment and discount
+        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+
+        // Calculate discount amount
+        const discountAmount = (totalFee * (discount / 100));
+        
+        // Calculate balance
+        const balance = totalFee - downpayment - discountAmount;
+        document.getElementById('balance').value = balance >= 0 ? balance.toFixed(2) : 0.00; // Ensure balance is not negative
+        
+        // Calculate installment payment
+        calculateInstallmentPayment(balance);
+    }
+
+    // Function to calculate installment payment based on selected option
+    function calculateInstallmentPayment(balance) {
+        const installmentOption = document.getElementById('installment_option').value;
+        let installmentPayment = 0;
+
+        if (installmentOption === 'Monthly') {
+            installmentPayment = balance / 12; // Monthly installments for 1 year
+        } else if (installmentOption === 'Quarterly') {
+            installmentPayment = balance / 4; // Quarterly installments for 1 year
+        } else if (installmentOption === 'Annually') {
+            installmentPayment = balance; // Full payment at once
+        }
+
+        document.getElementById('installment_payment').value = installmentPayment.toFixed(2); // Format to 2 decimal places
+    }
+
+    // Add event listeners to input fields
+    document.getElementById('registration_fee').addEventListener('input', calculateTotals);
+    document.getElementById('misc_fee').addEventListener('input', calculateTotals);
+    document.getElementById('tuition_fee').addEventListener('input', calculateTotals);
+    document.getElementById('downpayment').addEventListener('input', calculateTotals);
+    document.getElementById('discount').addEventListener('input', calculateTotals);
+    document.getElementById('installment_option').addEventListener('change', function() {
+        const balance = parseFloat(document.getElementById('balance').value) || 0;
+        calculateInstallmentPayment(balance);
+    });
+</script>
+
+{% endblock main_content %}

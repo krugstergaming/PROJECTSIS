@@ -90,6 +90,7 @@ class Students(models.Model):
     student_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
 
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
 
     middle_name = models.CharField(max_length=50, blank=True, null=True)
@@ -116,14 +117,84 @@ class Students(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+
+class Enrollment(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    
+    # ForeignKey to Student
+    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+
+    # Registration, Miscellaneous, and Tuition Fees
+    registration_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    misc_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    tuition_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    # Total fee calculation
+    total_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Payments and Discounts
+    downpayment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Balance after applying downpayment and discounts
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Installment option
+    installment_option = models.CharField(max_length=50, default='Monthly')
+
+    # Assessment and Payment Details
+    assessed_by = models.CharField(max_length=100, blank=True, null=True)
+    assessed_date = models.DateField(blank=True, null=True)
+    payment_received_by = models.CharField(max_length=100, blank=True, null=True)
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    payment_date = models.DateField(blank=True, null=True)
+
+    # Enrollment status
+    enrollment_status = models.CharField(max_length=20, default='Pending')
+
+    # Additional remarks and attachments
+    remarks = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = models.Manager()
+
+    # Methods for dynamic fee calculation (Optional but recommended)
+    def calculate_total_fee(self):
+        return self.registration_fee + self.misc_fee + self.tuition_fee
+
+    def calculate_balance(self):
+        return self.calculate_total_fee() - (self.downpayment + self.discount)
+
+    @property
+    def total_fee(self):
+        return self.calculate_total_fee()
+
+    @property
+    def balance(self):
+        return self.calculate_balance()
+
+class Attachment(models.Model):
+    enrollment = models.ForeignKey('Enrollment', on_delete=models.CASCADE, related_name='attachments')
+    name = models.CharField(max_length=255, blank=True, null=True)
+    file = models.FileField(upload_to='attachments/', blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)  
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    objects = models.Manager()
+
 class StudentPromotionHistory(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE)
     previous_grade = models.ForeignKey(GradeLevel, related_name='previous_grade', on_delete=models.SET_NULL, null=True)
     new_grade = models.ForeignKey(GradeLevel, related_name='new_grade', on_delete=models.SET_NULL, null=True)
     promotion_date = models.DateField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"{self.student} promoted from {self.previous_grade} to {self.new_grade} on {self.promotion_date}"
+    objects = models.Manager()
 
 
 class Section(models.Model):

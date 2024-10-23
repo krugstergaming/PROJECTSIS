@@ -59,6 +59,11 @@ urlpatterns = [
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
 
+    # enrollment urls
+    path('add_enrollment/', HodViews.add_enrollment, name="add_enrollment"),
+    path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
+
+
     path('add_load/', HodViews.add_load, name="add_load"),
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
     # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
