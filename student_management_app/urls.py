@@ -20,7 +20,9 @@ urlpatterns = [
 
     path('edit_staff/<staff_id>/', HodViews.edit_staff, name="edit_staff"),
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
-    path('delete_staff/<staff_id>/', HodViews.deactivate_staff, name="delete_staff"),
+    path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
+
+    # path('edit_max_load/<int:staff_id>/', views.edit_max_load, name='edit_max_load'),
 
 
     path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
@@ -32,11 +34,11 @@ urlpatterns = [
     path('unarchive_curriculum/<curriculum_id>/', HodViews.unarchive_curriculum, name="unarchive_curriculum"),
     path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
 
+    
+    # path('delete_curriculum/<curriculum_id>/', HodViews.delete_curriculum, name="delete_curriculum"),
+
     path('add_gradelevel/', HodViews.add_gradelevel, name="add_gradelevel"),
     path('add_gradelevel_save/', HodViews.add_gradelevel_save, name="add_gradelevel_save"),
-    path('export-gradelevels/', HodViews.export_gradelevels_to_excel, name="export_gradelevels_to_excel"),
-    path('export-staffs/', HodViews.export_staffs_to_excel, name="export_staffs_to_excel"),
-    path('export-students/', HodViews.export_students_to_excel, name="export_students_to_excel"),
     path('manage_gradelevel/', HodViews.manage_gradelevel, name="manage_gradelevel"),
     path('edit_gradelevel/<GradeLevel_id>/', HodViews.edit_gradelevel, name="edit_gradelevel"),
     path('edit_gradelevel_save/', HodViews.edit_gradelevel_save, name="edit_gradelevel_save"),
@@ -57,19 +59,22 @@ urlpatterns = [
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
 
+    # enrollment urls
+    path('add_enrollment/', HodViews.add_enrollment, name="add_enrollment"),
+    path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
+
+
     path('add_load/', HodViews.add_load, name="add_load"),
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
     # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
     # path('edit_load_save/', HodViews.edit_load_save, name="edit_load_save"),
     # path('manage_load/', HodViews.manage_load, name="manage_load"),
 
-
-
     path('add_assignsection/', HodViews.add_assignsection, name="add_assignsection"),
     path('load_sections_and_students/', HodViews.load_sections_and_students, name='load_sections_and_students'),
     path('add_assignsection_save/', HodViews.add_assignsection_save, name="add_assignsection_save"),
 
-    
+
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
@@ -78,7 +83,7 @@ urlpatterns = [
     path('manage_schedule/search/', HodViews.class_search, name="class_search"),
 
 
-    path('deactivate_student/<student_id>/', HodViews.deactivate_student, name="deactivate_student"),
+    path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
 
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),

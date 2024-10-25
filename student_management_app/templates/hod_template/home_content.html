@@ -43,7 +43,7 @@
               <!-- small box -->
               <div class="small-box bg-warning">
                 <div class="inner">
-                  <h3>{{ course_count }}</h3>
+                  <h3>{{ GradeLevel_count }}</h3>
 
                   <p>Total GradeLevel</p>
                 </div>
@@ -286,7 +286,7 @@
 
       // Total Students in Each GradeLevel
       //var donutChartCanvas = $('#pieChart2').get(0).getContext('2d')
-      var student_count_list_in_course = {{student_count_list_in_course }}
+      var student_count_list_in_course = {{ student_count_list_in_course }}
       var pieData2 = {
         labels: GradeLevel_name_list,
         datasets: [
