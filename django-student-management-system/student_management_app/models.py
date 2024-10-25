@@ -134,14 +134,18 @@ class Enrollment(models.Model):
     total_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
     # Payments and Discounts
-    downpayment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    downpayment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
+
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
     
     # Balance after applying downpayment and discounts
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
     
     # Installment option
-    installment_option = models.CharField(max_length=50, default='Monthly')
+    installment_option = models.CharField(max_length=50, default='Monthly', blank=True, null=True)
+
+    installment_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
 
     # Assessment and Payment Details
     assessed_by = models.CharField(max_length=100, blank=True, null=True)
@@ -161,28 +165,24 @@ class Enrollment(models.Model):
     
     objects = models.Manager()
 
-    # Methods for dynamic fee calculation (Optional but recommended)
-    def calculate_total_fee(self):
-        return self.registration_fee + self.misc_fee + self.tuition_fee
-
-    def calculate_balance(self):
-        return self.calculate_total_fee() - (self.downpayment + self.discount)
-
-    @property
-    def total_fee(self):
-        return self.calculate_total_fee()
-
-    @property
-    def balance(self):
-        return self.calculate_balance()
-
 class Attachment(models.Model):
     enrollment = models.ForeignKey('Enrollment', on_delete=models.CASCADE, related_name='attachments')
-    name = models.CharField(max_length=255, blank=True, null=True)
-    file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)  
+    id_picture = models.CharField(max_length=255, blank=True, null=True)
+    id_picture_file = models.FileField(upload_to='attachments/', blank=True, null=True)
+    psa = models.CharField(max_length=255, blank=True, null=True)
+    psa_file = models.FileField(upload_to='attachments/', blank=True, null=True)
+    form_138 = models.CharField(max_length=255, blank=True, null=True)
+    form_138_file = models.FileField(upload_to='attachments/', blank=True, null=True)
+    attachment_remarks = models.CharField(max_length=255, blank=True, null=True)  
     uploaded_at = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
+
+class BalancePayment(models.Model):
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='payments')
+    payment_balance_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_balance_date = models.DateField(blank=True, null=True)
+    past_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_balance_remarks = models.TextField(blank=True, null=True)
 
 class StudentPromotionHistory(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE)
@@ -222,12 +222,6 @@ class Subjects(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-class FacultyLoad(models.Model):
-    id = models.AutoField(primary_key=True)
-    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    Load_Limit = models.CharField(max_length=255, blank=True, null=True)
     objects = models.Manager()
 
 class AssignSection(models.Model):
@@ -366,8 +360,6 @@ class FeedBackStaffs(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-
-
 class NotificationStudent(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
@@ -376,7 +368,6 @@ class NotificationStudent(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-
 class NotificationStaffs(models.Model):
     id = models.AutoField(primary_key=True)
     stafff_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
@@ -384,7 +375,6 @@ class NotificationStaffs(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
-
 
 class StudentResult(models.Model):
     id = models.AutoField(primary_key=True)

@@ -70,8 +70,9 @@
 
             <li class="nav-item">
               {% url 'add_enrollment' as add_enrollment %}
-              
-              <a href="{{ add_enrollment }}" class="nav-link 
+              {% url 'manage_enrollment' as manage_enrollment %}
+              <a href="{{ manage_enrollment }}" class="nav-link 
+              {% if request.path == manage_enrollment %} active {% endif %}
               {% if request.path == add_enrollment %} active {% endif %}">
                 <i class="nav-icon fas fa-user-graduate"></i>
                 <p>
@@ -87,13 +88,13 @@
               {% url 'add_assignsection' as add_assignsection %}
               {% url 'add_load' as add_load %}
               {% url 'add_schedule' as add_schedule %}
-              {% url 'manage_schedule' as manage_schedule %}
+              {% url 'manage_class_scheduling' as manage_class_scheduling %}
               {% url 'edit_schedule' schedule_id=id as edit_schedule %}
-              <a href="{{ manage_schedule }}" class="nav-link 
+              <a href="{{ manage_class_scheduling }}" class="nav-link 
               {% if request.path == add_assignsection %} active {% endif %}
               {% if request.path == add_load %} active {% endif %}
               {% if request.path == add_schedule %} active {% endif %}
-              {% if request.path == manage_schedule %} active {% endif %}
+              {% if request.path == manage_class_scheduling %} active {% endif %}
               {% if request.path == edit_schedule %} active {% endif %}">
                 <i class="nav-icon fas fa-user-graduate"></i>
                 <p>

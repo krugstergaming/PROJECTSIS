@@ -75,63 +75,91 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Total Fee</label>
-                                <input type="number" class="form-control" name="total_fee" id="total_fee" step="0.01" min="0" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Downpayment</label>
-                                <input type="number" class="form-control" name="downpayment" id="downpayment" placeholder="Enter Downpayment" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
                                 <label>Discount (%)</label>
                                 <input type="number" class="form-control" name="discount" id="discount" placeholder="Enter Discount (e.g., 20 for 20%)" step="0.01" min="0">
                             </div>
 
                             <div class="form-group">
-                                <label>Balance</label>
-                                <input type="number" class="form-control" name="balance" id="balance"  step="0.01" min="0" readonly>
+                                <label>Discount Amount</label>
+                                <input type="number" class="form-control" name="discount_amount" id="discount_amount" placeholder="0" step="0.01" min="0" readonly>
                             </div>
 
                             <div class="form-group">
-                                <label>Installment Option</label>
-                                <select class="form-control" name="installment_option" id="installment_option">
-                                    <option value="n/a">n/a</option>
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Quarterly">Quarterly</option>
-                                    <option value="Annually">Annually</option>
-                                </select>
+                                <label>Total Fee</label>
+                                <input type="number" class="form-control" name="total_fee" id="total_fee" step="0.01" min="0" readonly>
                             </div>
 
-                            <div class="form-group">
-                                <label>Installment Payment</label>
-                                <input type="number" class="form-control" name="installment_payment" id="installment_payment" step="0.01" min="0" readonly>
+                            <div class="panel panel-default" style="background-color: #d3d3d3; border: 1px solid #b2ebf2;">
+                                <div class="panel-heading" style="margin-left: 20px; margin-top: 20px;">
+                                    <h4>Installment Payment Option:</h4>
+                                </div>
+                                <div class="panel-body" style="margin-left: 20px;">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="installment_checkbox"> Enable Installment Payment
+                                        </label>
+                                    </div>
+                            
+
+                                    <div id="installment_fields" style="margin-left: 20px; margin-right: 20px;">
+                                        <div class="form-group">
+                                            <label>Downpayment</label>
+                                            <input type="number" class="form-control" name="downpayment" id="downpayment" placeholder="Enter Downpayment" step="0.01" min="0">
+                                        </div>
+                            
+
+                                        <div class="form-group">
+                                            <label>Balance</label>
+                                            <input type="number" class="form-control" name="balance" id="balance" step="0.01" min="0" readonly>
+                                        </div>
+                            
+
+                                        <div class="form-group">
+                                            <label>Installment Option</label>
+                                            <select class="form-control" name="installment_option" id="installment_option">
+                                                <option value="n/a">n/a</option>
+                                                <option value="Monthly">Monthly</option>
+                                                <option value="Quarterly">Quarterly</option>
+                                                <option value="Annually">Annually</option>
+                                            </select>
+                                        </div>
+                            
+
+                                        <div class="form-group">
+                                            <label>Installment Payment</label>
+                                            <input type="number" class="form-control" name="installment_payment" id="installment_payment" step="0.01" min="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            
 
                             <div class="form-group">
                                 <label>Assessed By</label>
-                                <input type="text" class="form-control" name="assessed_by" id="assessed_by" placeholder="Enter Assessor's Name">
+                                <input type="text" class="form-control" name="assessed_by" id="assessed_by" 
+                                       value="{{ request.user.get_full_name }}" readonly>
                             </div>
-
+                            
                             <div class="form-group">
                                 <label>Assessed Date</label>
-                                <input type="date" class="form-control" name="assessed_date" id="assessed_date">
+                                <input type="date" class="form-control" name="assessed_date" id="assessed_date" readonly>
                             </div>
-
+                            
                             <div class="form-group">
                                 <label>Payment Received By</label>
-                                <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" placeholder="Enter Name">
+                                <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" 
+                                       value="{{ request.user.get_full_name }}" readonly>
                             </div>
-
+                            
                             <div class="form-group">
                                 <label>Payment Amount</label>
-                                <input type="number" class="form-control" name="payment_amount" id="payment_amount" placeholder="Enter Payment Amount" step="0.01" min="0">
+                                <input type="number" class="form-control" name="payment_amount" id="payment_amount" 
+                                       step="0.01" min="0" readonly>
                             </div>
-
+                            
                             <div class="form-group">
                                 <label>Payment Date</label>
-                                <input type="date" class="form-control" name="payment_date" id="payment_date">
+                                <input type="date" class="form-control" name="payment_date" id="payment_date" readonly>
                             </div>
 
                             <div class="form-group">
@@ -153,6 +181,34 @@
                                 <textarea class="form-control" name="remarks" id="remarks" rows="3" placeholder="Additional Remarks"></textarea>
                             </div>
 
+                            <div class="form-group">
+                                <label>Attachments:</label>
+                            
+                                <div>
+                                    <input type="checkbox" name="include_id_picture" id="id_picture">
+                                    <label for="id_picture">2x2 ID Picture</label>
+                                    <input type="file" name="id_picture_file" accept="image/*">
+                                </div>
+                            
+                                <div>
+                                    <input type="checkbox" name="include_birth_certificate" id="birth_certificate">
+                                    <label for="birth_certificate">PSA Birth Certificate</label>
+                                    <input type="file" name="birth_certificate_file" accept="image/*">
+                                </div>
+                            
+                                <div>
+                                    <input type="checkbox" name="include_form_138" id="form_138">
+                                    <label for="form_138">Form 138</label>
+                                    <input type="file" name="form_138_file" accept="image/*">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Attachments Remark:</label>
+                                <textarea class="form-control" name="attachment_remarks" id="attachment_remarks" rows="3" placeholder="Additional Remarks"></textarea>
+                            </div>
+                            
+
                         </div>
                         <!-- /.card-body -->
 
@@ -170,57 +226,138 @@
 </section>
 
 <script>
-    // Function to calculate total fee, balance, and installment payment
-    function calculateTotals() {
+    // Set today's date for assessed date and payment date fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('assessed_date').value = today;
+        document.getElementById('payment_date').value = today;
+
+        toggleInstallmentFields(); // Call the function to set the initial state
+        formatDecimalInputs(); // Format decimal inputs on page load
+    });
+
+    // Function to format decimal input fields and handle empty field defaults
+function formatDecimalInputs() {
+    const decimalFields = [
+        'registration_fee',
+        'misc_fee',
+        'tuition_fee',
+        'discount',
+        'downpayment',
+        'balance',
+        'payment_amount',
+        'installment_payment',
+        'discount_amount',
+        'total_fee'
+    ];
+
+    decimalFields.forEach(function(fieldId) {
+        const field = document.getElementById(fieldId);
+
+        // Event listener for input to allow typing without formatting interference
+        field.addEventListener('input', function() {
+            let value = this.value;
+
+            // Keep only digits and at most one decimal point
+            if (!/^\d*\.?\d*$/.test(value)) {
+                this.value = value.slice(0, -1); // Revert last character if invalid
+            }
+        });
+
+        // Event listener for focus to clear the field if it's empty
+        field.addEventListener('focus', function() {
+            if (this.value === '0.00') {
+                this.value = ''; // Clear the field on focus if it was 0.00
+            }
+        });
+
+        // Event listener for blur to format input to two decimal places if needed
+        field.addEventListener('blur', function() {
+            if (this.value === '') {
+                this.value = '0.00'; // Set to 0.00 if the field is left empty
+            } else {
+                // Parse to float and format to two decimal places
+                const value = parseFloat(this.value);
+                this.value = isNaN(value) ? '0.00' : value.toFixed(2);
+            }
+        });
+    });
+}
+
+    // Function to toggle display of installment fields based on checkbox state
+    function toggleInstallmentFields() {
+        const installmentFields = document.getElementById('installment_fields');
+        const checkbox = document.getElementById('installment_checkbox');
+        installmentFields.style.display = checkbox.checked ? 'block' : 'none';
+        setPaymentAmount(); // Update payment amount based on checkbox state
+    }
+
+    // Toggle display of installment fields when the checkbox is checked
+    document.getElementById('installment_checkbox').addEventListener('change', toggleInstallmentFields);
+
+    // Function to calculate total fees
+    function calculateTotalFees() {
         const registrationFee = parseFloat(document.getElementById('registration_fee').value) || 0;
         const miscFee = parseFloat(document.getElementById('misc_fee').value) || 0;
         const tuitionFee = parseFloat(document.getElementById('tuition_fee').value) || 0;
-
-        // Calculate total fee
-        const totalFee = registrationFee + miscFee + tuitionFee;
-        document.getElementById('total_fee').value = totalFee.toFixed(2); // Format to 2 decimal places
-
-        // Get downpayment and discount
-        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
         const discount = parseFloat(document.getElementById('discount').value) || 0;
 
-        // Calculate discount amount
-        const discountAmount = (totalFee * (discount / 100));
+        const totalFees = registrationFee + miscFee + tuitionFee;
+        const discountAmount = tuitionFee * (discount / 100); // Calculate the discount amount only on tuition fee
+        const totalAfterDiscount = totalFees - discountAmount;
         
-        // Calculate balance
-        const balance = totalFee - downpayment - discountAmount;
-        document.getElementById('balance').value = balance >= 0 ? balance.toFixed(2) : 0.00; // Ensure balance is not negative
-        
-        // Calculate installment payment
-        calculateInstallmentPayment(balance);
+        document.getElementById('total_fee').value = totalAfterDiscount.toFixed(2);
+        document.getElementById('discount_amount').value = discountAmount.toFixed(2); // Update discount amount field
+        setPaymentAmount(); // Update payment amount whenever total fees are calculated
     }
 
-    // Function to calculate installment payment based on selected option
-    function calculateInstallmentPayment(balance) {
-        const installmentOption = document.getElementById('installment_option').value;
-        let installmentPayment = 0;
+    // Calculate total fees on input change
+    document.querySelectorAll('#registration_fee, #misc_fee, #tuition_fee, #discount').forEach(function(input) {
+        input.addEventListener('input', calculateTotalFees);
+    });
 
-        if (installmentOption === 'Monthly') {
-            installmentPayment = balance / 12; // Monthly installments for 1 year
-        } else if (installmentOption === 'Quarterly') {
-            installmentPayment = balance / 4; // Quarterly installments for 1 year
-        } else if (installmentOption === 'Annually') {
-            installmentPayment = balance; // Full payment at once
+    // Function to set payment amount based on installment checkbox
+    function setPaymentAmount() {
+        const totalFee = parseFloat(document.getElementById('total_fee').value) || 0;
+        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
+
+        let balance = 0;
+        if (downpayment > 0) { // Only compute balance if downpayment has a value
+            balance = totalFee - downpayment;
         }
 
-        document.getElementById('installment_payment').value = installmentPayment.toFixed(2); // Format to 2 decimal places
+        document.getElementById('balance').value = balance.toFixed(2);
+        
+        const checkbox = document.getElementById('installment_checkbox');
+        const paymentAmount = checkbox.checked ? downpayment : totalFee;
+
+        document.getElementById('payment_amount').value = paymentAmount.toFixed(2);
+        
+        // Calculate installment payment if installment option is selected
+        const installmentOption = document.getElementById('installment_option').value;
+        const installmentPayment = calculateInstallmentPayment(installmentOption, balance);
+        document.getElementById('installment_payment').value = installmentPayment.toFixed(2);
     }
 
-    // Add event listeners to input fields
-    document.getElementById('registration_fee').addEventListener('input', calculateTotals);
-    document.getElementById('misc_fee').addEventListener('input', calculateTotals);
-    document.getElementById('tuition_fee').addEventListener('input', calculateTotals);
-    document.getElementById('downpayment').addEventListener('input', calculateTotals);
-    document.getElementById('discount').addEventListener('input', calculateTotals);
-    document.getElementById('installment_option').addEventListener('change', function() {
-        const balance = parseFloat(document.getElementById('balance').value) || 0;
-        calculateInstallmentPayment(balance);
-    });
+    // Calculate installment payment based on option selected
+    function calculateInstallmentPayment(option, balance) {
+        switch (option) {
+            case 'Monthly':
+                return balance / 12; // Assuming 12 months
+            case 'Quarterly':
+                return balance / 4; // Assuming 4 quarters
+            case 'Annually':
+                return balance; // Full balance as a single payment
+            default:
+                return 0; // No installment
+        }
+    }
+
+    // Update balance and payment amount when downpayment is changed
+    document.getElementById('downpayment').addEventListener('input', setPaymentAmount);
+    
+    // Update payment amount when installment option changes
+    document.getElementById('installment_option').addEventListener('change', setPaymentAmount);
 </script>
 
 {% endblock main_content %}
