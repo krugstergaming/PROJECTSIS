@@ -2,13 +2,8 @@
 from django.urls import path, include
 from . import views
 from .import HodViews, StaffViews, StudentViews
-<<<<<<< Updated upstream
-
-=======
 from django.contrib.auth import views as auth_views
 from django.conf import settings
-from django.conf.urls.static import static
->>>>>>> Stashed changes
 
 urlpatterns = [
     path('', views.loginPage, name="login"),
@@ -25,14 +20,27 @@ urlpatterns = [
 
     path('edit_staff/<staff_id>/', HodViews.edit_staff, name="edit_staff"),
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
-    path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
-    path('add_course/', HodViews.add_course, name="add_course"),
+    path('delete_staff/<staff_id>/', HodViews.deactivate_staff, name="delete_staff"),
 
-    path('add_course_save/', HodViews.add_course_save, name="add_course_save"),
-    path('manage_course/', HodViews.manage_course, name="manage_course"),
-    path('edit_course/<course_id>/', HodViews.edit_course, name="edit_course"),
-    path('edit_course_save/', HodViews.edit_course_save, name="edit_course_save"),
-    path('delete_course/<course_id>/', HodViews.delete_course, name="delete_course"),
+
+    path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
+    path('add_curriculum_save/', HodViews.add_curriculum_save, name="add_curriculum_save"),
+    path('manage_curriculum/', HodViews.manage_curriculum, name="manage_curriculum"),
+    path('edit_curriculum/<curriculum_id>/', HodViews.edit_curriculum, name="edit_curriculum"),
+    path('edit_curriculum_save/', HodViews.edit_curriculum_save, name="edit_curriculum_save"),
+    path('archive_curriculum/<curriculum_id>/', HodViews.archive_curriculum, name="archive_curriculum"),
+    path('unarchive_curriculum/<curriculum_id>/', HodViews.unarchive_curriculum, name="unarchive_curriculum"),
+    path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
+
+    path('add_gradelevel/', HodViews.add_gradelevel, name="add_gradelevel"),
+    path('add_gradelevel_save/', HodViews.add_gradelevel_save, name="add_gradelevel_save"),
+    path('export-gradelevels/', HodViews.export_gradelevels_to_excel, name="export_gradelevels_to_excel"),
+    path('export-staffs/', HodViews.export_staffs_to_excel, name="export_staffs_to_excel"),
+    path('export-students/', HodViews.export_students_to_excel, name="export_students_to_excel"),
+    path('manage_gradelevel/', HodViews.manage_gradelevel, name="manage_gradelevel"),
+    path('edit_gradelevel/<GradeLevel_id>/', HodViews.edit_gradelevel, name="edit_gradelevel"),
+    path('edit_gradelevel_save/', HodViews.edit_gradelevel_save, name="edit_gradelevel_save"),
+    path('delete_gradelevel/<GradeLevel_id>/', HodViews.delete_gradelevel, name="delete_gradelevel"),
 
     path('manage_session/', HodViews.manage_session, name="manage_session"),
     path('add_session/', HodViews.add_session, name="add_session"),
@@ -49,16 +57,28 @@ urlpatterns = [
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
 
+    path('add_load/', HodViews.add_load, name="add_load"),
+    path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
+    # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
+    # path('edit_load_save/', HodViews.edit_load_save, name="edit_load_save"),
+    # path('manage_load/', HodViews.manage_load, name="manage_load"),
+
+
+
+    path('add_assignsection/', HodViews.add_assignsection, name="add_assignsection"),
+    path('load_sections_and_students/', HodViews.load_sections_and_students, name='load_sections_and_students'),
+    path('add_assignsection_save/', HodViews.add_assignsection_save, name="add_assignsection_save"),
+
+    
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
     path('edit_schedule_save/', HodViews.edit_schedule_save, name="edit_schedule_save"),
     path('manage_schedule/', HodViews.manage_schedule, name="manage_schedule"),
+    path('manage_schedule/search/', HodViews.class_search, name="class_search"),
 
 
-
-
-    path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
+    path('deactivate_student/<student_id>/', HodViews.deactivate_student, name="deactivate_student"),
 
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),
@@ -114,6 +134,8 @@ urlpatterns = [
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
     path('staff_add_result_save/', StaffViews.staff_add_result_save, name="staff_add_result_save"),
 
+    path('staff_view_schedule/', StaffViews.staff_view_schedule, name="staff_view_schedule"),
+
     # URSL for Student
     path('student_home/', StudentViews.student_home, name="student_home"),
     path('student_view_attendance/', StudentViews.student_view_attendance, name="student_view_attendance"),
@@ -125,9 +147,7 @@ urlpatterns = [
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
     path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
-<<<<<<< Updated upstream
-]
-=======
+    path('student_view_schedule/', StudentViews.student_view_schedule, name="student_view_schedule"), 
 
     # Password reset    
     path('password_reset/', auth_views.PasswordResetView.as_view(), name="password_reset"),
@@ -135,5 +155,4 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
->>>>>>> Stashed changes
+]

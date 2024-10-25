@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Manage Staff
+    Manage Faculty
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,38 +11,55 @@
 <section class="content">
     <div class="container-fluid">
         <!-- Add Staff Button -->
-        <a class="btn btn-primary" href="{% url 'add_staff' %}" role="button">+ Add Staff</a> 
-        <br/>&nbsp;
+        <div class="row">
+            <div class="col-12 mb-3">
+                <a class="btn btn-primary" href="{% url 'add_staff' %}" role="button">+ Add Faculty</a>
+                <a class="btn btn-secondary" href="{% url 'export_staffs_to_excel' %}" role="button">Export to Excel</a> 
+            </div>
+        </div>
 
         <!-- Activate/Deactivate Grading Button -->
-        <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
-            {% if grading_config.is_grading_active %}
-                Deactivate Grading
-            {% else %}
-                Activate Grading
-            {% endif %}
-        </a> 
-        <br/>&nbsp;
+        <div class="row">
+            <div class="col-12 mb-3">
+                <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
+                    {% if grading_config.is_grading_active %}
+                        Deactivate Grading
+                    {% else %}
+                        Activate Grading
+                    {% endif %}
+                </a>
+            </div>
+        </div>
 
+        <!-- Column Toggle Checkboxes -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <label><input type="checkbox" class="column-check" value="0" checked> Name</label>
+                <label><input type="checkbox" class="column-check" value="1" checked> Username</label>
+                <label><input type="checkbox" class="column-check" value="2" checked> Email</label>
+            </div>
+        </div>
+
+        <!-- Feedback Messages -->
         {% if messages %}
         <div class="form-group">
             <div class="col-12">
                 {% for message in messages %}
-                {% if message.tags == "error" %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% elif message.tags == "success" %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endif %}
+                    {% if message.tags == "error" %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% elif message.tags == "success" %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -50,67 +67,80 @@
 
         <div class="row">
             <div class="col-md-12">
-                <!-- General form elements -->
+                <!-- Faculty Details -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Staff Details</h3>
+                        <h3 class="card-title">Faculty Details</h3>
 
+                        <!-- Search Input -->
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                                <input type="text" name="table_search" id="staffSearch" onkeyup="searchTable()" class="form-control float-right" placeholder="Search">
                                 <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                    <button type="submit" class="btn btn-default">
+                                        <i class="fas fa-search"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- /.card-header -->
+
                     <div class="card-body table-responsive p-0">
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <th>Profile Pic</th>
-                                    <th>First Name</th>
-                                    <th>Last Name</th>
+                                    <th>Name</th>
                                     <th>Username</th>
                                     <th>Email</th>
-                                    <th>Address</th>
-                                    <!-- New Addition -->
-                                    <th>Employee Number</th>
-                                    <th>Registration Number</th>
-                                    <th>Registration Date</th>
-                                    <th>Teacher License</th>
-                                    <th>Signature</th>
-                                    <!-- end -->
-                                    <th>Last Login</th>
-                                    <th>Date Joined</th>
+                                    <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for staff in staffs %}
+                            {% for staff in staffs %}
                                 <tr>
-                                    <td><img src="{{ staff.profile_pic }}" style="width: 100px;" alt="Profile Picture"/></td>                                    
-                                    <td>{{ staff.admin.first_name }}</td>
-                                    <td>{{ staff.admin.last_name }}</td>
+                                    <td>{{ staff.admin.last_name }}, {{ staff.admin.first_name }} {{ staff.middle_name }}</td>
                                     <td>{{ staff.admin.username }}</td>
                                     <td>{{ staff.admin.email }}</td>
-                                    <td>{{ staff.address }}</td>
-                                    <!-- New Addition -->
-                                    <td>{{ staff.employee_no }}</td>
-                                    <td>{{ staff.registration_no }}</td>
-                                    <td>{{ staff.registration_date }}</td>
-                                    <td><img src="{{ staff.teacher_license }}" style="width: 100px;" alt="Teacher License"/></td>
-                                    <td><img src="{{ staff.signature }}" style="width: 100px;" alt="Signature"/></td>
-                                    <!-- end -->
-                                    <td>{{ staff.admin.last_login }}</td>
-                                    <td>{{ staff.admin.date_joined }}</td>
+                                    <td>{{ staff.admin.is_active }}</td>
                                     <td>
                                         <a href="{% url 'edit_staff' staff.admin.id %}" class="btn btn-success">Edit</a> 
-                                        <a href="{% url 'delete_staff' staff.admin.id %}" class="btn btn-danger">Delete</a>
+                                        <a href="{% url 'delete_staff' staff.admin.id %}" class="btn btn-danger">Deactivate</a>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{ staff.admin.id }}">
+                                            View Information
+                                        </button>
                                     </td>
+                                    <!-- Modal Structure for Each Staff -->
+                                    <div class="modal fade" id="modal{{ staff.admin.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ staff.admin.id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalLabel{{ staff.admin.id }}">Staff Details for {{ staff.admin.last_name }} , {{ staff.admin.first_name }} {{ staff.middle_name }}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>Address:</strong> {{ staff.permanent_address }}</p>
+                                                    <p><strong>Date of Birth:</strong> {{ staff.dob }}</p>
+                                                    <p><strong>Age:</strong> {{ staff.age }}</p>
+                                                    <p><strong>Place of Birth:</strong> {{ staff.pob }}</p>
+                                                    <p><strong>Sex:</strong> {{ staff.sex}}</p>
+                                                    <p><strong>Civil Status:</strong> {{ staff.civil_status }}</p>
+                                                    <p><strong>Height:</strong> {{ staff.height }}</p>
+                                                    <p><strong>Weight:</strong> {{ staff.weight }}</p>
+                                                    <p><strong>Blood type:</strong> {{ staff.blood_type }}</p>
+                                                    <p><strong>GSIS ID:</strong> {{ staff.gsis_id }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </tr>
-                                {% endfor %}
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -121,5 +151,8 @@
         </div>
     </div><!-- /.container-fluid -->
 </section>
+
+<!-- Linking JavaScript file -->
+<script src="{% static 'toggle/toggle.js' %}"></script>
 
 {% endblock main_content %}

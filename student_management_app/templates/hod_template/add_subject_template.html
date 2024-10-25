@@ -9,21 +9,12 @@
 {% load static %}
 
 <section class="content">
-<<<<<<< Updated upstream
-        <div class="container-fluid">
-
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
-=======
     <div class="container-fluid">
 
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
                 <div class="card card-primary">
->>>>>>> Stashed changes
                     <div class="card-header">
                         <h3 class="card-title">Add Subject</h3>
                     </div>
@@ -32,46 +23,6 @@
                     <form role="form" method="POST" action="{% url 'add_subject_save' %}">
                         {% csrf_token %}
 
-<<<<<<< Updated upstream
-                        
-                                {% comment %} Display Messages {% endcomment %}
-                                {% if messages %}
-                                <div class="form-group">
-                                <div class="col-12">
-                                    {% for message in messages %}
-                                    {% if message.tags == "error" %}
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% elif message.tags == "success" %}
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                                </div>
-                                {% endif %}
-                            
-
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Subject Name </label>
-                                <input type="text" class="form-control" name="subject" placeholder="Enter Subject">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Course </label>
-                                <select class="form-control" name="course">
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
-=======
                         <!-- Display Messages -->
                         {% if messages %}
                             <div class="form-group">
@@ -114,99 +65,31 @@
                                     <option value="">Select a Grade level</option>
                                     {% for gradelevel in gradelevels %}
                                         <option value="{{ gradelevel.id }}" data-curriculum-id="{{ gradelevel.curriculum_id.id }}">{{ gradelevel.GradeLevel_name }}</option>
->>>>>>> Stashed changes
                                     {% endfor %}
                                 </select>
                             </div>
 
-<<<<<<< Updated upstream
                             <div class="form-group">
-                                <label>Staff </label>
-                                <select class="form-control" name="staff">
-                                    {% for staff in staffs %}
-                                        <option value="{{ staff.id }}">{{ staff.first_name }} {{ staff.last_name }}</option>
-                                    {% endfor %}
-                                </select>
+                                <label>Subject Code</label>
+                                <input type="text" class="form-control" id="subject_code" name="subject_code" placeholder="Enter Subject Code" required>
                             </div>
-
-=======
-                            <!-- Always Visible Input Fields -->
                             <div class="form-group">
                                 <label>Subject Name</label>
-                                <input type="text" class="form-control" name="subject_one" placeholder="Enter Subject 1">
+                                <input type="text" class="form-control" id="subject_name" name="subject_name" placeholder="Enter Subject name" required>
                             </div>
 
                             <div class="form-group">
-                                <label>Subject Name</label>
-                                <input type="text" class="form-control" name="subject_two" placeholder="Enter Subject 2">
+                                <label>Subject Description</label>
+                                <textarea class="form-control" id="subject_description" name="subject_description" placeholder="Enter Subject description" required></textarea>
                             </div>
-
                             <div class="form-group">
-                                <label>Subject Name</label>
-                                <input type="text" class="form-control" name="subject_three" placeholder="Enter Subject 3">
+                                <label>Lecture Hour</label>
+                                <input type="text" class="form-control" id="subject_hours" name="subject_hours" placeholder="Enter Lecture Hour" required>
                             </div>
-
-                            <div class="form-group">
-                                <label>Subject Name</label>
-                                <input type="text" class="form-control" name="subject_four" placeholder="Enter Subject 4">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Subject Name</label>
-                                <input type="text" class="form-control" name="subject_five" placeholder="Enter Subject 5">
-                            </div>
-
-                            <!-- Hidden Fields for Additional Subjects -->
-                            <div id="additional-subjects">
-                                <div class="form-group" style="display: none;">
-                                    <label>Subject Name</label>
-                                    <input type="text" class="form-control" name="subject_six" placeholder="Enter Subject 6">
-                                </div>
-
-                                <div class="form-group" style="display: none;">
-                                    <label>Subject Name</label>
-                                    <input type="text" class="form-control" name="subject_seven" placeholder="Enter Subject 7">
-                                </div>
-
-                                <div class="form-group" style="display: none;">
-                                    <label>Subject Name</label>
-                                    <input type="text" class="form-control" name="subject_eight" placeholder="Enter Subject 8">
-                                </div>
-
-                                <div class="form-group" style="display: none;">
-                                    <label>Subject Name</label>
-                                    <input type="text" class="form-control" name="subject_nine" placeholder="Enter Subject 9">
-                                </div>
-
-                                <div class="form-group" style="display: none;">
-                                    <label>Subject Name</label>
-                                    <input type="text" class="form-control" name="subject_ten" placeholder="Enter Subject 10">
-                                </div>
-                            </div>
-
-                            <!-- Button to Add More Subjects -->
-                            <button type="button" id="add-subject" class="btn btn-secondary">Add Another Subject</button>
-
->>>>>>> Stashed changes
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-<<<<<<< Updated upstream
-                        <button type="submit" class="btn btn-primary">Add Subject</button>
-                        </div>
-                    </form>
-                    </div>
-                    <!-- /.card -->
-
-                </div>
-            </div>
-
-        </div><!-- /.container-fluid -->
-      </section>
-
-  {% endblock main_content %}
-=======
                             <button type="submit" class="btn btn-primary">Add Subject</button>
                         </div>
                     </form>
@@ -221,16 +104,6 @@
 
 <!-- JavaScript to Show Hidden Subject Fields One by One -->
 <script>
-    document.getElementById('add-subject').addEventListener('click', function() {
-        var additionalSubjects = document.getElementById('additional-subjects').querySelectorAll('.form-group');
-        for (var i = 0; i < additionalSubjects.length; i++) {
-            if (additionalSubjects[i].style.display === 'none') {
-                additionalSubjects[i].style.display = 'block';
-                break; // Stop after showing one field
-            }
-        }
-    });
-
 
     document.addEventListener('DOMContentLoaded', function() {
         var curriculumSelect = document.getElementById('curriculum_id');
@@ -264,4 +137,3 @@
 </script>
 
 {% endblock main_content %}
->>>>>>> Stashed changes

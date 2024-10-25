@@ -1,68 +1,47 @@
 {% extends 'base.html' %}
-{% load static %} 
+{% load static %}
+
+
 
 {% block content %}
 
-    <body class="hold-transition login-page">
-      <div class="login-logo" style="text-align: center !important; margin-top: 30px !important;">
-        <img src="{% static 'admin/img/logo.png' %}" alt="Logo" style="display: block; margin: 0 auto 10px auto; width: 100px; height: auto;">
-        <a href="{% url 'login' %}"><b>SCHOOL MANAGEMENT SYSTEM</b></a>
-    </div>
-    
-  <!-- /.login-logo -->
-  <div class="card">
-    <div class="card-body login-card-body">
-      <p class="login-box-msg">Sign in to Student Management System</p>
 
-    <form action="{% url 'doLogin' %}" method="POST">
-      {% csrf_token %}
-        <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="Email" name="email">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>
-        </div>
-        <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password" name="password">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
-            </div>
-          </div>
-        </div>
-
-          <div class="col-12">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-          </div>
-          
-          <div class="col-12 text-center">
-            <a href="{% url 'password_reset' %}">Forgot Password?</a>
-          </div>
-
-          {% if messages %}
-          <div class="col-12">
-            {% for message in messages %}
-              {% if message.tags == "error" %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                  {{ message }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <!-- /.col -->
-        </div>
-    </form>
-
-
+<div class="login-box">
+  <div class="logo-section">
+    <img src="{% static 'admin/img/logo.png' %}" alt="Logo" class="login-logo">
+    <h2>Flor de Grace School, Inc</h2>
+    <h3><b>SCHOOL MANAGEMENT SYSTEM</b></h3>
   </div>
+  
+  <form action="{% url 'doLogin' %}" method="POST">
+    {% csrf_token %}
+    
+    <div class="input-group">
+      <span for="email" class="input-label">Enter Email</span>
+      <input type="email" id="email" class="form-control" placeholder="Email" name="email" required>
+    </div>
+
+    <div class="input-group">
+      <span for="password" class="input-label">Enter Password</span> <!-- Label above -->
+      <input type="password" id="password" class="form-control" placeholder="Password" name="password" required>
+    </div>
+
+    <button type="submit" class="login-btn">Login</button>
+    
+    <div class="forgot-password">
+      <a href="{% url 'password_reset' %}">Forgot Password?</a>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </form>
 </div>
-<!-- /.login-box -->
 
 {% endblock %}

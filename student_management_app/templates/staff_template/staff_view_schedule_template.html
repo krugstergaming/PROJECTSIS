@@ -1,0 +1,53 @@
+{% extends 'staff_template/base_template.html' %}
+
+{% block page_title %}
+    View Schedule
+{% endblock page_title %}
+
+{% block main_content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Your Schedule</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade Level</th>
+                                        <th>Section</th>
+                                        <th>Day</th>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    {% for schedule in schedules %}
+                                    <tr>
+                                        <td>{{ schedule.load_id.subject_id.subject_name }}</td>
+                                        <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }}</td>
+                                        <td>{{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
+                                        <td>{{ schedule.day_of_week }}</td>
+                                        <td>{{ schedule.start_time }}</td>
+                                        <td>{{ schedule.end_time }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock main_content %}

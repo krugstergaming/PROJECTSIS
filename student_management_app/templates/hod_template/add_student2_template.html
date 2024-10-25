@@ -48,126 +48,6 @@
                         {% endif %}
 
                         <div class="card-body">
-<<<<<<< Updated upstream
-                            <!-- Form Fields -->
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="first_name">First Name</label>
-                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="last_name">Last Name</label>
-                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="username">Username</label>
-                                <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="gender">Gender</label>
-                                <select class="form-control" name="gender" id="gender">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="address">Address</label>
-                                <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="age">Age</label>
-                                <input type="number" class="form-control" name="age" id="age" placeholder="Enter Age">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="date_of_birth">Date of Birth</label>
-                                <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="place_of_birth">Place of Birth</label>
-                                <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="nationality">Nationality</label>
-                                <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="religion">Religion</label>
-                                <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="rank_in_family">Rank in the Family</label>
-                                <input type="number" class="form-control" name="rank_in_family" id="rank_in_family" placeholder="Enter Rank in Family">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="telephone_nos">Telephone Nos</label>
-                                <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="mobile_phone_nos">Mobile Phone Nos</label>
-                                <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
-                                <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
-                                    <option value="True">Yes</option>
-                                    <option value="False">No</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="date_of_vaccination">Date of Vaccination</label>
-                                <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
-                            </div>
-
-                            <!-- Dynamic Course Selection -->
-                            <div class="form-group">
-                                <label for="course">Course</label>
-                                <select class="form-control" name="course" id="course">
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}">{{ course.course_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Dynamic Session Selection -->
-                            <div class="form-group">
-                                <label for="staff">Session</label>
-                                <select class="form-control" name="staff" id="staff">
-                                    {% for session in sessions %}
-                                        <option value="{{ session.id }}">{{ session.session_start_year }} - {{ staff.session_end_year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <!-- Profile Picture -->
-                            <div class="form-group">
-                                <label for="profile_pic">Profile Picture</label>
-                                <input type="file" class="form-control" name="profile_pic" id="profile_pic">
-                            </div>
-                        </div>
-=======
 
                             <!-- Tabs Navigation -->
                             <ul class="nav nav-tabs" id="studentFormTabs" role="tablist">
@@ -196,27 +76,22 @@
 
                                     <div class="form-group">
                                         <label for="username">Username</label>
-                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username">
+                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="email">Email</label>
-                                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email">
+                                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
                                     </div>
-                        
-                                    <div class="form-group">
-                                        <label for="password">Password</label>
-                                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password">
-                                    </div>
-                        
+                                    
                                     <div class="form-group">
                                         <label for="first_name">First Name</label>
-                                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name">
+                                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
                                     </div>
                         
                                     <div class="form-group">
                                         <label for="last_name">Last Name</label>
-                                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name">
+                                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name" required>
                                     </div>
                         
                                     <div class="form-group">
@@ -233,12 +108,10 @@
                                         <label for="middle_name">NickName</label>
                                         <input type="text" class="form-control" name="nickname" id="nickname" placeholder="Enter NickName (optional)">
                                     </div>
-
-                                    
                         
                                     <div class="form-group">
-                                        <label for="gender">Gender</label>
-                                        <select class="form-control" name="gender" id="gender">
+                                        <label for="gender">Sex</label>
+                                        <select class="form-control" name="sex" id="sex">
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                         </select>
@@ -246,12 +119,12 @@
                         
                                     <div class="form-group">
                                         <label for="address">Address</label>
-                                        <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address">
+                                        <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="date_of_birth">Date of Birth</label>
-                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="Select your date of birth" onchange="calculateAge()">
+                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="Select your date of birth" onchange="calculateAge()" required>
                                     </div>
                                     
                                     <div class="form-group">
@@ -261,12 +134,12 @@
                         
                                     <div class="form-group">
                                         <label for="place_of_birth">Place of Birth</label>
-                                        <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth">
+                                        <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth" required>
                                     </div>
                         
                                     <div class="form-group">
                                         <label for="nationality">Nationality</label>
-                                        <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality">
+                                        <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality" required>
                                     </div>
                         
                                     <div class="form-group">
@@ -276,7 +149,7 @@
                         
                                     <div class="form-group">
                                         <label for="rank_in_family">Rank in the Family</label>
-                                        <select class="form-control" name="rank_in_family" id="rank_in_family">
+                                        <select class="form-control" name="rank_in_family" id="rank_in_family" required>
                                             <option value="">Select Rank</option>
                                             <option value="1">1st</option>
                                             <option value="2">2nd</option>
@@ -298,7 +171,7 @@
                         
                                     <div class="form-group">
                                         <label for="mobile_phone_nos">Mobile Phone Nos</label>
-                                        <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos">
+                                        <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos" required>
                                     </div>
                         
                                     <div class="form-group">
@@ -317,7 +190,7 @@
                                     <!-- Dynamic GradeLevel Selection -->
                                     <div class="form-group">
                                         <label for="gradelevel">GradeLevel</label>
-                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id">
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
                                             <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
                                             {% for gradelevel in gradelevels %}
                                                 <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
@@ -328,7 +201,7 @@
                                     <!-- Dynamic Session Selection -->
                                     <div class="form-group">
                                         <label for="session">Session</label>
-                                        <select class="form-control" name="session_year_id" id="session_year_id">
+                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
                                             <option value="">Select a Session</option> <!-- Optional placeholder -->
                                             {% for session in sessions %}
                                                 <option value="{{ session.id }}">{{ session.session_start_year }} - {{ session.session_end_year }}</option>
@@ -352,7 +225,7 @@
                         
                                     <div class="form-group">
                                         <label for="father_occupation">Father's Occupation</label>
-                                        <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation" required>
+                                        <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation">
                                     </div>
                         
                                     <div class="form-group">
@@ -443,18 +316,14 @@
                                 </div>
                             </div> <!-- Closing tab-content div -->
                         </div> <!-- Closing card-body div -->
->>>>>>> Stashed changes
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Add Student</button>
-<<<<<<< Updated upstream
-                        </div>
-=======
-                            <button id="scrollUpButton" class="btn btn-secondary"> UP </button>
+                            <button type="button" class="btn btn-primary" id="prevBtn">Previous</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                            <button type="submit" class="btn btn-success" id="saveBtn">Save</button>
                         </div>
                         
->>>>>>> Stashed changes
                     </form>
                 </div>
                 <!-- /.card -->
@@ -464,11 +333,14 @@
 </section>
 
 {% endblock main_content %}
-<<<<<<< Updated upstream
-=======
 
 {% block custom_js %}
     {% comment %} Checking if email and username already exists or not usin Ajax {% endcomment %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 <script>
     $(document).ready(function(){
@@ -551,6 +423,78 @@
             }
             
         })
+
+        var $tabs = $('#studentFormTabs a');
+        var $tabContent = $('#studentFormContent .tab-pane');
+        var $prevBtn = $('#prevBtn');
+        var $nextBtn = $('#nextBtn');
+        var $saveBtn = $('#saveBtn');
+
+        function validateTab(index) {
+            var $currentTab = $tabContent.eq(index);
+            var $requiredFields = $currentTab.find('[required]');
+            var isValid = true;
+            var firstMissingField = null;
+
+            $requiredFields.each(function() {
+                var $field = $(this);
+                if ($field.val().trim() === '') {
+                    if (!firstMissingField) {
+                        firstMissingField = $field;
+                    }
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                // Scroll to and focus on the first missing field
+                $('html, body').animate({
+                    scrollTop: firstMissingField.offset().top - 100 // Adjust as needed
+                }, 500);
+                firstMissingField.focus();
+            }
+
+            return isValid;
+        }
+
+        function showTab(index) {
+            if (validateTab(index - 1) || index === 0) { // Allow navigation if current tab is valid or it's the first tab
+                $tabs.removeClass('active');
+                $tabContent.removeClass('show active');
+                $tabs.eq(index).addClass('active');
+                $tabContent.eq(index).addClass('show active');
+
+                // Show or hide buttons based on the tab index
+                if (index === 0) {
+                    $prevBtn.hide(); // Hide Previous button on the first tab
+                } else {
+                    $prevBtn.show(); // Show Previous button on other tabs
+                }
+
+                if (index === $tabs.length - 1) {
+                    $saveBtn.show(); // Show Save button on the last tab
+                } else {
+                    $saveBtn.hide(); // Hide Save button on other tabs
+                }
+            }
+        }
+
+        $('#nextBtn').click(function(){
+            var currentIndex = $tabs.index($tabs.filter('.active'));
+            if (currentIndex < $tabs.length - 1) {
+                showTab(currentIndex + 1);
+            }
+        });
+
+        $('#prevBtn').click(function(){
+            var currentIndex = $tabs.index($tabs.filter('.active'));
+            if (currentIndex > 0) {
+                showTab(currentIndex - 1);
+            }
+        });
+
+        // Initial state
+        showTab(0); // Start with the first tab
     });
 
     function calculateAge() {
@@ -572,4 +516,3 @@
 
 
 {% endblock custom_js %}
->>>>>>> Stashed changes
