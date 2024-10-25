@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage #To upload Profile Picture
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -13,7 +12,7 @@ from openpyxl.styles import Font, PatternFill, Alignment
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 
-from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Enrollment
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -874,6 +873,70 @@ def add_student_save(request):
     except Exception as e:
         messages.error(request, f"Failed to Add Student! Error: {str(e)}")
         return redirect('add_student')
+
+def add_enrollment(request):
+    # Get all students who are NOT in the Enrollment table
+    enrolled_students_ids = Enrollment.objects.values_list('student_id', flat=True)
+    students = Students.objects.exclude(id__in=enrolled_students_ids)
+    
+    context = {
+        "students": students
+    }
+    return render(request, 'hod_template/add_enrollment_template.html', context)
+
+def add_enrollment_save(request):
+
+    if request.method != "POST":
+        messages.error(request, "Invalid Method!")
+        return redirect('add_enrollment')
+    else:
+
+        student_id = request.POST.get('student_id')
+        student_id = CustomUser.objects.get(id=student_id)
+
+        registration_fee = request.POST.get('registration_fee')
+        misc_fee = request.POST.get('misc_fee')
+        tuition_fee = request.POST.get('tuition_fee')
+        total_fee = request.POST.get('total_fee')
+        downpayment = request.POST.get('downpayment', 0)  # Default to 0 if not provided
+        discount = request.POST.get('discount', 0)  # Default to 0 if not provided
+        balance = request.POST.get('balance')
+        installment_option = request.POST.get('installment_option')
+        assessed_by = request.POST.get('assessed_by')
+        assessed_date = request.POST.get('assessed_date')
+        payment_received_by = request.POST.get('payment_received_by')
+        payment_amount = request.POST.get('payment_amount')
+        payment_date = request.POST.get('payment_date')
+        enrollment_status = request.POST.get('enrollment_status')
+        remarks = request.POST.get('remarks', '')
+        
+        try:
+            enrollment = Enrollment(
+
+                student_id=student_id,
+                registration_fee = registration_fee,
+                misc_fee = misc_fee,
+                tuition_fee = tuition_fee,
+                total_fee = total_fee,
+                downpayment = downpayment,
+                discount = discount,
+                balance = balance,
+                installment_option = installment_option,
+                assessed_by = assessed_by,
+                assessed_date = assessed_date,
+                payment_received_by = payment_received_by,
+                payment_amount = payment_amount,
+                payment_date = payment_date,
+                enrollment_status = enrollment_status,
+                remarks = remarks,
+                )
+            enrollment.save()
+            messages.success(request, "Enrollement Added Successfully!")
+            return redirect('add_enrollment')
+        except:
+            messages.error(request, "Failed to Add Enrollement!")
+            return redirect('add_enrollment')
+
 
 
 def manage_student(request):
