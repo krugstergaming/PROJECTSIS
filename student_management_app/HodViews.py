@@ -5,17 +5,10 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
-<<<<<<< Updated upstream
 import cloudinary.uploader
 
 from student_management_app.models import CustomUser, Staffs, Courses, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration
 from .forms import AddStudentForm, EditStudentForm, AddScheduleForm, EditScheduleForm, ParentGuardianForm, PreviousSchoolForm, EmergencyContactForm
-=======
-from datetime import datetime
-import cloudinary.uploader
-from student_management_app.models import CustomUser, Staffs, Curriculums, GradeLevel, Subjects, Section, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Schedule, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
-from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
->>>>>>> Stashed changes
 
 
 def admin_home(request):
@@ -523,15 +516,6 @@ def add_student_save(request):
             else:
                 profile_pic_url = None
 
-<<<<<<< Updated upstream
-=======
-        # Handle file upload for profile picture
-        profile_pic_url = None
-        if 'profile_pic' in request.FILES:
-            profile_pic = request.FILES['profile_pic']
-            upload_result = cloudinary.uploader.upload(profile_pic, folder="media/")
-            profile_pic_url = upload_result.get('url')
->>>>>>> Stashed changes
 
             try:
                 user = CustomUser.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name, user_type=3)
