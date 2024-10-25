@@ -11,7 +11,11 @@
 <section class="content">
         <div class="container-fluid">
 
+<<<<<<< Updated upstream
             <a class="btn btn-primary" href="{% url 'add_student' %}" role="button">+ Add Student</a> <br/>&nbsp;
+=======
+            <a class="btn btn-primary" href="{% url 'add_student' %}" role="button">+ Add Student</a> <br/>&nbsp; 
+>>>>>>> Stashed changes
             
             {% if messages %}
                                 <div class="form-group">
@@ -70,7 +74,11 @@
                                 <th>Profile Pic</th>
                                 <th>Start Year</th>
                                 <th>End Year</th>
+<<<<<<< Updated upstream
                                 <th>Course</th>
+=======
+                                <th>GradeLevel</th>
+>>>>>>> Stashed changes
                                 <th>Last Login</th>
                                 <th>Date Joined</th>
                                 <th>Action</th>
@@ -89,7 +97,11 @@
                                 <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td>
                                 <td>{{ student.session_year_id.session_start_year }}</td>
                                 <td>{{ student.session_year_id.session_end_year }}</td>
+<<<<<<< Updated upstream
                                 <td>{{ student.course_id.course_name }}</td>
+=======
+                                <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
+>>>>>>> Stashed changes
                                 <td>{{ student.admin.last_login }}</td>
                                 <td>{{ student.admin.date_joined }}</td>
                                 <td>
