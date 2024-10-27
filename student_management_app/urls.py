@@ -57,6 +57,13 @@ urlpatterns = [
     path('manage_student/', HodViews.manage_student, name="manage_student"),
 
 
+    # enrollment urls
+    path('add_enrollment/', HodViews.add_enrollment, name="add_enrollment"),
+    path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
+    path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
+    path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
+
+
     path('add_load/', HodViews.add_load, name="add_load"),
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
     # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
@@ -74,7 +81,8 @@ urlpatterns = [
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),
     path('edit_schedule_save/', HodViews.edit_schedule_save, name="edit_schedule_save"),
-    path('manage_schedule/', HodViews.manage_schedule, name="manage_schedule"),
+
+    path('manage_class_scheduling/', HodViews.manage_class_scheduling, name="manage_class_scheduling"),
     path('manage_schedule/search/', HodViews.class_search, name="class_search"),
 
 

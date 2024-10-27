@@ -11,9 +11,11 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
+from decimal import Decimal, InvalidOperation
+from django.db import IntegrityError
 
-from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Enrollment
-from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
+from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm, UpdateBalanceForm
 
 
 def admin_home(request):
@@ -885,58 +887,198 @@ def add_enrollment(request):
     return render(request, 'hod_template/add_enrollment_template.html', context)
 
 def add_enrollment_save(request):
-
     if request.method != "POST":
         messages.error(request, "Invalid Method!")
         return redirect('add_enrollment')
-    else:
 
-        student_id = request.POST.get('student_id')
-        student_id = CustomUser.objects.get(id=student_id)
+    # Retrieve student instance
+    student_id = request.POST.get('student_id')
+    
+    try:
+        student_instance = Students.objects.get(id=student_id)
+    except Students.DoesNotExist:
+        messages.error(request, "Student not found.")
+        return redirect('add_enrollment')
 
-        registration_fee = request.POST.get('registration_fee')
-        misc_fee = request.POST.get('misc_fee')
-        tuition_fee = request.POST.get('tuition_fee')
-        total_fee = request.POST.get('total_fee')
-        downpayment = request.POST.get('downpayment', 0)  # Default to 0 if not provided
-        discount = request.POST.get('discount', 0)  # Default to 0 if not provided
-        balance = request.POST.get('balance')
-        installment_option = request.POST.get('installment_option')
-        assessed_by = request.POST.get('assessed_by')
-        assessed_date = request.POST.get('assessed_date')
-        payment_received_by = request.POST.get('payment_received_by')
-        payment_amount = request.POST.get('payment_amount')
-        payment_date = request.POST.get('payment_date')
-        enrollment_status = request.POST.get('enrollment_status')
-        remarks = request.POST.get('remarks', '')
-        
+    # Retrieve and convert values from the form
+    def safe_decimal(value, field_name):
+        """Helper function to safely convert to Decimal with error logging."""
         try:
-            enrollment = Enrollment(
+            return Decimal(value.strip() or '0.00')
+        except InvalidOperation:
+            messages.error(request, f"Invalid input for {field_name}. Please check your values.")
+            raise
 
-                student_id=student_id,
-                registration_fee = registration_fee,
-                misc_fee = misc_fee,
-                tuition_fee = tuition_fee,
-                total_fee = total_fee,
-                downpayment = downpayment,
-                discount = discount,
-                balance = balance,
-                installment_option = installment_option,
-                assessed_by = assessed_by,
-                assessed_date = assessed_date,
-                payment_received_by = payment_received_by,
-                payment_amount = payment_amount,
-                payment_date = payment_date,
-                enrollment_status = enrollment_status,
-                remarks = remarks,
+    try:
+        # Convert and log values
+        registration_fee = safe_decimal(request.POST.get('registration_fee', '0.00'), 'registration fee')
+        misc_fee = safe_decimal(request.POST.get('misc_fee', '0.00'), 'misc fee')
+        tuition_fee = safe_decimal(request.POST.get('tuition_fee', '0.00'), 'tuition fee')
+        total_fee = safe_decimal(request.POST.get('total_fee', '0.00'), 'total fee')
+        downpayment = safe_decimal(request.POST.get('downpayment', '0.00'), 'downpayment')
+        discount = safe_decimal(request.POST.get('discount', '0.00'), 'discount')
+        discount_amount = safe_decimal(request.POST.get('discount_amount', '0.00'), 'discount amount')
+        balance = safe_decimal(request.POST.get('balance', '0.00'), 'balance')
+        installment_payment = safe_decimal(request.POST.get('installment_payment', '0.00'), 'installment payment')
+        payment_amount = safe_decimal(request.POST.get('payment_amount', '0.00'), 'payment amount')
+
+        installment_option = request.POST.get('installment_option', 'Monthly')
+        assessed_by = request.POST.get('assessed_by', '')
+        assessed_date = request.POST.get('assessed_date', None)  # Modify as needed for date format
+        payment_received_by = request.POST.get('payment_received_by', '')
+        payment_date = request.POST.get('payment_date', None)  # Modify as needed for date format
+        enrollment_status = request.POST.get('enrollment_status', 'Pending')
+        remarks = request.POST.get('remarks', '')
+
+        # Create and save the enrollment instance
+        enrollment = Enrollment(
+            student_id=student_instance,
+            registration_fee=registration_fee,
+            misc_fee=misc_fee,
+            tuition_fee=tuition_fee,
+            total_fee=total_fee,
+            downpayment=downpayment,
+            discount=discount,
+            discount_amount=discount_amount,
+            balance=balance,
+            installment_payment=installment_payment,
+            installment_option=installment_option,
+            assessed_by=assessed_by,
+            assessed_date=assessed_date,
+            payment_received_by=payment_received_by,
+            payment_amount=payment_amount,
+            payment_date=payment_date,
+            enrollment_status=enrollment_status,
+            remarks=remarks,
+        )
+        
+        enrollment.save()
+
+        # Handle file uploads from the request
+        id_picture_file = request.FILES.get('id_picture_file') if request.POST.get('include_id_picture') else None
+        psa_file = request.FILES.get('birth_certificate_file') if request.POST.get('include_birth_certificate') else None
+        form_138_file = request.FILES.get('form_138_file') if request.POST.get('include_form_138') else None
+
+        # Create an Attachment instance
+        attachment = Attachment(
+            enrollment=enrollment,
+            id_picture="2x2 ID picture" if id_picture_file else '',
+            id_picture_file=id_picture_file,
+            psa="PSA birth certificate" if psa_file else '',
+            psa_file=psa_file,
+            form_138="Form 138" if form_138_file else '',
+            form_138_file=form_138_file,
+            attachment_remarks=request.POST.get('attachment_remarks', ''),
+        )
+
+        attachment.save()
+        messages.success(request, "Enrollment Added Successfully!")
+    except Exception as e:
+        messages.error(request, f"Failed to Add Enrollment! Error: {str(e)}")
+    
+    return redirect('add_enrollment')
+
+def manage_enrollment(request):
+    students = Students.objects.all()
+    enrollments = Enrollment.objects.all()
+    attachments = Attachment.objects.all()
+    balancepayments = BalancePayment.objects.all()
+    context = {
+        "students": students,
+        "enrollments": enrollments,
+        "attachments": attachments,
+        "balancepayments": balancepayments,
+    }
+    return render(request, 'hod_template/manage_enrollment_template.html', context)
+
+
+def update_balance(request, enrollment_id=None):
+    # List all enrollments
+    enrollments = Enrollment.objects.all()
+
+    if enrollment_id:
+        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+    else:
+        enrollment = None
+
+    if request.method == 'POST' and enrollment_id:
+        form = UpdateBalanceForm(request.POST)
+        if form.is_valid():
+            payment_balance_amount = form.cleaned_data['payment_balance_amount']
+            
+            # Store the current balance before updating it
+            past_balance = enrollment.balance
+            
+            try:
+                # Update the balance
+                enrollment.balance -= payment_balance_amount
+                enrollment.save()
+                
+                # Create a new Payment record with past balance
+                BalancePayment.objects.create(
+                    enrollment=enrollment, 
+                    payment_balance_amount=payment_balance_amount,
+                    payment_balance_date=form.cleaned_data['payment_balance_date'], 
+                    payment_balance_remarks=form.cleaned_data.get('payment_balance_remarks'),
+                    past_balance=past_balance 
                 )
-            enrollment.save()
-            messages.success(request, "Enrollement Added Successfully!")
-            return redirect('add_enrollment')
-        except:
-            messages.error(request, "Failed to Add Enrollement!")
-            return redirect('add_enrollment')
+                
+                # Include the current balance in the success message
+                current_balance = enrollment.balance  # Get the updated balance
+                messages.success(request, f'Balance updated successfully. Current balance: {current_balance:.2f}, Past balance: {past_balance:.2f}')
+                
+                # Redirect to the same manage_enrollment page
+                return redirect('manage_enrollment')
 
+            except IntegrityError:
+                messages.error(request, 'There was an error updating the balance. Please try again.')
+            except Exception as e:
+                messages.error(request, f'An unexpected error occurred: {str(e)}')
+
+    else:
+        form = UpdateBalanceForm()
+
+    return render(request, 'hod_template/manage_enrollment_template.html', {
+        'form': form,
+        'enrollments': enrollments,
+        'enrollment': enrollment,
+    })
+
+
+    
+# def promote_students(request):
+#     if request.method == "POST":
+#         current_grade_id = request.POST.get('current_grade')
+#         next_grade_id = request.POST.get('next_grade')
+        
+#         try:
+#             current_grade = GradeLevel.objects.get(id=current_grade_id)
+#             next_grade = GradeLevel.objects.get(id=next_grade_id)
+            
+#             # Get all students in the current grade
+#             students_to_promote = Students.objects.filter(GradeLevel_id=current_grade)
+            
+#             # Create a promotion history for each student
+#             for student in students_to_promote:
+#                 StudentPromotionHistory.objects.create(
+#                     student=student,
+#                     previous_grade=current_grade,
+#                     new_grade=next_grade,
+#                     promotion_date=timezone.now()
+#                 )
+
+#             # Promote students to the next grade
+#             students_to_promote.update(GradeLevel_id=next_grade)
+            
+#             messages.success(request, f"All students have been promoted from {current_grade.name} to {next_grade.name}.")
+#         except Exception as e:
+#             messages.error(request, f"Failed to promote students. Error: {e}")
+        
+#     return redirect('students_list')
+
+# def view_promotion_history(request, student_id):
+#     promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
+#     return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
 
 
 def manage_student(request):
@@ -1349,7 +1491,7 @@ def add_schedule_save(request):
             messages.error(request, f"Failed to Add Schedule! Erro: {e}" )
             return redirect('add_schedule')
 
-def manage_schedule(request):
+def manage_class_scheduling(request):
     loads = Load.objects.all()
     assignsections = AssignSection.objects.all()
     schedules = Schedule.objects.all()
@@ -1416,7 +1558,7 @@ def edit_schedule(request, schedule_id):
         schedule = Schedule.objects.get(id=schedule_id)
     except Schedule.DoesNotExist:
         messages.error(request, "Schedule does not exist.")
-        return redirect('manage_schedule')  # Adjust this redirect based on your URL names
+        return redirect('manage_class_scheduling')  # Adjust this redirect based on your URL names
 
     # Initialize the form with data from the database
     form = EditScheduleForm()
@@ -1441,7 +1583,7 @@ def edit_schedule_save(request):
     else:
         schedule_id = request.session.get('schedule_id')
         if schedule_id is None:
-            return redirect('/manage_schedule')
+            return redirect('/manage_class_scheduling')
 
         form = EditScheduleForm(request.POST, request.FILES)
         if form.is_valid():
