@@ -13,86 +13,66 @@ from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
+from django.db.models import Count
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm, UpdateBalanceForm
 
 
 def admin_home(request):
-    all_student_count = Students.objects.all().count()
-    subject_count = Subjects.objects.all().count()
-    gradelevel_count = GradeLevel.objects.all().count()
-    staff_count = Staffs.objects.all().count()
+    all_student_count = Students.objects.count()
+    subject_count = Subjects.objects.count()
+    gradelevel_count = GradeLevel.objects.count()
+    staff_count = Staffs.objects.count()
+    load_count = Load.objects.count()
+    curriculum_count = Curriculums.objects.count()
 
-    # Total Subjects and students in Each GradeLevel
-    gradelevel_all = GradeLevel.objects.all()
-    GradeLevel_name_list = []
-    subject_count_list = []
-    student_count_list_in_gradelevel = []
+    # Serialize GradeLevel data
+    grade_levels = GradeLevel.objects.values('GradeLevel_name')
+    grade_levels_data = json.dumps(list(grade_levels))  # Serialize data for JSON compatibility
 
-    for gradelevel in gradelevel_all:
-        subjects = Subjects.objects.filter(GradeLevel_id=gradelevel.id).count()
-        students = Students.objects.filter(GradeLevel_id=gradelevel.id).count()
-        GradeLevel_name_list.append(gradelevel.GradeLevel_name)
-        subject_count_list.append(subjects)
-        student_count_list_in_gradelevel.append(students)
+    # Updated query to get subjects grouped by GradeLevel
+    subjects_per_gradelevel = Subjects.objects.select_related('GradeLevel_id') \
+        .values('GradeLevel_id__GradeLevel_name') \
+        .annotate(subject_count=Count('id'))
+
+    # Prepare data to be passed to Chart.js
+    gradelevels_datas = [
+        {
+            "grade_level": item['GradeLevel_id__GradeLevel_name'],  # The grade level name
+            "subject_count": item['subject_count']  # The count of subjects per grade level
+        }
+        for item in subjects_per_gradelevel
+    ]
+
+    # Aggregate the number of students per GradeLevel
+    students_per_gradelevel = Students.objects.values('GradeLevel_id__GradeLevel_name').annotate(student_count=Count('id'))
     
-    subject_all = Subjects.objects.all()
-    subject_list = []
-    student_count_list_in_subject = []
-    for subject in subject_all:
-        gradelevel = GradeLevel.objects.get(id=subject.GradeLevel_id.id)
-        student_count = Students.objects.filter(GradeLevel_id=gradelevel.id).count()
-        subject_list.append(subject.subject_name)
-        student_count_list_in_subject.append(student_count)
-    
-    # For Saffs
-    staff_attendance_present_list=[]
-    staff_attendance_leave_list=[]
-    staff_name_list=[]
+    # Prepare the data to pass to the template
+    student_gradelevel_data = [
+        {
+            "grade_level": item['GradeLevel_id__GradeLevel_name'],
+            "student_count": item['student_count']
+        }
+        for item in students_per_gradelevel
+    ]
 
-    staffs = Staffs.objects.all()
-    for staff in staffs:
-        # subject_ids = Subjects.objects.filter(staff_id=staff.admin.id)
-        # attendance = Attendance.objects.filter(subject_id__in=subject_ids).count()
-        leaves = LeaveReportStaff.objects.filter(staff_id=staff.id, leave_status=1).count()
-        # staff_attendance_present_list.append(attendance)
-        staff_attendance_leave_list.append(leaves)
-        staff_name_list.append(staff.admin.first_name)
-
-    # For Students
-    student_attendance_present_list=[]
-    student_attendance_leave_list=[]
-    student_name_list=[]
-
-    students = Students.objects.all()
-    for student in students:
-        attendance = AttendanceReport.objects.filter(student_id=student.id, status=True).count()
-        absent = AttendanceReport.objects.filter(student_id=student.id, status=False).count()
-        leaves = LeaveReportStudent.objects.filter(student_id=student.id, leave_status=1).count()
-        student_attendance_present_list.append(attendance)
-        student_attendance_leave_list.append(leaves+absent)
-        student_name_list.append(student.admin.first_name)
-
-
-    context={
+    context = {
         "all_student_count": all_student_count,
         "subject_count": subject_count,
         "gradelevel_count": gradelevel_count,
         "staff_count": staff_count,
-        "GradeLevel_name_list": GradeLevel_name_list,
-        "subject_count_list": subject_count_list,
-        "student_count_list_in_gradelevel": student_count_list_in_gradelevel,
-        "subject_list": subject_list,
-        "student_count_list_in_subject": student_count_list_in_subject,
-        "staff_attendance_present_list": staff_attendance_present_list,
-        "staff_attendance_leave_list": staff_attendance_leave_list,
-        "staff_name_list": staff_name_list,
-        "student_attendance_present_list": student_attendance_present_list,
-        "student_attendance_leave_list": student_attendance_leave_list,
-        "student_name_list": student_name_list,
+        "load_count": load_count,
+        "curriculum_count": curriculum_count,
+        "curriculum_count": curriculum_count,
+        "grade_levels_data": grade_levels_data,  # Pass JSON-serialized data to context
+        "gradelevels_datas": json.dumps(gradelevels_datas),  # Pass JSON-serialized data to context
+        "student_gradelevel_data": json.dumps(student_gradelevel_data),  # Pass JSON-serialized data to context
     }
+
     return render(request, "hod_template/home_content.html", context)
+
+
 
 
 def add_staff(request):
