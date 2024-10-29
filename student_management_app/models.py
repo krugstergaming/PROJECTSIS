@@ -15,13 +15,10 @@ class SessionYearModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-
-
 # Overriding the Default Django Auth User and adding One More Field (user_type)
 class CustomUser(AbstractUser):
     user_type_data = ((1, "HOD"), (2, "Staff"), (3, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
-
 
 
 class AdminHOD(models.Model):
@@ -117,7 +114,6 @@ class Students(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-
 class Enrollment(models.Model):
     
     id = models.AutoField(primary_key=True)
@@ -196,7 +192,6 @@ class StudentPromotionHistory(models.Model):
         return f"{self.student} promoted from {self.previous_grade} to {self.new_grade} on {self.promotion_date}"
     objects = models.Manager()
 
-
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
 
@@ -264,9 +259,6 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.load_id.subject_id.subject_name} - {self.load_id.GradeLevel_id.GradeLevel_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
     
-
-
-
 class ParentGuardian(models.Model):
     students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
     father_name = models.CharField(max_length=100, blank=True, null=True)

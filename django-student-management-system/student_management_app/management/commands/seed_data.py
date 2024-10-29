@@ -34,6 +34,8 @@ class Command(BaseCommand):
 
         # Seed GradeLevel for the first curriculum
         grade_levels1 = [
+            'Kinder',
+            'Preparatory',
             'Grade 1',
             'Grade 2',
             'Grade 3',
@@ -58,37 +60,79 @@ class Command(BaseCommand):
 
         # Seed Subjects for each GradeLevel and Curriculum
         subjects_data = {
-                'Grade 1': [
-                    {'code': 'MAT101', 'name': 'Mathematics 101', 'description': 'Introduction to Mathematics', 'hours': '3'},
-                    {'code': 'SCI101', 'name': 'Science 101', 'description': 'Introduction to Science', 'hours': '3'},
-                    {'code': 'ENG101', 'name': 'English 101', 'description': 'Introduction to English', 'hours': '3'}
-                ],
-                'Grade 2': [
-                    {'code': 'HIS101', 'name': 'History 101', 'description': 'Introduction to History', 'hours': '3'},
-                    {'code': 'GEO101', 'name': 'Geography 101', 'description': 'Introduction to Geography', 'hours': '3'},
-                    {'code': 'ART101', 'name': 'Art 101', 'description': 'Introduction to Art', 'hours': '3'}
-                ],
-                'Grade 3': [
-                    {'code': 'BIO101', 'name': 'Biology 101', 'description': 'Introduction to Biology', 'hours': '3'},
-                    {'code': 'PHY101', 'name': 'Physics 101', 'description': 'Introduction to Physics', 'hours': '3'},
-                    {'code': 'CHE101', 'name': 'Chemistry 101', 'description': 'Introduction to Chemistry', 'hours': '3'}
-                ],
-                'Grade 4': [
-                    {'code': 'MATH201', 'name': 'Mathematics 201', 'description': 'Advanced Mathematics', 'hours': '4'},
-                    {'code': 'LIT201', 'name': 'Literature 201', 'description': 'Introduction to Literature', 'hours': '3'},
-                    {'code': 'SCI201', 'name': 'Science 201', 'description': 'Advanced Science', 'hours': '4'}
-                ],
-                'Grade 5': [
-                    {'code': 'MATH301', 'name': 'Mathematics 301', 'description': 'Intermediate Mathematics', 'hours': '4'},
-                    {'code': 'HIS301', 'name': 'History 301', 'description': 'World History', 'hours': '3'},
-                    {'code': 'GEOG301', 'name': 'Geography 301', 'description': 'Advanced Geography', 'hours': '4'}
-                ],
-                'Grade 6': [
-                    {'code': 'BIO301', 'name': 'Biology 301', 'description': 'Intermediate Biology', 'hours': '4'},
-                    {'code': 'CHE301', 'name': 'Chemistry 301', 'description': 'Intermediate Chemistry', 'hours': '4'},
-                    {'code': 'PHIL301', 'name': 'Philosophy 301', 'description': 'Introduction to Philosophy', 'hours': '3'}
-                ]
-            }
+            'Kinder': [
+                {'code': 'READ101', 'name': 'Reading', 'description': 'Introduction to Reading', 'hours': '50'},
+                {'code': 'LANG101', 'name': 'Language', 'description': 'Introduction to Language', 'hours': '50'},
+                {'code': 'MATH101', 'name': 'Mathematics', 'description': 'Basic Mathematics', 'hours': '50'},
+                {'code': 'SCI101', 'name': 'Science', 'description': 'Basic Science Concepts', 'hours': '50'},
+                {'code': 'FIL101', 'name': 'Filipino', 'description': 'Introduction to Filipino Language', 'hours': '50'}
+            ],
+            'Preparatory': [
+                {'code': 'READ201', 'name': 'Reading', 'description': 'Reading Fundamentals', 'hours': '50'},
+                {'code': 'LANG201', 'name': 'Language', 'description': 'Language Basics', 'hours': '50'},
+                {'code': 'MATH201', 'name': 'Mathematics', 'description': 'Foundational Mathematics', 'hours': '50'},
+                {'code': 'SCI201', 'name': 'Science', 'description': 'Foundational Science Concepts', 'hours': '50'},
+                {'code': 'FIL201', 'name': 'Filipino', 'description': 'Filipino Language Basics', 'hours': '50'},
+                {'code': 'MAKA201', 'name': 'Makabayan', 'description': 'Introduction to Philippine Culture', 'hours': '50'}
+            ],
+            'Grade 1': [
+                {'code': 'FIL301', 'name': 'Filipino', 'description': 'Filipino Language Development', 'hours': '50'},
+                {'code': 'ENG301', 'name': 'English', 'description': 'English Language Skills', 'hours': '50'},
+                {'code': 'SCI301', 'name': 'Science', 'description': 'Science Concepts and Exploration', 'hours': '50'},
+                {'code': 'MATH301', 'name': 'Mathematics', 'description': 'Mathematics Skills', 'hours': '50'},
+                {'code': 'AP301', 'name': 'Araling Panlipunan', 'description': 'Social Studies', 'hours': '50'},
+                {'code': 'ESP301', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Values Education', 'hours': '50'},
+                {'code': 'MAPEH301', 'name': 'MAPEH', 'description': 'Music, Arts, PE, and Health', 'hours': '50'}
+            ],
+            'Grade 2': [
+                {'code': 'FIL302', 'name': 'Filipino', 'description': 'Filipino Language Skills', 'hours': '50'},
+                {'code': 'ENG302', 'name': 'English', 'description': 'English Language Skills', 'hours': '50'},
+                {'code': 'SCI302', 'name': 'Science', 'description': 'Exploration of Science', 'hours': '50'},
+                {'code': 'MATH302', 'name': 'Mathematics', 'description': 'Intermediate Mathematics', 'hours': '50'},
+                {'code': 'AP302', 'name': 'Araling Panlipunan', 'description': 'Social Studies', 'hours': '50'},
+                {'code': 'ESP302', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Values Education', 'hours': '50'},
+                {'code': 'MAPEH302', 'name': 'MAPEH', 'description': 'Music, Arts, PE, and Health', 'hours': '50'}
+            ],
+            'Grade 3': [
+                {'code': 'FIL303', 'name': 'Filipino', 'description': 'Filipino Language Enrichment', 'hours': '50'},
+                {'code': 'ENG303', 'name': 'English', 'description': 'Advanced English Skills', 'hours': '50'},
+                {'code': 'SCI303', 'name': 'Science', 'description': 'Advanced Science Concepts', 'hours': '50'},
+                {'code': 'MATH303', 'name': 'Mathematics', 'description': 'Advanced Mathematics', 'hours': '50'},
+                {'code': 'AP303', 'name': 'Araling Panlipunan', 'description': 'Philippine Social Studies', 'hours': '50'},
+                {'code': 'ESP303', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Character Education', 'hours': '50'},
+                {'code': 'MAPEH303', 'name': 'MAPEH', 'description': 'Advanced MAPEH', 'hours': '50'}
+            ],
+            'Grade 4': [
+                {'code': 'FIL401', 'name': 'Filipino', 'description': 'Filipino Language Mastery', 'hours': '50'},
+                {'code': 'ENG401', 'name': 'English', 'description': 'English Proficiency', 'hours': '50'},
+                {'code': 'SCI401', 'name': 'Science', 'description': 'Enhanced Science Concepts', 'hours': '50'},
+                {'code': 'MATH401', 'name': 'Mathematics', 'description': 'Advanced Mathematics Skills', 'hours': '50'},
+                {'code': 'AP401', 'name': 'Araling Panlipunan', 'description': 'Social Science', 'hours': '50'},
+                {'code': 'ESP401', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Values Education', 'hours': '50'},
+                {'code': 'MAPEH401', 'name': 'MAPEH', 'description': 'Music, Arts, PE, and Health', 'hours': '50'},
+                {'code': 'EPP401', 'name': 'HELE / EPP', 'description': 'Home Economics and Livelihood Education', 'hours': '50'}
+            ],
+            'Grade 5': [
+                {'code': 'FIL501', 'name': 'Filipino', 'description': 'Filipino Language Enrichment', 'hours': '50'},
+                {'code': 'ENG501', 'name': 'English', 'description': 'English Language Enrichment', 'hours': '50'},
+                {'code': 'SCI501', 'name': 'Science', 'description': 'Advanced Science', 'hours': '50'},
+                {'code': 'MATH501', 'name': 'Mathematics', 'description': 'Math Enrichment', 'hours': '50'},
+                {'code': 'AP501', 'name': 'Araling Panlipunan', 'description': 'History and Geography', 'hours': '50'},
+                {'code': 'ESP501', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Ethics and Values', 'hours': '50'},
+                {'code': 'MAPEH501', 'name': 'MAPEH', 'description': 'Music, Arts, PE, and Health', 'hours': '50'},
+                {'code': 'EPP501', 'name': 'HELE / EPP', 'description': 'Practical Life Skills', 'hours': '50'}
+            ],
+            'Grade 6': [
+                {'code': 'FIL601', 'name': 'Filipino', 'description': 'Filipino Proficiency', 'hours': '50'},
+                {'code': 'ENG601', 'name': 'English', 'description': 'Advanced English Proficiency', 'hours': '50'},
+                {'code': 'SCI601', 'name': 'Science', 'description': 'Comprehensive Science', 'hours': '50'},
+                {'code': 'MATH601', 'name': 'Mathematics', 'description': 'Advanced Mathematics', 'hours': '50'},
+                {'code': 'AP601', 'name': 'Araling Panlipunan', 'description': 'Civic Studies', 'hours': '50'},
+                {'code': 'ESP601', 'name': 'Edukasyon sa Pagpapakatao', 'description': 'Advanced Ethics and Values', 'hours': '50'},
+                {'code': 'MAPEH601', 'name': 'MAPEH', 'description': 'Music, Arts, PE, and Health', 'hours': '50'},
+                {'code': 'EPP601', 'name': 'HELE / EPP', 'description': 'Life Skills Education', 'hours': '50'}
+            ]
+        }
 
         for grade_level in grade_levels:
             subjects_list = subjects_data.get(grade_level.GradeLevel_name, [])
