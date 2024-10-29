@@ -58,108 +58,147 @@
                                     {% endfor %}
                                 </select>
                             </div>
-
-                            <div class="form-group">
-                                <label>Registration Fee</label>
-                                <input type="number" class="form-control" name="registration_fee" id="registration_fee" placeholder="Enter Registration Fee" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Miscellaneous Fee</label>
-                                <input type="number" class="form-control" name="misc_fee" id="misc_fee" placeholder="Enter Miscellaneous Fee" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Tuition Fee</label>
-                                <input type="number" class="form-control" name="tuition_fee" id="tuition_fee" placeholder="Enter Tuition Fee" step="0.01" min="0" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Discount (%)</label>
-                                <input type="number" class="form-control" name="discount" id="discount" placeholder="Enter Discount (e.g., 20 for 20%)" step="0.01" min="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label>Discount Amount</label>
-                                <input type="number" class="form-control" name="discount_amount" id="discount_amount" placeholder="0" step="0.01" min="0" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Total Fee</label>
-                                <input type="number" class="form-control" name="total_fee" id="total_fee" step="0.01" min="0" readonly>
-                            </div>
-
-                            <div class="panel panel-default" style="background-color: #d3d3d3; border: 1px solid #b2ebf2;">
-                                <div class="panel-heading" style="margin-left: 20px; margin-top: 20px;">
-                                    <h4>Installment Payment Option:</h4>
-                                </div>
-                                <div class="panel-body" style="margin-left: 20px;">
+                        
+                            <div class="row">
+                                <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>
-                                            <input type="checkbox" id="installment_checkbox"> Enable Installment Payment
-                                        </label>
+                                        <label>Registration Fee</label>
+                                        <input type="number" class="form-control" name="registration_fee" id="registration_fee" placeholder="Enter Registration Fee" step="0.01" min="0" required>
                                     </div>
-                            
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Miscellaneous Fee</label>
+                                        <input type="number" class="form-control" name="misc_fee" id="misc_fee" placeholder="Enter Miscellaneous Fee" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Tuition Fee</label>
+                                        <input type="number" class="form-control" name="tuition_fee" id="tuition_fee" placeholder="Enter Tuition Fee" step="0.01" min="0" required>
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <div id="installment_fields" style="margin-left: 20px; margin-right: 20px;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Discount (%)</label>
+                                        <input type="number" class="form-control" name="discount" id="discount" placeholder="Enter Discount (e.g., 20 for 20%)" step="0.01" min="0">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Discount Amount</label>
+                                        <input type="number" class="form-control" name="discount_amount" id="discount_amount" placeholder="0" step="0.01" min="0" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Total Fee</label>
+                                        <input type="number" class="form-control" name="total_fee" id="total_fee" step="0.01" min="0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="panel panel-default" style="background-color: #d3d3d3; border: 1px solid #b2ebf2; margin-top: 20px;">
+                                    <div class="panel-heading" style="margin-left: 20px; margin-top: 20px;">
+                                        <h4>Installment Payment Option:</h4>
+                                    </div>
+                                    <div class="panel-body" style="margin-left: 20px; margin-right: 20px;">
                                         <div class="form-group">
-                                            <label>Downpayment</label>
-                                            <input type="number" class="form-control" name="downpayment" id="downpayment" placeholder="Enter Downpayment" step="0.01" min="0">
+                                            <label>
+                                                <input type="checkbox" id="installment_checkbox"> Enable Installment Payment
+                                            </label>
                                         </div>
                             
+                                        <div id="installment_fields">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Downpayment</label>
+                                                        <input type="number" class="form-control" name="downpayment" id="downpayment" placeholder="Enter Downpayment" step="0.01" min="0">
+                                                    </div>
+                                                </div>
 
-                                        <div class="form-group">
-                                            <label>Balance</label>
-                                            <input type="number" class="form-control" name="balance" id="balance" step="0.01" min="0" readonly>
-                                        </div>
-                            
-
-                                        <div class="form-group">
-                                            <label>Installment Option</label>
-                                            <select class="form-control" name="installment_option" id="installment_option">
-                                                <option value="n/a">n/a</option>
-                                                <option value="Monthly">Monthly</option>
-                                                <option value="Quarterly">Quarterly</option>
-                                                <option value="Annually">Annually</option>
-                                            </select>
-                                        </div>
-                            
-
-                                        <div class="form-group">
-                                            <label>Installment Payment</label>
-                                            <input type="number" class="form-control" name="installment_payment" id="installment_payment" step="0.01" min="0" readonly>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Balance</label>
+                                                        <input type="number" class="form-control" name="balance" id="balance" step="0.01" min="0" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Installment Option</label>
+                                                        <select class="form-control" name="installment_option" id="installment_option">
+                                                            <option value="n/a">n/a</option>
+                                                            <option value="Monthly">Monthly</option>
+                                                            <option value="Quarterly">Quarterly</option>
+                                                            <option value="Annually">Annually</option>
+                                                        </select>
+                                                    </div>
+                                                </div>   
+                                                
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Installment Payment</label>
+                                                        <input type="number" class="form-control" name="installment_payment" id="installment_payment" step="0.01" min="0" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
 
-                            <div class="form-group">
-                                <label>Assessed By</label>
-                                <input type="text" class="form-control" name="assessed_by" id="assessed_by" 
-                                       value="{{ request.user.get_full_name }}" readonly>
+                            <div class="row" style="margin-top: 20px;">
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Assessed By</label>
+                                        <input type="text" class="form-control" name="assessed_by" id="assessed_by" 
+                                               value="{{ request.user.get_full_name }}" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Assessed Date</label>
+                                        <input type="date" class="form-control" name="assessed_date" id="assessed_date" readonly>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label>Assessed Date</label>
-                                <input type="date" class="form-control" name="assessed_date" id="assessed_date" readonly>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Payment Received By</label>
-                                <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" 
-                                       value="{{ request.user.get_full_name }}" readonly>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Payment Amount</label>
-                                <input type="number" class="form-control" name="payment_amount" id="payment_amount" 
-                                       step="0.01" min="0" readonly>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Payment Date</label>
-                                <input type="date" class="form-control" name="payment_date" id="payment_date" readonly>
+
+                            <div class="row">
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Payment Received By</label>
+                                        <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" 
+                                            value="{{ request.user.get_full_name }}" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Payment Amount</label>
+                                        <input type="number" class="form-control" name="payment_amount" id="payment_amount" 
+                                               step="0.01" min="0" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Payment Date</label>
+                                        <input type="date" class="form-control" name="payment_date" id="payment_date" readonly>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="form-group">
