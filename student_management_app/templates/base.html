@@ -9,6 +9,7 @@
   <link rel="icon" href="{% static 'logo.ico' %}" type="image/x-icon" style="display: block !important;">
 
   <title>Student Management System | Login</title>
+  
   <style>
    
       body {
@@ -35,12 +36,34 @@
         justify-content: center; /* Center content vertically */
         border-radius: 0px; /* No rounded corners */
       }
-  html, body {
-    height: 100%;
-    overflow: hidden; /* Prevent scrolling */
-    margin: 0;
-    padding: 0;
-  }
+
+      html, body {
+        height: 100%;
+        overflow: hidden; /* Prevent scrolling */
+        margin: 0;
+        padding: 0;
+      }
+
+      .session-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .session-active {
+      background-color: red; /* Active session */
+    }
+
+    .session-inactive {
+      background-color: blue; /* No session */
+    }
     .logo-section {
       margin-bottom: 30px !important;
     }
@@ -167,10 +190,13 @@
 
 
 
+
+
 {% block content %}
 
 
 {% endblock %}
+
 
 <!-- jQuery -->
 <script src="{% static 'jquery/jquery.min.js'  %}"></script>

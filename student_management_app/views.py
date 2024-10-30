@@ -12,7 +12,11 @@ def home(request):
 
 
 def loginPage(request):
-    return render(request, 'login.html')
+    session_exists = request.session.session_key is not None
+    context = {
+        'session_exists': session_exists,
+    }
+    return render(request, 'login.html', context)
 
  
 def doLogin(request):

@@ -625,7 +625,7 @@ def add_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
         session_limit = request.POST.get('session_limit')
-        session_status = request.pOST.get('session_status')
+        session_status = request.POST.get('session_status')
 
         try:
             sessionyear = SessionYearModel(
@@ -1302,12 +1302,7 @@ def delete_subject(request, subject_id):
         return redirect('manage_subject')
     
 def add_assignsection(request):
-    # Filter grade levels only for students present in the Enrollment table
-    gradelevels = GradeLevel.objects.filter(
-        id__in=Students.objects.filter(
-            id__in=Enrollment.objects.values_list('student_id', flat=True)
-        ).values_list('GradeLevel_id', flat=True)
-    )
+    gradelevels = GradeLevel.objects.filter(id__in=Students.objects.values_list('GradeLevel_id', flat=True))
     context = {
         "gradelevels": gradelevels,
     }
@@ -1318,14 +1313,8 @@ def load_sections_and_students(request):
     
     # Fetch sections and students filtered by GradeLevel
     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
-
-    # Get all students in the GradeLevel who are NOT already assigned to a section
-    assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
-    students = Students.objects.filter(
-        GradeLevel_id=gradelevel_id,
-        id__in=Enrollment.objects.values_list('student_id', flat=True)  # Only include enrolled students
-    ).exclude(id__in=assigned_students)
-
+    students = Students.objects.filter(GradeLevel_id=gradelevel_id)
+    
     # Prepare data for response
     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
