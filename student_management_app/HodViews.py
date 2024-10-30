@@ -88,7 +88,7 @@ def add_staff_save(request):
             last_name = request.POST.get('last_name')
             username = request.POST.get('username')
             email = request.POST.get('email')
-            max_laod = request.poST.get('max_load')
+            max_laod = request.POST.get('max_load')
             middle_name = request.POST.get('middle_name')
             dob = request.POST.get('dob')
             age = request.POST.get('age')

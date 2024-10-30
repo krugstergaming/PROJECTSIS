@@ -264,11 +264,45 @@
                     
                             <!-- Permanent Address -->
                             <div class="form-group row">
-                                <label for="permanent_address" class="col-sm-3 col-form-label form-label">Permanent Address</label>
+                                <label for="region" class="col-sm-3 col-form-label form-label">Region</label>
                                 <div class="col-sm-9">
-                                    <textarea class="form-control" id="permanent_address" name="permanent_address" rows="3" placeholder="Enter your permanent address"></textarea>
+                                    <select name="region" class="form-control form-control-md" id="region"></select>
+                                    <input type="hidden" class="form-control form-control-md" name="region_text" id="region-text" required>
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <label for="province" class="col-sm-3 col-form-label form-label">Province</label>
+                                <div class="col-sm-9">
+                                    <select name="province" class="form-control form-control-md" id="province"></select>
+                                    <input type="hidden" class="form-control form-control-md" name="province_text" id="province-text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="city" class="col-sm-3 col-form-label form-label">City</label>
+                                <div class="col-sm-9">
+                                    <select name="city" class="form-control form-control-md" id="city"></select>
+                                    <input type="hidden" class="form-control form-control-md" name="city_text" id="city-text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="barangay" class="col-sm-3 col-form-label form-label">Barangay</label>
+                                <div class="col-sm-9">
+                                    <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                                    <input type="hidden" class="form-control form-control-md" name="barangay_text" id="barangay-text" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="street" class="col-sm-3 col-form-label form-label">street</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control form-control-md" name="street_text" id="street-text">
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="permanent_address" id="permanent_address" required>
                     
                             <!-- Contact Numbers -->
                             <div class="form-group row">
@@ -302,6 +336,34 @@
 
 <!-- Include Bootstrap JS (if not already included in base_template.html) -->
 <script src="{% static 'bootstrap-4.0.0-dist\js\bootstrap.bundle.min.js' %}"></script> 
+<script src="{% static 'ph-json/ph-address-selector.js' %}"></script>
+
+<script>
+    function concatenateAddress() {
+        // Get the values of the input fields
+        var region = document.getElementById('region-text').value;
+        var province = document.getElementById('province-text').value;
+        var city = document.getElementById('city-text').value;
+        var barangay = document.getElementById('barangay-text').value;
+        var street = document.getElementById('street-text').value;
+
+        // Concatenate the values
+        var fullAddress = street + ", " + barangay + ", " + city + ", " + province + ", " + region;
+
+        // Set the concatenated address to the hidden input
+        document.getElementById('permanent_address').value = fullAddress;
+    }
+
+    // Call the function initially (in case values are already set)
+    concatenateAddress();
+
+    // Add event listeners to update the address when any input changes
+    document.getElementById('region-text').addEventListener('input', concatenateAddress);
+    document.getElementById('province-text').addEventListener('input', concatenateAddress);
+    document.getElementById('city-text').addEventListener('input', concatenateAddress);
+    document.getElementById('barangay-text').addEventListener('input', concatenateAddress);
+    document.getElementById('street-text').addEventListener('input', concatenateAddress);
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
