@@ -166,7 +166,7 @@ def manage_staff(request):
         "staffs": staffs,
         "grading_config": grading_config,  # Pass the grading configuration to the template
     }
-    return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
+    return render(request, "hod_template/manage_staff_template.html", context)
 
 
 def edit_staff(request, staff_id):
@@ -176,7 +176,7 @@ def edit_staff(request, staff_id):
         "staff": staff,
         "id": staff_id
     }
-    return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
+    return render(request, "hod_template/edit_staff_template.html", context)
 
 
 def edit_staff_save(request):
@@ -264,7 +264,7 @@ def manage_curriculum(request):
     context = {
         "curriculums": curriculums
     }
-    return render(request, 'hod_template/Manage_Template/manage_curriculum_template.html', context)
+    return render(request, 'hod_template/manage_curriculum_template.html', context)
 
 def edit_curriculum(request, curriculum_id):
     curriculum = Curriculums.objects.get(id=curriculum_id)
@@ -272,12 +272,7 @@ def edit_curriculum(request, curriculum_id):
         "curriculum": curriculum,
         "id": curriculum_id
     }
-<<<<<<< HEAD:student_management_app/HodViews.py
     return render(request, 'hod_template/edit_curriculum_template.html', context)
-=======
-    return render(request, 'hod_template/Edit_Template/edit_curriculum_template.html', context)
-
->>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 def edit_curriculum_save(request):
     if request.method != "POST":
         HttpResponse("Invalid Method")
@@ -303,12 +298,7 @@ def archived_curriculums(request):
     context = {
         "curriculums": curriculums
     }
-<<<<<<< HEAD:student_management_app/HodViews.py
     return render(request, 'hod_template/archived_curriculum_template.html', context)
-=======
-    return render(request, 'hod_template/Archive_Template/archived_curriculum_template.html', context)
-
->>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 def archive_curriculum(request, curriculum_id):
     curriculum = get_object_or_404(Curriculums, id=curriculum_id)
     curriculum.is_archived = True
@@ -572,7 +562,7 @@ def manage_gradelevel(request):
     context = {
         "gradelevels": gradelevels
     }
-    return render(request, 'hod_template/Manage_Template/manage_gradelevel_template.html', context)
+    return render(request, 'hod_template/manage_gradelevel_template.html', context)
 
 
 def edit_gradelevel(request, GradeLevel_id):
@@ -581,7 +571,7 @@ def edit_gradelevel(request, GradeLevel_id):
         "gradelevel": gradelevel,
         "id": GradeLevel_id
     }
-    return render(request, 'hod_template/Edit_Template/edit_gradelevel_template.html', context)
+    return render(request, 'hod_template/edit_gradelevel_template.html', context)
 
 
 def edit_gradelevel_save(request):
@@ -619,7 +609,7 @@ def manage_session(request):
     context = {
         "session_years": session_years
     }
-    return render(request, "hod_template/Manage_Template/manage_session_template.html", context)
+    return render(request, "hod_template/manage_session_template.html", context)
 
 def add_session(request):
     # Get the latest session year if it exists
@@ -673,7 +663,7 @@ def edit_session(request, session_id):
     context = {
         "session_year": session_year
     }
-    return render(request, "hod_template/Edit_Template/edit_session_template.html", context)
+    return render(request, "hod_template/edit_session_template.html", context)
 
 def edit_session_save(request):
     if request.method != "POST":
@@ -706,7 +696,7 @@ def archived_sessions(request):
     context = {
         "session_years": session_years
     }
-    return render(request, 'hod_template/Archive_Template/archived_session_template.html', context)
+    return render(request, 'hod_template/archived_session_template.html', context)
 
 def archive_session(request, session_id):
     session_year = get_object_or_404(SessionYearModel, id=session_id)
@@ -1004,7 +994,7 @@ def manage_enrollment(request):
         "attachments": attachments,
         "balancepayments": balancepayments,
     }
-    return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', context)
+    return render(request, 'hod_template/manage_enrollment_template.html', context)
 
 def edit_enrollment(request, enrollment_id):
     # Retrieve the enrollment instance
@@ -1053,7 +1043,7 @@ def edit_enrollment(request, enrollment_id):
         })
 
     # Render the edit template with populated data
-    return render(request, "hod_template/Edit_Template/edit_enrollment_template.html", context)
+    return render(request, "hod_template/edit_enrollment_template.html", context)
 
 def edit_enrollment_save(request, enrollment_id):
     if request.method != "POST":
@@ -1160,7 +1150,7 @@ def update_balance(request, enrollment_id=None):
     else:
         form = UpdateBalanceForm()
 
-    return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', {
+    return render(request, 'hod_template/manage_enrollment_template.html', {
         'form': form,
         'enrollments': enrollments,
         'enrollment': enrollment,
@@ -1206,7 +1196,7 @@ def manage_student(request):
     context = {
         "students": students
     }
-    return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
+    return render(request, 'hod_template/manage_student_template.html', context)
 
 
 def edit_student(request, student_id):
@@ -1230,7 +1220,7 @@ def edit_student(request, student_id):
         "username": student.admin.username,
         "form": form
     }
-    return render(request, "hod_template/Edit_Template/edit_student_template.html", context)
+    return render(request, "hod_template/edit_student_template.html", context)
 
 
 def edit_student_save(request):
@@ -1319,7 +1309,7 @@ def manage_section(request):
         "sections": sections,
         "gradelevels":gradelevels,
     }
-    return render(request, "hod_template/Manage_Template/manage_section_template.html", context)
+    return render(request, "hod_template/manage_section_template.html", context)
 
 def add_section(request):
     gradelevels = GradeLevel.objects.all()
@@ -1361,7 +1351,7 @@ def edit_section(request, section_id):
         "gradelevel":gradelevel,
     }
 
-    return render(request, 'hod_template/Edit_Template/edit_section_template.html', context)
+    return render(request, 'hod_template/edit_section_template.html', context)
 
 def edit_section_save(request):
     if request.method != "POST":
@@ -1437,7 +1427,7 @@ def manage_subject(request):
     context = {
         "subjects": subjects
     }
-    return render(request, 'hod_template/Manage_Template/manage_subject_template.html', context)
+    return render(request, 'hod_template/manage_subject_template.html', context)
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
@@ -1448,7 +1438,7 @@ def edit_subject(request, subject_id):
         "gradelevels": gradelevels,
         "id": subject_id
     }
-    return render(request, 'hod_template/Edit_Template/edit_subject_template.html', context)
+    return render(request, 'hod_template/edit_subject_template.html', context)
 
 def edit_subject_save(request):
     if request.method != "POST":
@@ -1599,9 +1589,6 @@ def add_load_save(request):
             subject = Subjects.objects.get(id=subject_id)
 
             staff_id = request.POST.get('staff_id')
-<<<<<<< HEAD:student_management_app/HodViews.py
-            staff = CustomUser.objects.get(id=staff_id)
-=======
             staff_user = CustomUser.objects.get(id=staff_id)
 
             is_advisory = request.POST.get('is_advisory')
@@ -1614,7 +1601,6 @@ def add_load_save(request):
             if current_load >= staff.max_load:
                 messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load}.")
                 return redirect('add_load')
->>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 
             # Saving the load
             load = Load(
@@ -1622,12 +1608,8 @@ def add_load_save(request):
                         curriculum_id=curriculum,
                         AssignSection_id=assignsection, 
                         subject_id=subject,
-<<<<<<< HEAD:student_management_app/HodViews.py
-                        staff_id=staff
-=======
                         staff_id=staff_user,
                         is_advisory=is_advisory
->>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
                         )
             load.save()
 
@@ -1701,7 +1683,7 @@ def manage_class_scheduling(request):
         "schedules": schedules,
         
     }
-    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
+    return render(request, 'hod_template/manage_schedule_template.html', context)
 
 
 def class_search(request):
@@ -1733,7 +1715,7 @@ def class_search(request):
     # Check if there is a search query in the GET request and if a search has been made
     if 'search' in request.GET:
         # Don't redirect on the initial search
-        return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
+        return render(request, 'hod_template/manage_schedule_template.html', {
             'assignsections': assignsections,
             'loads': loads,
             'schedules': schedules,
@@ -1741,7 +1723,7 @@ def class_search(request):
         })
 
     # Render the search results or the default page
-    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
+    return render(request, 'hod_template/manage_schedule_template.html', {
         'assignsections': assignsections,
         'loads': loads,
         'schedules': schedules,
@@ -1775,7 +1757,7 @@ def edit_schedule(request, schedule_id):
         "form": form
     }
 
-    return render(request, "hod_template/Edit_Template/edit_schedule_template.html", context)
+    return render(request, "hod_template/edit_schedule_template.html", context)
 
 def edit_schedule_save(request):
     if request.method != "POST":
