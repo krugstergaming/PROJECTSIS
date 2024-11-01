@@ -25,7 +25,7 @@
                                     <th>Assigned Section</th>
                                     <th>Subject</th>
                                     <th>Faculty</th>
-                                    <th>Is Advisory</th>
+                                    <th>Advisory</th>
                                     <th> Action </th>
                                 </tr>
                             </thead>
@@ -35,7 +35,7 @@
                                         <td>{{ load.curriculum_id.curriculum_name }}</td>
                                         <td>{{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
                                         <td>{{ load.subject_id.subject_name }}</td>
-                                        <td>{{ load.staff_id.first_name }} {{ load.staff.last_name }}</td>
+                                        <td>{{ load.staff_id.first_name }} {{ load.staff_id.last_name }}</td>
                                         <td>
                                             {% if load.is_advisory %}
                                                 Yes

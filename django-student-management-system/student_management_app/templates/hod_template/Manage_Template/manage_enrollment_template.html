@@ -110,10 +110,11 @@
                                             <div class="modal-body">
                                                 <ul class="list-group">
                                                     {% for attachment in enrollment.attachments.all %}
-                                                        <li class="list-group-item">
+                                                        <li class="list-group-item"> 
                                                             <strong>ID Picture:</strong> 
                                                             {% if attachment.id_picture_file %}
-                                                                <a href="{{ attachment.id_picture_file.url }}" target="_blank">{{ attachment.id_picture }}</a>
+                                                                <a href="{{ attachment.id_picture_file.url }}" target="_blank">{{ attachment.id_picture_file }}</a>
+                                                                <img src="{{ attachment.id_picture_file.url }}" alt="ID Picture Preview" style="width: 250px; display: block; margin-top: 10px;">
                                                             {% else %}
                                                                 Not Uploaded
                                                             {% endif %}
@@ -121,7 +122,8 @@
                                                         <li class="list-group-item">
                                                             <strong>PSA:</strong> 
                                                             {% if attachment.psa_file %}
-                                                                <a href="{{ attachment.psa_file.url }}" target="_blank">{{ attachment.psa }}</a>
+                                                                <a href="{{ attachment.psa_file.url }}" target="_blank">{{ attachment.psa_file }}</a>
+                                                                <img src="{{ attachment.psa_file.url }}" alt="PSA Preview" style="width: 250px; display: block; margin-top: 10px;">
                                                             {% else %}
                                                                 Not Uploaded
                                                             {% endif %}
@@ -129,9 +131,18 @@
                                                         <li class="list-group-item">
                                                             <strong>Form 138:</strong> 
                                                             {% if attachment.form_138_file %}
-                                                                <a href="{{ attachment.form_138_file.url }}" target="_blank">{{ attachment.form_138 }}</a>
+                                                                <a href="{{ attachment.form_138_file.url }}" target="_blank">{{ attachment.form_138_file }}</a>
+                                                                <img src="{{ attachment.form_138_file.url }}" alt="Form 138 Preview" style="width: 250px; display: block; margin-top: 10px;">
                                                             {% else %}
                                                                 Not Uploaded
+                                                            {% endif %}
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <strong>Remarks:</strong> 
+                                                            {% if attachment.attachment_remarks %}
+                                                                {{ attachment.attachment_remarks }}
+                                                            {% else %}
+                                                                No remarks provided
                                                             {% endif %}
                                                         </li>
                                                     {% endfor %}
@@ -178,6 +189,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <a href="{% url 'edit_enrollment' enrollment.id %}" class="btn btn-warning">Edit</a>
                                             </div>
                                         </div>
                                     </div>
