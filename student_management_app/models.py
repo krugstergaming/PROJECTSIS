@@ -11,6 +11,7 @@ class SessionYearModel(models.Model):
     session_end_year = models.DateField(blank=True, null=True)
     session_limit = models.IntegerField(blank=True, null=True)
     session_status = models.CharField(max_length=255)
+    is_archived = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -230,6 +231,7 @@ class AssignSection(models.Model):
 class Load(models.Model):
     id = models.AutoField(primary_key=True)
 
+    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)

@@ -51,6 +51,15 @@
                         <div class="card-body">
                            
                             <div class="form-group">
+                                <label>Academic Year </label>
+                                <select class="form-control" name="session_year" id="session_year">
+                                    {% for session_year in session_years %}
+                                        <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
                                 <label>Subject </label>
                                 <select class="form-control" name="subject" id="subject">
                                     {% for subject in subjects %}
@@ -60,10 +69,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Session Year </label>
-                                <select class="form-control" name="session_year" id="session_year">
-                                    {% for session_year in session_years %}
-                                        <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
+                                <label>Load </label>
+                                <select class="form-control" name="load" id="load">
+                                    {% for load in loads %}
+                                        <option value="{{ load.id }}">{{ load.section_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -96,24 +105,24 @@
 {% block custom_js %}
 
 <script>
-    $(document).ready(function(){
-        $("#fetch_student").click(function(){
-
+    $(document).ready(function() {
+        $("#fetch_student").click(function() {
             var subject = $("#subject").val();
             var session_year = $("#session_year").val();
 
             $.ajax({
                 url: '{% url 'get_students' %}',
                 type: 'POST',
-                data: {subject: subject, session_year: session_year},
-                success: function(response){
+                data: { subject: subject, session_year: session_year },
+                success: function(response) {
                     var json_data = JSON.parse(response);
                     console.log(json_data);
 
-                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' name='student_list' student_number='student_list'>";
+                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' id='student_list' name='student_list'>";
 
-                    for (var key in json_data) {
-                        div_data += "<option value='" + key + "'>ID: " + json_data[key]['student_number'] + " : " + json_data[key]['name'] + "</option>";
+                    for (var i = 0; i < json_data.length; i++) {
+                        var student = json_data[i];
+                        div_data += "<option value='" + i + "'>ID: " + student['student_number'] + " : " + student['name'] + "</option>";
                     }
 
                     div_data += "</select></div>";
@@ -144,27 +153,31 @@
 
                     $("#student_data").html(div_data);
 
-                    // Initialize grades for the first student
-                    updateGradeFields(json_data, Object.keys(json_data)[0]);
+                    // Initialize grades for the first student in the list
+                    if (json_data.length > 0) {
+                        updateGradeFields(json_data, 0); // initialize with first student
+                    }
 
                     // Update grades when the student selection changes
                     $("#student_list").change(function() {
-                        var selectedStudentKey = $(this).val();
-                        updateGradeFields(json_data, selectedStudentKey);
+                        var selectedIndex = $(this).val();
+                        updateGradeFields(json_data, selectedIndex);
                     });
                 },
-                error: function(){
+                error: function() {
                     alert("Error in Fetching Students.");
                 }
             });
         });
 
         // Function to update grade fields based on selected student
-        function updateGradeFields(json_data, key) {
-            $("#first_quarter").val(json_data[key] ? json_data[key]['first_quarter'] : "");
-            $("#second_quarter").val(json_data[key] ? json_data[key]['second_quarter'] : "");
-            $("#third_quarter").val(json_data[key] ? json_data[key]['third_quarter'] : "");
-            $("#fourth_quarter").val(json_data[key] ? json_data[key]['fourth_quarter'] : "");
+        function updateGradeFields(json_data, index) {
+            if (json_data[index]) {
+                $("#first_quarter").val(json_data[index]['first_quarter'] || "");
+                $("#second_quarter").val(json_data[index]['second_quarter'] || "");
+                $("#third_quarter").val(json_data[index]['third_quarter'] || "");
+                $("#fourth_quarter").val(json_data[index]['fourth_quarter'] || "");
+            }
         }
     });
 </script>
