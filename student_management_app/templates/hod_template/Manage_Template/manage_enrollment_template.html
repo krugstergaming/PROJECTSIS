@@ -1,0 +1,300 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Manage Enrollment Records
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+{% load humanize %}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between">
+            <a class="btn btn-success" href="{% url 'add_enrollment' %}" role="button">+ Add Enrollment</a>
+        </div>
+        <br>&nbsp;
+
+        {% if messages %}
+            <div class="form-group">
+                <div class="col-12">
+                    {% for message in messages %}
+                        {% if message.tags == "error" %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% elif message.tags == "success" %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Enrollment Details</h3>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Grade Level</th>
+                                    <th>Enrollment Status</th>
+                                    <th>Date Enrolled</th>
+                                    <th>Date Updated</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrollments %}
+                                    <tr>
+                                        <td>{{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</td>
+                                        <td>{{ enrollment.student_id.GradeLevel_id.GradeLevel_name }}</td>
+                                        <td>{{ enrollment.enrollment_status }}</td>
+                                        <td>{{ enrollment.created_at }}</td>
+                                        <td>{{ enrollment.updated_at }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#attachmentsModal{{ enrollment.id }}">Attachments</button>
+                                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal{{ enrollment.id }}">Details</button>
+                                            {% if enrollment.balance > 0 %}
+                                                <!-- Only show the button if there is a balance -->
+                                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#balanceModal{{ enrollment.id }}">Balance</button>
+                                                <!-- Button to show payment history -->
+                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentHistoryModal{{ enrollment.id }}">Balance Payment History</button>
+                                            {% endif %}
+
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No records Found.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                            {% for enrollment in enrollments %}
+                                <!-- Modal for Attachments -->
+                                <div class="modal fade" id="attachmentsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="attachmentsModalLabel{{ enrollment.id }}" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="attachmentsModalLabel{{ enrollment.id }}">Attachments for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <ul class="list-group">
+                                                    {% for attachment in enrollment.attachments.all %}
+                                                        <li class="list-group-item">
+                                                            <strong>ID Picture:</strong> 
+                                                            {% if attachment.id_picture_file %}
+                                                                <a href="{{ attachment.id_picture_file.url }}" target="_blank">{{ attachment.id_picture }}</a>
+                                                            {% else %}
+                                                                Not Uploaded
+                                                            {% endif %}
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <strong>PSA:</strong> 
+                                                            {% if attachment.psa_file %}
+                                                                <a href="{{ attachment.psa_file.url }}" target="_blank">{{ attachment.psa }}</a>
+                                                            {% else %}
+                                                                Not Uploaded
+                                                            {% endif %}
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <strong>Form 138:</strong> 
+                                                            {% if attachment.form_138_file %}
+                                                                <a href="{{ attachment.form_138_file.url }}" target="_blank">{{ attachment.form_138 }}</a>
+                                                            {% else %}
+                                                                Not Uploaded
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% if not enrollment.attachments.exists %}
+                                                    <p>No attachments found for this enrollment.</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of Modal for Attachments -->
+
+                                <!-- Modal for Enrollment Details -->
+                                <div class="modal fade" id="detailsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel{{ enrollment.id }}" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="detailsModalLabel{{ enrollment.id }}">Enrollment Details for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>Registration Fee:</strong> {{ enrollment.registration_fee|intcomma }}</p>
+                                                <p><strong>Miscellaneous Fee:</strong> {{ enrollment.misc_fee|intcomma }}</p>
+                                                <p><strong>Tuition Fee:</strong> {{ enrollment.tuition_fee|intcomma }}</p>
+                                                <p><strong>Discount (%):</strong> {{ enrollment.discount }} </p>
+                                                <p><strong>Discount Amount:</strong> {{ enrollment.discount_amount|intcomma }}</p>
+                                                <p><strong>Total Fee:</strong> {{ enrollment.total_fee|intcomma }}</p>
+                                                <p><strong>Downpayment:</strong> {{ enrollment.downpayment|intcomma }}</p>
+                                                <p><strong>Balance:</strong> {{ enrollment.balance|intcomma }}</p>
+                                                <p><strong>Installment Option:</strong> {{ enrollment.installment_option }}</p>
+                                                <p><strong>Installment Payment:</strong> {{ enrollment.installment_payment|intcomma }}</p>
+                                                <p><strong>Assessed By:</strong> {{ enrollment.assessed_by }}</p>
+                                                <p><strong>Assessed Date:</strong> {{ enrollment.assessed_date }}</p>
+                                                <p><strong>Payment Received By:</strong> {{ enrollment.payment_received_by }}</p>
+                                                <p><strong>Payment Amount:</strong> {{ enrollment.payment_amount|intcomma }}</p>
+                                                <p><strong>Payment Date:</strong> {{ enrollment.payment_date }}</p>
+                                                <p><strong>Remarks:</strong> {{ enrollment.remarks }}</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Your modal code here -->
+                                <div class="modal fade" id="balanceModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="balanceModalLabel{{ enrollment.id }}" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="balanceModalLabel{{ enrollment.id }}">Update Balance for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form method="POST" action="{% url 'update_balance' enrollment.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="current_balance">Current Balance:</label>
+                                                        <input type="text" class="form-control" id="current_balance" name="current_balance" value="{{ enrollment.balance|intcomma }}" readonly>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="payment_balance_amount">Payment Amount:</label>
+                                                        <input type="text" class="form-control" id="payment_balance_amount" name="payment_balance_amount" value="{{ enrollment.installment_payment|intcomma }}" required oninput="this.value = formatNumber(this.value)">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="payment_balance_date">Payment Date:</label>
+                                                        <input type="date" class="form-control" id="payment_balance_date" name="payment_balance_date" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="payment_balance_remarks">Remarks:</label>
+                                                        <textarea class="form-control" id="payment_balance_remarks" name="payment_balance_remarks"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Update Balance</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal for Payment History -->
+                                <div class="modal fade" id="paymentHistoryModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="paymentHistoryModalLabel{{ enrollment.id }}" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="paymentHistoryModalLabel{{ enrollment.id }}">Payment History for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if enrollment.payments.count > 0 %}
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Date</th>
+                                                                <th>Amount</th>
+                                                                <th>Remarks</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for payment in enrollment.payments.all %}
+                                                                <tr>
+                                                                    <td>{{ payment.payment_balance_date|date:"Y-m-d" }}</td>
+                                                                    <td>{{ payment.payment_balance_amount|intcomma }}</td>
+                                                                    <td>{{ payment.remarks }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                {% else %}
+                                                    <p>No payment history available.</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %} 
+                                <!-- End of Modal for Enrollment Details -->
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('payment_balance_date').value = today;
+    });
+
+function formatNumber(value) {
+value = value.replace(/[^0-9.]/g, '');
+return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function parseNumber(value) {
+    return parseFloat(value.replace(/,/g, ''));
+}
+
+document.querySelector('form').addEventListener('submit', function(event) {
+    const amountInput = document.getElementById('payment_balance_amount');
+    amountInput.value = parseNumber(amountInput.value);
+});
+</script>
+
+{% endblock main_content %}

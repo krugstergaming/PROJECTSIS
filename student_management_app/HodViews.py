@@ -76,7 +76,7 @@ def admin_home(request):
 
 
 def add_staff(request):
-    return render(request, "hod_template/Add_Template/add_staff_template.html")
+    return render(request, "hod_template/add_staff_template.html")
 
 def add_staff_save(request):
     if request.method != "POST":
@@ -233,7 +233,7 @@ def deactivate_staff(request, staff_id):
 
 
 def add_curriculum(request):
-    return render(request, "hod_template/Add_Template/add_curriculum_template.html")
+    return render(request, "hod_template/add_curriculum_template.html")
 
 
 def add_curriculum_save(request):
@@ -320,7 +320,7 @@ def add_gradelevel(request):
     context = {
         "curriculums": curriculums
     }
-    return render(request, "hod_template/Add_Template/add_gradelevel_template.html", context)
+    return render(request, "hod_template/add_gradelevel_template.html", context)
 
 def add_gradelevel_save(request):
     if request.method != "POST":
@@ -593,6 +593,7 @@ def edit_gradelevel_save(request):
             messages.error(request, "Failed to Update GradeLevel.")
             return redirect('/edit_gradelevel/'+GradeLevel_id)
 
+
 def delete_gradelevel(request, GradeLevel_id):
     gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
     try:
@@ -605,34 +606,16 @@ def delete_gradelevel(request, GradeLevel_id):
 
 
 def manage_session(request):
-    session_years = SessionYearModel.objects.filter(is_archived=False)
+    session_years = SessionYearModel.objects.all()
     context = {
         "session_years": session_years
     }
     return render(request, "hod_template/manage_session_template.html", context)
 
+
 def add_session(request):
-    # Get the latest session year if it exists
-    latest_session = SessionYearModel.objects.order_by('-session_end_year').first()
-    
-    if latest_session:
-        # Use the end year of the last session as the start year of the new session
-        last_end_year = latest_session.session_end_year.year
-        # Set the new session years based on the last session
-        session_start_year = f"{last_end_year}-01-01"  # Start of the new session year
-        session_end_year = f"{last_end_year + 1}-12-31"  # End of the new session year
-    else:
-        # If no session exists, set default values, e.g., for the current year
-        current_year = datetime.now().year
-        session_start_year = f"{current_year}-01-01"
-        session_end_year = f"{current_year + 1}-12-31"
+    return render(request, "hod_template/add_session_template.html")
 
-    print(f"Session Start Year: {session_start_year}, Session End Year: {session_end_year}")  # Debug print
-
-    return render(request, "hod_template/Add_Template/add_session_template.html", {
-        'session_start_year': session_start_year,
-        'session_end_year': session_end_year
-    })
 
 def add_session_save(request):
     if request.method != "POST":
@@ -642,7 +625,7 @@ def add_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
         session_limit = request.POST.get('session_limit')
-        session_status = "Active"
+        session_status = request.POST.get('session_status')
 
         try:
             sessionyear = SessionYearModel(
@@ -658,12 +641,26 @@ def add_session_save(request):
             messages.error(request, "Failed to Add Session Year")
             return redirect("add_session")
 
+
 def edit_session(request, session_id):
     session_year = SessionYearModel.objects.get(id=session_id)
     context = {
         "session_year": session_year
     }
     return render(request, "hod_template/edit_session_template.html", context)
+
+
+def manage_section(request):
+    session_years = SessionYearModel.objects.all()
+    context = {
+        "session_years": session_years
+    }
+    return render(request, "hod_template/manage_session_template.html", context)
+
+
+def add_session(request):
+    return render(request, "hod_template/add_session_template.html")
+
 
 def edit_session_save(request):
     if request.method != "POST":
@@ -674,45 +671,20 @@ def edit_session_save(request):
         session_start_year = request.POST.get('session_start_year')
         session_end_year = request.POST.get('session_end_year')
         session_limit = request.POST.get('session_limit')
-        session_status = request.POST.get('session_status')
 
         try:
             session_year = SessionYearModel.objects.get(id=session_id)
             session_year.session_start_year = session_start_year
             session_year.session_end_year = session_end_year
-            session_year.session_limit = session_limit
-            session_year.session_status = session_status
+            session_limit = session_limit
             session_year.save()
 
             messages.success(request, "Session Year Updated Successfully.")
-            return redirect('manage_session')
-        except Exception as e:
-            messages.error(request, f"Failed to Update Session Year: {e}")
-            return redirect('manage_session')
+            return redirect('/edit_session/'+session_id)
+        except:
+            messages.error(request, "Failed to Update Session Year.")
+            return redirect('/edit_session/'+session_id)
 
-def archived_sessions(request):
-    # Filter session years with status 'Archived'
-    session_years = SessionYearModel.objects.filter(is_archived=True)
-    context = {
-        "session_years": session_years
-    }
-    return render(request, 'hod_template/archived_session_template.html', context)
-
-def archive_session(request, session_id):
-    session_year = get_object_or_404(SessionYearModel, id=session_id)
-    session_year.is_archived = True
-    session_year.session_status = "Inactive"
-    session_year.save()
-    messages.success(request, "Session archived successfully!")
-    return redirect('manage_session')
-
-def unarchive_session(request, session_id):
-    session_year = get_object_or_404(SessionYearModel, id=session_id)
-    session_year.is_archived = False
-    session_year.session_status = "Active"
-    session_year.save()
-    messages.success(request, "Session unarchived successfully!")
-    return redirect('manage_session')
 
 def delete_session(request, session_id):
     session = SessionYearModel.objects.get(id=session_id)
@@ -755,7 +727,7 @@ def add_student(request):
         "sessions": sessions,
         "student_number": new_number
     }
-    return render(request, 'hod_template/Add_Template/add_student2_template.html', context)
+    return render(request, 'hod_template/add_student2_template.html', context)
 
 def add_student_save(request):
     if request.method != "POST":
@@ -892,7 +864,7 @@ def add_enrollment(request):
     context = {
         "students": students
     }
-    return render(request, 'hod_template/Add_Template/add_enrollment_template.html', context)
+    return render(request, 'hod_template/add_enrollment_template.html', context)
 
 def add_enrollment_save(request):
     if request.method != "POST":
@@ -970,10 +942,13 @@ def add_enrollment_save(request):
         # Create an Attachment instance
         attachment = Attachment(
             enrollment=enrollment,
+            id_picture="2x2 ID picture" if id_picture_file else '',
             id_picture_file=id_picture_file,
+            psa="PSA birth certificate" if psa_file else '',
             psa_file=psa_file,
+            form_138="Form 138" if form_138_file else '',
             form_138_file=form_138_file,
-            attachment_remarks=request.POST.get('attachment_remarks', '')
+            attachment_remarks=request.POST.get('attachment_remarks', ''),
         )
 
         attachment.save()
@@ -996,113 +971,6 @@ def manage_enrollment(request):
     }
     return render(request, 'hod_template/manage_enrollment_template.html', context)
 
-def edit_enrollment(request, enrollment_id):
-    # Retrieve the enrollment instance
-    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    
-    # Prepare context with existing data from the enrollment instance
-    context = {
-        "enrollment_id": enrollment.id,
-        "student_id": enrollment.student_id.id,
-        "student_name": f"{enrollment.student_id.admin.first_name} {enrollment.student_id.admin.last_name}",
-        "registration_fee": enrollment.registration_fee,
-        "misc_fee": enrollment.misc_fee,
-        "tuition_fee": enrollment.tuition_fee,
-        "total_fee": enrollment.total_fee,
-        "downpayment": enrollment.downpayment,
-        "discount": enrollment.discount,
-        "discount_amount": enrollment.discount_amount,
-        "balance": enrollment.balance,
-        "installment_payment": enrollment.installment_payment,
-        "installment_option": enrollment.installment_option,
-        "assessed_by": enrollment.assessed_by,
-        "assessed_date": enrollment.assessed_date,
-        "payment_received_by": enrollment.payment_received_by,
-        "payment_amount": enrollment.payment_amount,
-        "payment_date": enrollment.payment_date,
-        "enrollment_status": enrollment.enrollment_status,
-        "remarks": enrollment.remarks,
-    }
-
-    # Check for attachments and add them to the context if they exist
-    attachment = getattr(enrollment, 'attachment', None)
-    if attachment is not None:
-        context.update({
-            "id_picture_file": attachment.id_picture_file or '',  # Provide default if None
-            "birth_certificate_file": attachment.psa_file or '',  # Provide default if None
-            "form_138_file": attachment.form_138_file or '',  # Provide default if None
-            "attachment_remarks": attachment.attachment_remarks or '',  # Provide default if None
-        })
-    else:
-        # If no attachment exists, you might want to set default values for the context
-        context.update({
-            "id_picture_file": '',
-            "birth_certificate_file": '',
-            "form_138_file": '',
-            "attachment_remarks": '',
-        })
-
-    # Render the edit template with populated data
-    return render(request, "hod_template/edit_enrollment_template.html", context)
-
-def edit_enrollment_save(request, enrollment_id):
-    if request.method != "POST":
-        messages.error(request, "Invalid Method!")
-        return redirect('edit_enrollment', enrollment_id=enrollment_id)
-
-    # Retrieve the existing enrollment instance
-    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    student_instance = enrollment.student_id
-
-    # Retrieve and convert values from the form
-    def safe_decimal(value, field_name):
-        """Helper function to safely convert to Decimal with error logging."""
-        try:
-            return Decimal(value.strip() or '0.00')
-        except InvalidOperation:
-            messages.error(request, f"Invalid input for {field_name}. Please check your values.")
-            raise
-
-    try:
-        # Convert and log values
-        enrollment.registration_fee = safe_decimal(request.POST.get('registration_fee', '0.00'), 'registration fee')
-        enrollment.misc_fee = safe_decimal(request.POST.get('misc_fee', '0.00'), 'misc fee')
-        enrollment.tuition_fee = safe_decimal(request.POST.get('tuition_fee', '0.00'), 'tuition fee')
-        enrollment.total_fee = safe_decimal(request.POST.get('total_fee', '0.00'), 'total fee')
-        enrollment.downpayment = safe_decimal(request.POST.get('downpayment', '0.00'), 'downpayment')
-        enrollment.discount = safe_decimal(request.POST.get('discount', '0.00'), 'discount')
-        enrollment.discount_amount = safe_decimal(request.POST.get('discount_amount', '0.00'), 'discount amount')
-        enrollment.balance = safe_decimal(request.POST.get('balance', '0.00'), 'balance')
-        enrollment.installment_payment = safe_decimal(request.POST.get('installment_payment', '0.00'), 'installment payment')
-        enrollment.payment_amount = safe_decimal(request.POST.get('payment_amount', '0.00'), 'payment amount')
-
-        enrollment.installment_option = request.POST.get('installment_option', 'Monthly')
-        enrollment.assessed_by = request.POST.get('assessed_by', '')
-        enrollment.assessed_date = request.POST.get('assessed_date', None)
-        enrollment.payment_received_by = request.POST.get('payment_received_by', '')
-        enrollment.payment_date = request.POST.get('payment_date', None)
-        enrollment.enrollment_status = request.POST.get('enrollment_status', 'Pending')
-        enrollment.remarks = request.POST.get('remarks', '')
-
-        # Save the updated enrollment instance
-        enrollment.save()
-
-        # Handle file uploads from the request
-        if request.POST.get('include_id_picture'):
-            enrollment.attachment.id_picture_file = request.FILES.get('id_picture_file')
-        if request.POST.get('include_birth_certificate'):
-            enrollment.attachment.psa_file = request.FILES.get('birth_certificate_file')
-        if request.POST.get('include_form_138'):
-            enrollment.attachment.form_138_file = request.FILES.get('form_138_file')
-
-        enrollment.attachment.attachment_remarks = request.POST.get('attachment_remarks', '')
-        enrollment.attachment.save()
-
-        messages.success(request, "Enrollment Updated Successfully!")
-    except Exception as e:
-        messages.error(request, f"Failed to Update Enrollment! Error: {str(e)}")
-
-    return redirect('edit_enrollment', enrollment_id=enrollment_id)
 
 def update_balance(request, enrollment_id=None):
     # List all enrollments
@@ -1155,7 +1023,9 @@ def update_balance(request, enrollment_id=None):
         'enrollments': enrollments,
         'enrollment': enrollment,
     })
- 
+
+
+    
 # def promote_students(request):
 #     if request.method == "POST":
 #         current_grade_id = request.POST.get('current_grade')
@@ -1301,22 +1171,13 @@ def deactivate_student(request, student_id):
         return redirect('manage_student')
 
 
-def manage_section(request):
-    gradelevels = GradeLevel.objects.all()
-    sections = Section.objects.all()
-
-    context = {
-        "sections": sections,
-        "gradelevels":gradelevels,
-    }
-    return render(request, "hod_template/manage_section_template.html", context)
-
 def add_section(request):
     gradelevels = GradeLevel.objects.all()
     context = {
-        "gradelevels":gradelevels,
+        "gradelevels": gradelevels
     }
-    return render(request, 'hod_template/Add_Template/add_section_template.html', context)
+    return render(request, 'hod_template/add_section_template.html', context)
+
 
 def add_section_save(request):
     if request.method != "POST":
@@ -1341,47 +1202,6 @@ def add_section_save(request):
             messages.error(request, "Failed to Add Section!")
             return redirect('add_section')
 
-def edit_section(request, section_id):
-
-    section = Section.objects.get(id=section_id)
-    gradelevel = GradeLevel.objects.all()
-
-    context = {
-        "section": section,
-        "gradelevel":gradelevel,
-    }
-
-    return render(request, 'hod_template/edit_section_template.html', context)
-
-def edit_section_save(request):
-    if request.method != "POST":
-        HttpResponse("Invalid Method.")
-    else:
-        section_id = request.POST.get('section_id')
-        section_name = request.POST.get('section_name')
-        section_limit = request.POST.get('section_limit')
-        GradeLevel_id = request.POST.get('gradelevel')
-        
-        try:
-            section = Section.objects.get(id=section_id)
-            section.section_name = section_name
-
-            gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
-            section.GradeLevel_id = gradelevel
-
-            section_limit = section_limit
-
-            section.save()
-
-            messages.success(request, "Section Updated Successfully.")
-            # return redirect('/edit_subject/'+subject_id)
-            return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
-        except:
-            messages.error(request, "Failed to Update Section.")
-            return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
-            # return redirect('/edit_subject/'+subject_id)
-
-
 def add_subject(request):
     curriculums = Curriculums.objects.all()
     gradelevels = GradeLevel.objects.all()
@@ -1390,7 +1210,7 @@ def add_subject(request):
         "gradelevels": gradelevels
         
     }
-    return render(request, 'hod_template/Add_Template/add_subject_template.html', context)
+    return render(request, 'hod_template/add_subject_template.html', context)
 
 def add_subject_save(request):
     if request.method != "POST":
@@ -1432,10 +1252,11 @@ def manage_subject(request):
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
     gradelevels = GradeLevel.objects.all()
-    
+    staffs = CustomUser.objects.filter(user_type='2')
     context = {
         "subject": subject,
         "gradelevels": gradelevels,
+        "staffs": staffs,
         "id": subject_id
     }
     return render(request, 'hod_template/edit_subject_template.html', context)
@@ -1445,23 +1266,19 @@ def edit_subject_save(request):
         HttpResponse("Invalid Method.")
     else:
         subject_id = request.POST.get('subject_id')
-        GradeLevel_id = request.POST.get('gradelevel')
         subject_name = request.POST.get('subject')
-        
-        subject_code = request.POST.get('subject_code')
-        subject_description = request.POST.get('subject_description')
-        subject_hours = request.POST.get('subject_hours')
-        
+        GradeLevel_id = request.POST.get('gradelevel')
+        staff_id = request.POST.get('staff')
+
         try:
             subject = Subjects.objects.get(id=subject_id)
             subject.subject_name = subject_name
-            
+
             gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
             subject.GradeLevel_id = gradelevel
-            
-            subject.subject_code = subject_code
-            subject.subject_description = subject_description
-            subject.subject_hours = subject_hours
+
+            staff = CustomUser.objects.get(id=staff_id)
+            subject.staff_id = staff
             
             subject.save()
 
@@ -1489,7 +1306,7 @@ def add_assignsection(request):
     context = {
         "gradelevels": gradelevels,
     }
-    return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
+    return render(request, 'hod_template/add_assignsection_template.html', context)
 
 def load_sections_and_students(request):
     gradelevel_id = request.GET.get('gradelevel_id')
@@ -1546,8 +1363,6 @@ def add_assignsection_save(request):
 
 
 def add_load(request):
-    # Fetch all necessary data for the context
-    session_years = SessionYearModel.objects.all()
     curriculums = Curriculums.objects.all()
     assignsections = AssignSection.objects.select_related('GradeLevel_id', 'section_id').distinct('GradeLevel_id', 'section_id')
     gradelevels = GradeLevel.objects.all()
@@ -1558,7 +1373,6 @@ def add_load(request):
     # Fetching existing loads to display in the table
     loads = Load.objects.select_related('curriculum_id', 'AssignSection_id', 'subject_id', 'staff_id').all()  
     context = {
-        "session_years":session_years,
         "curriculums": curriculums,
         "assignsections": assignsections,
         "gradelevels": gradelevels,
@@ -1567,7 +1381,7 @@ def add_load(request):
         "staffs": staffs,
         "loads": loads,
     }
-    return render(request, 'hod_template/Add_Template/add_load_template.html', context)
+    return render(request, 'hod_template/add_load_template.html', context)
 
 def add_load_save(request):
     if request.method != "POST":
@@ -1575,10 +1389,6 @@ def add_load_save(request):
         return redirect('add_load')
     else:
         try:
-
-            session_year_id = request.POST.get('session_year_id')
-            session_id = SessionYearModel.objects.get(id=session_year_id)
-
             curriculum_id = request.POST.get('curriculum_id')
             curriculum = Curriculums.objects.get(id=curriculum_id)
 
@@ -1589,27 +1399,14 @@ def add_load_save(request):
             subject = Subjects.objects.get(id=subject_id)
 
             staff_id = request.POST.get('staff_id')
-            staff_user = CustomUser.objects.get(id=staff_id)
-
-            is_advisory = request.POST.get('is_advisory')
-
-            # Get the related Staff instance to check the max_load
-            staff = Staffs.objects.get(admin=staff_user)
-            current_load = Load.objects.filter(staff_id=staff_user).count()
-
-            # Check if the current load exceeds or equals the staff's max_load
-            if current_load >= staff.max_load:
-                messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load}.")
-                return redirect('add_load')
+            staff = CustomUser.objects.get(id=staff_id)
 
             # Saving the load
-            load = Load(
-                        session_year_id=session_id,      
+            load = Load(      
                         curriculum_id=curriculum,
                         AssignSection_id=assignsection, 
                         subject_id=subject,
-                        staff_id=staff_user,
-                        is_advisory=is_advisory
+                        staff_id=staff
                         )
             load.save()
 
@@ -1631,7 +1428,8 @@ def add_schedule(request):
         "staffs": staffs,
         "loads": loads,  
     }
-    return render(request, 'hod_template/Add_Template/add_schedule_template.html', context)
+    return render(request, 'hod_template/add_schedule_template.html', context)
+
 
 def add_schedule_save(request):
     if request.method != "POST":

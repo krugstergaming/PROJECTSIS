@@ -149,15 +149,11 @@ def get_students(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year")
 
-    load_id = request.POST.get("load_id")
-
     # Students enroll to GradeLevel, GradeLevel has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
-
-    load_model = Load.objects.get(id=load_id)
 
     students = Students.objects.filter(GradeLevel_id=subject_model.GradeLevel_id, session_year_id=session_model)
 
@@ -180,7 +176,7 @@ def get_students(request):
         grades = results_dict.get(student.id, {})
 
         data_small = {
-            "student_number": student.student_number,
+            "id": student.admin.id,
             "name": student.admin.first_name + " " + student.admin.last_name,
             "first_quarter": grades.get("first_quarter", ""),
             "second_quarter": grades.get("second_quarter", ""),

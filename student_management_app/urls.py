@@ -28,7 +28,6 @@ urlpatterns = [
     path('manage_curriculum/', HodViews.manage_curriculum, name="manage_curriculum"),
     path('edit_curriculum/<curriculum_id>/', HodViews.edit_curriculum, name="edit_curriculum"),
     path('edit_curriculum_save/', HodViews.edit_curriculum_save, name="edit_curriculum_save"),
-    
     path('archive_curriculum/<curriculum_id>/', HodViews.archive_curriculum, name="archive_curriculum"),
     path('unarchive_curriculum/<curriculum_id>/', HodViews.unarchive_curriculum, name="unarchive_curriculum"),
     path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
@@ -49,10 +48,6 @@ urlpatterns = [
     path('edit_session/<session_id>', HodViews.edit_session, name="edit_session"),
     path('edit_session_save/', HodViews.edit_session_save, name="edit_session_save"),
     path('delete_session/<session_id>/', HodViews.delete_session, name="delete_session"),
-    
-    path('archive_session/<session_id>/', HodViews.archive_session, name="archive_session"),
-    path('unarchive_session/<session_id>/', HodViews.unarchive_session, name="unarchive_session"),
-    path('archived_sessions/', HodViews.archived_sessions, name='archived_sessions'),
 
 
     path('add_student/', HodViews.add_student, name="add_student"),
@@ -67,8 +62,6 @@ urlpatterns = [
     path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
     path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
-    path('edit_enrollment/<enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
-    path('edit_enrollment_save/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
 
 
     path('add_load/', HodViews.add_load, name="add_load"),

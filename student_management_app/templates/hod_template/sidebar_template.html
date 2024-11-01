@@ -86,6 +86,9 @@
               </a>
             </li>
 
+
+      
+
             <li class="nav-item">
               {% url 'add_assignsection' as add_assignsection %}
               {% url 'add_load' as add_load %}
@@ -105,6 +108,39 @@
               </a>
             </li>
 
+            <li class="nav-item">
+              {% url 'manage_gradelevel' as manage_gradelevel %}
+              {% url 'edit_course' GradeLevel_id=id as edit_course %}
+              <a href="{{ manage_gradelevel }}" class="nav-link {% if request.path == manage_gradelevel %} active {% endif %} {% if request.path == edit_course %} active {% endif %}">
+                <i class="nav-icon fas fa-chalkboard"></i>
+                <p>
+                  Manage Grade Level
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'manage_subject' as manage_subject %}
+              {% url 'edit_subject' subject_id=id as edit_subject %}
+              <a href="{{ manage_subject }}" class="nav-link {% if request.path == manage_subject %} active {% endif %} {% if request.path == edit_subject %} active {% endif %}">
+                <i class="nav-icon fas fa-book"></i>
+                <p>
+                  Manage Subject
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'manage_session' as manage_session %}
+              {% url 'edit_session' session_id=id as edit_session %}
+              <a href="{{ manage_session }}" class="nav-link {% if request.path == manage_session %} active {% endif %} {% if request.path == edit_session %} active {% endif %}">
+                <i class="nav-icon fas fa-graduation-cap"></i>
+                <p>
+                  Manage School Year
+                </p>
+              </a>
+            </li>
+
             <!-- System Configuration -->
             <li class="nav-item has-treeview {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section %} menu-open {% endif %}">
               <a href="#" class="nav-link {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section %} active {% endif %}">
@@ -117,14 +153,9 @@
               <ul class="nav nav-treeview">
                   <li class="nav-item">
                       {% url 'add_session' as add_session %}
-                      {% url 'manage_session' as manage_session %}
-                      {% url 'edit_session' edit_session=id as edit_session %}
-                      <a href="{{ manage_session }}" class="nav-link 
-                      {% if request.path == add_session %} active {% endif %}
-                      {% if request.path == manage_session %} active {% endif %} 
-                      {% if request.path == edit_session %} active {% endif %}">
+                      <a href="{{ add_session }}" class="nav-link {% if request.path == add_session %} active {% endif %}">
                           <i class="nav-icon fas fa-th"></i>
-                          <p>School Year Management</p>
+                          <p>Add School Year</p>
                       </a>
                   </li>
                   <li class="nav-item">
@@ -143,46 +174,26 @@
                   </li>
                   
                   <li class="nav-item">
-                      
                       {% url 'add_gradelevel' as add_gradelevel %}
-                      {% url 'manage_gradelevel' as manage_gradelevel %}
-                      {% url 'edit_course' GradeLevel_id=id as edit_course %}
-                      <a href="{{ manage_gradelevel }}" class="nav-link 
-                        {% if request.path == add_gradelevel %} active {% endif %}
-                        {% if request.path == manage_gradelevel %} active {% endif %} 
-                        {% if request.path == edit_course %} active {% endif %}">
+                      <a href="{{ add_gradelevel }}" class="nav-link {% if request.path == add_gradelevel %} active {% endif %}">
                           <i class="nav-icon fas fa-th"></i>
-                          <p>Grade Level Management</p>
+                          <p>Add Grade Level</p>
                       </a>
                   </li>
 
-
                   <li class="nav-item">
-                      
                     {% url 'add_section' as add_section %}
-                    {% url 'manage_section' as manage_section %}
-                    {% url 'edit_section' section_id=id as edit_section %}
-                    <a href="{{ manage_section }}" class="nav-link 
-                      {% if request.path == add_section %} active {% endif %}
-                      {% if request.path == manage_section %} active {% endif %} 
-                      {% if request.path == edit_section %} active {% endif %}">
+                    <a href="{{ add_section }}" class="nav-link {% if request.path == add_section %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
-                        <p>Section Management</p>
+                        <p>Add Section</p>
                     </a>
-                </li>
-
-                  
+                  </li>
 
                   <li class="nav-item">
                       {% url 'add_subject' as add_subject %}
-                      {% url 'manage_subject' as manage_subject %}
-                      {% url 'edit_subject' subject_id=id as edit_subject %}   
-                      <a href="{{ manage_subject }}" class="nav-link 
-                      {% if request.path == add_subject %} active {% endif %}
-                      {% if request.path == manage_subject %} active {% endif %} 
-                      {% if request.path == edit_subject %} active {% endif %}">
+                      <a href="{{ add_subject }}" class="nav-link {% if request.path == add_subject %} active {% endif %}">
                           <i class="nav-icon fas fa-th"></i>
-                          <p>Subject Management</p>
+                          <p>Add Subject</p>
                       </a>
                   </li>
                   
