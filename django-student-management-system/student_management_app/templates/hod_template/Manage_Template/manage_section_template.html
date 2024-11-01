@@ -1,7 +1,7 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Manage Academic Year
+    Manage Section
 {% endblock page_title %}
 
 {% block main_content %}
@@ -11,11 +11,8 @@
 <section class="content">
         <div class="container-fluid">
 
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-success" href="{% url 'add_session' %}" role="button">+ Add Academic Year</a>
-            <a class="btn btn-secondary float-right" href="{% url 'archived_sessions' %}" role="button">View Archived</a>
-        </div>
-        <br>&nbsp;
+            <a class="btn btn-success" href="{% url 'add_section' %}" role="button">+ Add Section</a> <br/>&nbsp;
+
             {% if messages %}
                                 <div class="form-group">
                                 <div class="col-12">
@@ -45,7 +42,7 @@
                     <!-- general form elements -->
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Academic Year Details</h3>
+                            <h3 class="card-title">Section Details</h3>
 
                             <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -62,27 +59,25 @@
                             <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                <th>ID</th>
-                                <th>Academic Start Year</th>
-                                <th>Academic End Year</th>
-                                <th>Academic Capacity </th>
-                                <th>Status</th>
+                                <!-- <th>ID</th> -->
+                                <th>Grade Level Name</th> 
+                                <th>Section Name</th>
+                                <th>Date Created</th>
+                                <th>Date Updated</th>
                                 <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for session_year in session_years %}
+                                {% for section in sections %}
                                 <tr>
-                                <td>{{ session_year.id }}</td>
-                                <td>{{ session_year.session_start_year }}</td>
-                                <td>{{ session_year.session_end_year }}</td>
-                                <td>{{ session_year.session_limit }}</td>
-                                <td>{{ session_year.session_status }}</td>
+                                <!-- <td>{{ gradelevel.id }}</td> -->
+                                <td>{{ section.GradeLevel_id.GradeLevel_name }}</td>
+                                <td>{{ section.section_name }}</td>
+                                <td>{{ section.created_at }}</td>
+                                <td>{{ section.updated_at }}</td>
                                 <td>
-                                    <a href="{% url 'edit_session' session_year.id %}" class="btn btn-warning">Edit</a> 
-                                    <!-- <a href="{% url 'delete_session' session_year.id %}" class="btn btn-danger">Delete</a> -->
-                                    <a href="{% url 'archive_session' session_year.id %}" class="btn btn-secondary">Archive</a>
-                                    
+                                    <a href="" class="btn btn-warning">Edit</a> 
+                                    <a href="" class="btn btn-secondary">Archive</a>
                                 </td>
                                 </tr>
                                 {% endfor %}

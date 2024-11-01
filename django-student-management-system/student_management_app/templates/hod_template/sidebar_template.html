@@ -151,6 +151,23 @@
                       </a>
                   </li>
 
+
+                  <li class="nav-item">
+                      
+                    {% url 'add_section' as add_section %}
+                    {% url 'manage_section' as manage_section %}
+                    {% url 'edit_section' section_id=id as edit_section %}
+                    <a href="{{ manage_section }}" class="nav-link 
+                      {% if request.path == add_section %} active {% endif %}
+                      {% if request.path == manage_section %} active {% endif %} 
+                      {% if request.path == edit_section %} active {% endif %}">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>Section Management</p>
+                    </a>
+                </li>
+
+                  
+
                   <li class="nav-item">
                       {% url 'add_subject' as add_subject %}
                       {% url 'manage_subject' as manage_subject %}

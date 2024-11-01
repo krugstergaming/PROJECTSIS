@@ -21,6 +21,7 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
+                                    <th>Academic Year</th>
                                     <th>Curriculum</th>
                                     <th>Assigned Section</th>
                                     <th>Subject</th>
@@ -32,6 +33,7 @@
                             <tbody>
                                 {% for load in loads %}
                                     <tr>
+                                        <td>{{ load.session_year.session_start_year}} - {{ load.session_year.session_end_year}}</td>
                                         <td>{{ load.curriculum_id.curriculum_name }}</td>
                                         <td>{{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
                                         <td>{{ load.subject_id.subject_name }}</td>
@@ -43,7 +45,10 @@
                                                 No
                                             {% endif %}
                                         </td>
-                                        <td>  </td>
+                                        <td>  
+                                            <a href="" class="btn btn-warning">Edit</a>
+                                            <a href="" class="btn btn-secondary" onclick="return confirm('Are you sure you want to archive this record?');">Archive</a> 
+                                        </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -90,6 +95,17 @@
                         {% endif %}
 
                         <div class="card-body">
+                            
+                            <div class="form-group">
+                                <label>School Year</label>
+                                <select class="form-control" name="session_year_id" required>
+                                    {% for session_year in session_years %}
+                                        <option value="">Select a School Year</option>
+                                        <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
                             <div class="form-group">
                                 <label for="curriculum">Curriculums</label>
                                 <select class="form-control" name="curriculum_id" id="curriculum_id" required>
@@ -99,6 +115,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
+
 
                             <div class="form-group">
                                 <label for="assignsection">Assigned Section</label>
