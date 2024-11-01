@@ -149,11 +149,15 @@ def get_students(request):
     subject_id = request.POST.get("subject")
     session_year = request.POST.get("session_year")
 
+    load_id = request.POST.get("load_id")
+
     # Students enroll to GradeLevel, GradeLevel has Subjects
     # Getting all data from subject model based on subject_id
     subject_model = Subjects.objects.get(id=subject_id)
 
     session_model = SessionYearModel.objects.get(id=session_year)
+
+    load_model = Load.objects.get(id=load_id)
 
     students = Students.objects.filter(GradeLevel_id=subject_model.GradeLevel_id, session_year_id=session_model)
 
