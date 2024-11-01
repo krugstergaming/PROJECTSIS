@@ -76,7 +76,7 @@ def admin_home(request):
 
 
 def add_staff(request):
-    return render(request, "hod_template/add_staff_template.html")
+    return render(request, "hod_template/Add_Template/add_staff_template.html")
 
 def add_staff_save(request):
     if request.method != "POST":
@@ -166,7 +166,7 @@ def manage_staff(request):
         "staffs": staffs,
         "grading_config": grading_config,  # Pass the grading configuration to the template
     }
-    return render(request, "hod_template/manage_staff_template.html", context)
+    return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
 
 
 def edit_staff(request, staff_id):
@@ -176,7 +176,7 @@ def edit_staff(request, staff_id):
         "staff": staff,
         "id": staff_id
     }
-    return render(request, "hod_template/edit_staff_template.html", context)
+    return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
 
 
 def edit_staff_save(request):
@@ -233,7 +233,7 @@ def deactivate_staff(request, staff_id):
 
 
 def add_curriculum(request):
-    return render(request, "hod_template/add_curriculum_template.html")
+    return render(request, "hod_template/Add_Template/add_curriculum_template.html")
 
 
 def add_curriculum_save(request):
@@ -264,7 +264,7 @@ def manage_curriculum(request):
     context = {
         "curriculums": curriculums
     }
-    return render(request, 'hod_template/manage_curriculum_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_curriculum_template.html', context)
 
 def edit_curriculum(request, curriculum_id):
     curriculum = Curriculums.objects.get(id=curriculum_id)
@@ -272,7 +272,12 @@ def edit_curriculum(request, curriculum_id):
         "curriculum": curriculum,
         "id": curriculum_id
     }
+<<<<<<< HEAD:student_management_app/HodViews.py
     return render(request, 'hod_template/edit_curriculum_template.html', context)
+=======
+    return render(request, 'hod_template/Edit_Template/edit_curriculum_template.html', context)
+
+>>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 def edit_curriculum_save(request):
     if request.method != "POST":
         HttpResponse("Invalid Method")
@@ -298,7 +303,12 @@ def archived_curriculums(request):
     context = {
         "curriculums": curriculums
     }
+<<<<<<< HEAD:student_management_app/HodViews.py
     return render(request, 'hod_template/archived_curriculum_template.html', context)
+=======
+    return render(request, 'hod_template/Archive_Template/archived_curriculum_template.html', context)
+
+>>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 def archive_curriculum(request, curriculum_id):
     curriculum = get_object_or_404(Curriculums, id=curriculum_id)
     curriculum.is_archived = True
@@ -320,7 +330,7 @@ def add_gradelevel(request):
     context = {
         "curriculums": curriculums
     }
-    return render(request, "hod_template/add_gradelevel_template.html", context)
+    return render(request, "hod_template/Add_Template/add_gradelevel_template.html", context)
 
 def add_gradelevel_save(request):
     if request.method != "POST":
@@ -562,7 +572,7 @@ def manage_gradelevel(request):
     context = {
         "gradelevels": gradelevels
     }
-    return render(request, 'hod_template/manage_gradelevel_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_gradelevel_template.html', context)
 
 
 def edit_gradelevel(request, GradeLevel_id):
@@ -571,7 +581,7 @@ def edit_gradelevel(request, GradeLevel_id):
         "gradelevel": gradelevel,
         "id": GradeLevel_id
     }
-    return render(request, 'hod_template/edit_gradelevel_template.html', context)
+    return render(request, 'hod_template/Edit_Template/edit_gradelevel_template.html', context)
 
 
 def edit_gradelevel_save(request):
@@ -610,11 +620,11 @@ def manage_session(request):
     context = {
         "session_years": session_years
     }
-    return render(request, "hod_template/manage_session_template.html", context)
+    return render(request, "hod_template/Manage_Template/manage_session_template.html", context)
 
 
 def add_session(request):
-    return render(request, "hod_template/add_session_template.html")
+    return render(request, "hod_template/Add_Template/add_session_template.html")
 
 
 def add_session_save(request):
@@ -647,7 +657,7 @@ def edit_session(request, session_id):
     context = {
         "session_year": session_year
     }
-    return render(request, "hod_template/edit_session_template.html", context)
+    return render(request, "hod_template/Edit_Template/edit_session_template.html", context)
 
 
 def manage_section(request):
@@ -655,11 +665,11 @@ def manage_section(request):
     context = {
         "session_years": session_years
     }
-    return render(request, "hod_template/manage_session_template.html", context)
+    return render(request, "hod_template/Manage_Template/manage_session_template.html", context)
 
 
 def add_session(request):
-    return render(request, "hod_template/add_session_template.html")
+    return render(request, "hod_template/Add_Template/add_session_template.html")
 
 
 def edit_session_save(request):
@@ -727,7 +737,7 @@ def add_student(request):
         "sessions": sessions,
         "student_number": new_number
     }
-    return render(request, 'hod_template/add_student2_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_student2_template.html', context)
 
 def add_student_save(request):
     if request.method != "POST":
@@ -864,7 +874,7 @@ def add_enrollment(request):
     context = {
         "students": students
     }
-    return render(request, 'hod_template/add_enrollment_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_enrollment_template.html', context)
 
 def add_enrollment_save(request):
     if request.method != "POST":
@@ -942,13 +952,10 @@ def add_enrollment_save(request):
         # Create an Attachment instance
         attachment = Attachment(
             enrollment=enrollment,
-            id_picture="2x2 ID picture" if id_picture_file else '',
             id_picture_file=id_picture_file,
-            psa="PSA birth certificate" if psa_file else '',
             psa_file=psa_file,
-            form_138="Form 138" if form_138_file else '',
             form_138_file=form_138_file,
-            attachment_remarks=request.POST.get('attachment_remarks', ''),
+            attachment_remarks=request.POST.get('attachment_remarks', '')
         )
 
         attachment.save()
@@ -969,7 +976,116 @@ def manage_enrollment(request):
         "attachments": attachments,
         "balancepayments": balancepayments,
     }
-    return render(request, 'hod_template/manage_enrollment_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', context)
+
+def edit_enrollment(request, enrollment_id):
+    # Retrieve the enrollment instance
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+    
+    # Prepare context with existing data from the enrollment instance
+    context = {
+        "enrollment_id": enrollment.id,
+        "student_id": enrollment.student_id.id,
+        "student_name": f"{enrollment.student_id.admin.first_name} {enrollment.student_id.admin.last_name}",
+        "registration_fee": enrollment.registration_fee,
+        "misc_fee": enrollment.misc_fee,
+        "tuition_fee": enrollment.tuition_fee,
+        "total_fee": enrollment.total_fee,
+        "downpayment": enrollment.downpayment,
+        "discount": enrollment.discount,
+        "discount_amount": enrollment.discount_amount,
+        "balance": enrollment.balance,
+        "installment_payment": enrollment.installment_payment,
+        "installment_option": enrollment.installment_option,
+        "assessed_by": enrollment.assessed_by,
+        "assessed_date": enrollment.assessed_date,
+        "payment_received_by": enrollment.payment_received_by,
+        "payment_amount": enrollment.payment_amount,
+        "payment_date": enrollment.payment_date,
+        "enrollment_status": enrollment.enrollment_status,
+        "remarks": enrollment.remarks,
+    }
+
+    # Check for attachments and add them to the context if they exist
+    attachment = getattr(enrollment, 'attachment', None)
+    if attachment is not None:
+        context.update({
+            "id_picture_file": attachment.id_picture_file or '',  # Provide default if None
+            "birth_certificate_file": attachment.psa_file or '',  # Provide default if None
+            "form_138_file": attachment.form_138_file or '',  # Provide default if None
+            "attachment_remarks": attachment.attachment_remarks or '',  # Provide default if None
+        })
+    else:
+        # If no attachment exists, you might want to set default values for the context
+        context.update({
+            "id_picture_file": '',
+            "birth_certificate_file": '',
+            "form_138_file": '',
+            "attachment_remarks": '',
+        })
+
+    # Render the edit template with populated data
+    return render(request, "hod_template/Edit_Template/edit_enrollment_template.html", context)
+
+
+def edit_enrollment_save(request, enrollment_id):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method!")
+        return redirect('edit_enrollment', enrollment_id=enrollment_id)
+
+    # Retrieve the existing enrollment instance
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+    student_instance = enrollment.student_id
+
+    # Retrieve and convert values from the form
+    def safe_decimal(value, field_name):
+        """Helper function to safely convert to Decimal with error logging."""
+        try:
+            return Decimal(value.strip() or '0.00')
+        except InvalidOperation:
+            messages.error(request, f"Invalid input for {field_name}. Please check your values.")
+            raise
+
+    try:
+        # Convert and log values
+        enrollment.registration_fee = safe_decimal(request.POST.get('registration_fee', '0.00'), 'registration fee')
+        enrollment.misc_fee = safe_decimal(request.POST.get('misc_fee', '0.00'), 'misc fee')
+        enrollment.tuition_fee = safe_decimal(request.POST.get('tuition_fee', '0.00'), 'tuition fee')
+        enrollment.total_fee = safe_decimal(request.POST.get('total_fee', '0.00'), 'total fee')
+        enrollment.downpayment = safe_decimal(request.POST.get('downpayment', '0.00'), 'downpayment')
+        enrollment.discount = safe_decimal(request.POST.get('discount', '0.00'), 'discount')
+        enrollment.discount_amount = safe_decimal(request.POST.get('discount_amount', '0.00'), 'discount amount')
+        enrollment.balance = safe_decimal(request.POST.get('balance', '0.00'), 'balance')
+        enrollment.installment_payment = safe_decimal(request.POST.get('installment_payment', '0.00'), 'installment payment')
+        enrollment.payment_amount = safe_decimal(request.POST.get('payment_amount', '0.00'), 'payment amount')
+
+        enrollment.installment_option = request.POST.get('installment_option', 'Monthly')
+        enrollment.assessed_by = request.POST.get('assessed_by', '')
+        enrollment.assessed_date = request.POST.get('assessed_date', None)
+        enrollment.payment_received_by = request.POST.get('payment_received_by', '')
+        enrollment.payment_date = request.POST.get('payment_date', None)
+        enrollment.enrollment_status = request.POST.get('enrollment_status', 'Pending')
+        enrollment.remarks = request.POST.get('remarks', '')
+
+        # Save the updated enrollment instance
+        enrollment.save()
+
+        # Handle file uploads from the request
+        if request.POST.get('include_id_picture'):
+            enrollment.attachment.id_picture_file = request.FILES.get('id_picture_file')
+        if request.POST.get('include_birth_certificate'):
+            enrollment.attachment.psa_file = request.FILES.get('birth_certificate_file')
+        if request.POST.get('include_form_138'):
+            enrollment.attachment.form_138_file = request.FILES.get('form_138_file')
+
+        enrollment.attachment.attachment_remarks = request.POST.get('attachment_remarks', '')
+        enrollment.attachment.save()
+
+        messages.success(request, "Enrollment Updated Successfully!")
+    except Exception as e:
+        messages.error(request, f"Failed to Update Enrollment! Error: {str(e)}")
+
+    return redirect('edit_enrollment', enrollment_id=enrollment_id)
 
 
 def update_balance(request, enrollment_id=None):
@@ -1018,7 +1134,7 @@ def update_balance(request, enrollment_id=None):
     else:
         form = UpdateBalanceForm()
 
-    return render(request, 'hod_template/manage_enrollment_template.html', {
+    return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', {
         'form': form,
         'enrollments': enrollments,
         'enrollment': enrollment,
@@ -1066,7 +1182,7 @@ def manage_student(request):
     context = {
         "students": students
     }
-    return render(request, 'hod_template/manage_student_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
 
 
 def edit_student(request, student_id):
@@ -1090,7 +1206,7 @@ def edit_student(request, student_id):
         "username": student.admin.username,
         "form": form
     }
-    return render(request, "hod_template/edit_student_template.html", context)
+    return render(request, "hod_template/Edit_Template/edit_student_template.html", context)
 
 
 def edit_student_save(request):
@@ -1176,7 +1292,7 @@ def add_section(request):
     context = {
         "gradelevels": gradelevels
     }
-    return render(request, 'hod_template/add_section_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_section_template.html', context)
 
 
 def add_section_save(request):
@@ -1210,7 +1326,7 @@ def add_subject(request):
         "gradelevels": gradelevels
         
     }
-    return render(request, 'hod_template/add_subject_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_subject_template.html', context)
 
 def add_subject_save(request):
     if request.method != "POST":
@@ -1247,7 +1363,7 @@ def manage_subject(request):
     context = {
         "subjects": subjects
     }
-    return render(request, 'hod_template/manage_subject_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_subject_template.html', context)
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
@@ -1259,7 +1375,7 @@ def edit_subject(request, subject_id):
         "staffs": staffs,
         "id": subject_id
     }
-    return render(request, 'hod_template/edit_subject_template.html', context)
+    return render(request, 'hod_template/Edit_Template/edit_subject_template.html', context)
 
 def edit_subject_save(request):
     if request.method != "POST":
@@ -1306,7 +1422,7 @@ def add_assignsection(request):
     context = {
         "gradelevels": gradelevels,
     }
-    return render(request, 'hod_template/add_assignsection_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
 
 def load_sections_and_students(request):
     gradelevel_id = request.GET.get('gradelevel_id')
@@ -1381,7 +1497,7 @@ def add_load(request):
         "staffs": staffs,
         "loads": loads,
     }
-    return render(request, 'hod_template/add_load_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_load_template.html', context)
 
 def add_load_save(request):
     if request.method != "POST":
@@ -1399,14 +1515,34 @@ def add_load_save(request):
             subject = Subjects.objects.get(id=subject_id)
 
             staff_id = request.POST.get('staff_id')
+<<<<<<< HEAD:student_management_app/HodViews.py
             staff = CustomUser.objects.get(id=staff_id)
+=======
+            staff_user = CustomUser.objects.get(id=staff_id)
+
+            is_advisory = request.POST.get('is_advisory')
+
+            # Get the related Staff instance to check the max_load
+            staff = Staffs.objects.get(admin=staff_user)
+            current_load = Load.objects.filter(staff_id=staff_user).count()
+
+            # Check if the current load exceeds or equals the staff's max_load
+            if current_load >= staff.max_load:
+                messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load}.")
+                return redirect('add_load')
+>>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
 
             # Saving the load
             load = Load(      
                         curriculum_id=curriculum,
                         AssignSection_id=assignsection, 
                         subject_id=subject,
+<<<<<<< HEAD:student_management_app/HodViews.py
                         staff_id=staff
+=======
+                        staff_id=staff_user,
+                        is_advisory=is_advisory
+>>>>>>> origin/levi_branch:django-student-management-system/student_management_app/HodViews.py
                         )
             load.save()
 
@@ -1428,7 +1564,7 @@ def add_schedule(request):
         "staffs": staffs,
         "loads": loads,  
     }
-    return render(request, 'hod_template/add_schedule_template.html', context)
+    return render(request, 'hod_template/Add_Template/add_schedule_template.html', context)
 
 
 def add_schedule_save(request):
@@ -1481,7 +1617,7 @@ def manage_class_scheduling(request):
         "schedules": schedules,
         
     }
-    return render(request, 'hod_template/manage_schedule_template.html', context)
+    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
 
 
 def class_search(request):
@@ -1513,7 +1649,7 @@ def class_search(request):
     # Check if there is a search query in the GET request and if a search has been made
     if 'search' in request.GET:
         # Don't redirect on the initial search
-        return render(request, 'hod_template/manage_schedule_template.html', {
+        return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
             'assignsections': assignsections,
             'loads': loads,
             'schedules': schedules,
@@ -1521,7 +1657,7 @@ def class_search(request):
         })
 
     # Render the search results or the default page
-    return render(request, 'hod_template/manage_schedule_template.html', {
+    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
         'assignsections': assignsections,
         'loads': loads,
         'schedules': schedules,
@@ -1555,7 +1691,7 @@ def edit_schedule(request, schedule_id):
         "form": form
     }
 
-    return render(request, "hod_template/edit_schedule_template.html", context)
+    return render(request, "hod_template/Edit_Template/edit_schedule_template.html", context)
 
 def edit_schedule_save(request):
     if request.method != "POST":

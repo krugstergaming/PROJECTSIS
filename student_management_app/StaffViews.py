@@ -176,7 +176,7 @@ def get_students(request):
         grades = results_dict.get(student.id, {})
 
         data_small = {
-            "id": student.admin.id,
+            "student_number": student.student_number,
             "name": student.admin.first_name + " " + student.admin.last_name,
             "first_quarter": grades.get("first_quarter", ""),
             "second_quarter": grades.get("second_quarter", ""),

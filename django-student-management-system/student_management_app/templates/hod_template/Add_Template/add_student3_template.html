@@ -1,0 +1,97 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Student
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Student</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'add_student_save' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Display Messages -->
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                        {{ message }}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <!-- Form Fields -->
+
+                            <div class="form-group">
+                                <label for="father_name">Father's Name</label>
+                                <input type="text" class="form-control" name="father_name" id="father_name" placeholder="Enter Father's Name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="father_occupation">Father's Occupation</label>
+                                <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="mother_name">Mother's Name</label>
+                                <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="Enter Mother's Name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="mother_occupation">Mother's Occupation</label>
+                                <input type="text" class="form-control" name="mother_occupation" id="mother_occupation" placeholder="Enter Mother's Occupation">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guardian_name">Guardian's Name</label>
+                                <input type="text" class="form-control" name="guardian_name" id="guardian_name" placeholder="Enter Guardian's Name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="guardian_occupation">Guardian's Occupation</label>
+                                <input type="text" class="form-control" name="guardian_occupation" id="guardian_occupation" placeholder="Enter Guardian's Occupation">
+                            </div>
+                            
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Next Tab</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+{% endblock main_content %}

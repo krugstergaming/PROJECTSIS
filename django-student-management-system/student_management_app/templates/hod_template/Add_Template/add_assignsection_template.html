@@ -1,0 +1,140 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add Assign Section
+{% endblock page_title %}
+
+{% block main_content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Assign Section</h3>
+                    </div>
+                    <form role="form" method="POST" action="{% url 'add_assignsection_save' %}">
+                        {% csrf_token %}
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="gradelevel">Grade level</label>
+                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                    <option value="">Select a Grade level</option>
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Section</label>
+                                <select class="form-control" name="section_id" id="section_id" required disabled>
+                                    <option value="" disabled selected>Select a Section</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Students</label>
+                                <table class="table table-bordered" id="student_table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="student_table_body">
+                                        <!-- Student rows will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Assign Section</button>
+                            <a href="{% url 'manage_class_scheduling' %}" class="btn btn-secondary">Back</a>
+                        </div>
+                        
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var gradeLevelSelect = document.getElementById('GradeLevel_id');
+        var sectionSelect = document.getElementById('section_id');
+        var studentTableBody = document.getElementById('student_table_body');
+
+        gradeLevelSelect.addEventListener('change', function() {
+            var selectedGradeLevelId = gradeLevelSelect.value;
+
+            if (!selectedGradeLevelId) {
+                sectionSelect.setAttribute('disabled', true);
+                sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                studentTableBody.innerHTML = '';  // Clear table
+                return;
+            }
+
+            sectionSelect.removeAttribute('disabled');
+
+            fetch(`/load_sections_and_students/?gradelevel_id=` + selectedGradeLevelId)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate section dropdown
+                    sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                    data.sections.forEach(function(section) {
+                        var option = document.createElement('option');
+                        option.value = section.id;
+                        option.textContent = section.name;
+                        sectionSelect.appendChild(option);
+                    });
+
+                    // Populate student table
+                    studentTableBody.innerHTML = ''; // Clear previous rows
+                    data.students.forEach(function(student) {
+                        var row = document.createElement('tr');
+                        // Automatically select the checkbox for the student
+                        row.innerHTML = `
+                            <td>
+                                <input type="checkbox" name="student_ids" value="${student.id}" checked>
+                                ${student.name}
+                            </td>`;
+                        studentTableBody.appendChild(row);
+                    });
+                });
+        });
+    });
+</script>
+{% endblock custom_js %}
