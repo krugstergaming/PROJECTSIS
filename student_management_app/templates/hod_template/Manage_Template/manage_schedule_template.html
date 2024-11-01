@@ -38,7 +38,7 @@
         {% endif %}
 
 
-        <a class="btn btn-primary" href="{% url 'add_assignsection' %}" role="button">+ Add Assign Section</a> <br/>&nbsp;
+        <a class="btn btn-success" href="{% url 'add_assignsection' %}" role="button">+ Add Assign Section</a> <br/>&nbsp;
 
         <div class="row">
             <div class="col-md-12">
@@ -82,6 +82,7 @@
                                         <td>
                                             <!-- Action buttons can go here, for example: -->
                                             <a href="{% url 'edit_schedule' assignsection.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="" class="btn btn-secondary">Archive</a>
                                             
                                         </td>
                                     </tr>
@@ -100,7 +101,7 @@
         </div>
 
 
-        <a class="btn btn-primary" href="{% url 'add_load' %}" role="button">+ Add Load</a> <br/>&nbsp;
+        <a class="btn btn-success" href="{% url 'add_load' %}" role="button">+ Add Load</a> <br/>&nbsp;
 
         <div class="row">
             <div class="col-md-12">
@@ -146,7 +147,10 @@
                                                 No
                                             {% endif %}
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            <a href="" class="btn btn-warning">Edit</a> 
+                                            <a href="" class="btn btn-secondary">Archive</a>
+                                        </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
@@ -163,7 +167,7 @@
         </div>
 
 
-        <a class="btn btn-primary" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp;
+        <a class="btn btn-success" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp;
 
         <div class="row">
 
@@ -216,7 +220,7 @@
                                     <td>{{ schedule.end_time }}</td>
                                     <td>
                                         <a href="{% url 'edit_schedule' schedule.id %}" class="btn btn-warning">Edit</a> 
-                                        
+                                        <a href="" class="btn btn-secondary">Archive</a>
                                     </td>
                                 </tr>
                                 {% endfor %}

@@ -50,61 +50,38 @@
                                 {% endif %}
                             
 
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="curriculum">Curriculums</label>
-                                        <select class="form-control" name="curriculum_id" id="curriculum_id">
-                                            <option value="">Select a Curriculum</option>
-                                            {% for curriculum in curriculums %}
-                                                <option value="{{ curriculum.id }}" 
-                                                    {% if curriculum.id == subject.curriculum_id.id %}selected{% endif %}>
-                                                    {{ curriculum.curriculum_name }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="gradelevel">Grade Level</label>
-                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id">
-                                            <option value="">Select a Grade level</option>
-                                            {% for gradelevel in gradelevels %}
-                                                <option value="{{ gradelevel.id }}" 
-                                                    {% if gradelevel.id == subject.GradeLevel_id.id %}selected{% endif %}>
-                                                    {{ gradelevel.GradeLevel_name }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-        
-                                    <div class="form-group">
-                                        <label>Subject Code</label>
-                                        <input type="text" class="form-control" id="subject_code" name="subject_code" 
-                                                value="{{ subject.subject_code }}" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Subject Name</label>
-                                        <input type="text" class="form-control" id="subject_name" name="subject_name" 
-                                                value="{{ subject.subject_name }}" required>
-                                    </div>
-        
-                                    <div class="form-group">
-                                        <label>Subject Description</label>
-                                        <textarea class="form-control" id="subject_description" name="subject_description" required>{{ subject.subject_description }}</textarea>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label>Lecture Hour</label>
-                                        <input type="text" class="form-control" id="subject_hours" name="subject_hours" 
-                                                value="{{ subject.subject_hours }}" required>
-                                    </div>
-                                </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Subject Name </label>
+                                <input type="text" class="form-control" name="subject" value="{{ subject.subject_name }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label>GradeLevel </label>
+                                <select class="form-control" name="gradelevel">
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}" {% if gradelevel.id == subject.GradeLevel_id.id %} selected {% endif %}>{{ gradelevel.GradeLevel_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Staff </label>
+                                <select class="form-control" name="staff">
+                                    {% for staff in staffs %}
+                                        <option value="{{ staff.id }}" {% if staff.id == subject.staff_id.id %} selected {% endif %}>{{ staff.first_name }} {{ staff.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <input type="hidden" name="subject_id" value="{{ subject.id }}" />
+                            </div>
+
+                        </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
                         
                         <button type="submit" class="btn btn-primary">Update Subject</button>
-                        <a href="{% url 'manage_subject' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
                     </div>

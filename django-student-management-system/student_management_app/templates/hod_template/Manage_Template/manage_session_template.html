@@ -11,11 +11,8 @@
 <section class="content">
         <div class="container-fluid">
 
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-success" href="{% url 'add_session' %}" role="button">+ Add Academic Year</a>
-            <a class="btn btn-secondary float-right" href="{% url 'archived_sessions' %}" role="button">View Archived</a>
-        </div>
-        <br>&nbsp;
+            <a class="btn btn-success" href="{% url 'add_session' %}" role="button">+ Add Academic Year</a> <br/>&nbsp;
+
             {% if messages %}
                                 <div class="form-group">
                                 <div class="col-12">
@@ -65,8 +62,6 @@
                                 <th>ID</th>
                                 <th>Academic Start Year</th>
                                 <th>Academic End Year</th>
-                                <th>Academic Capacity </th>
-                                <th>Status</th>
                                 <th>Action</th>
                                 </tr>
                             </thead>
@@ -76,13 +71,10 @@
                                 <td>{{ session_year.id }}</td>
                                 <td>{{ session_year.session_start_year }}</td>
                                 <td>{{ session_year.session_end_year }}</td>
-                                <td>{{ session_year.session_limit }}</td>
-                                <td>{{ session_year.session_status }}</td>
                                 <td>
                                     <a href="{% url 'edit_session' session_year.id %}" class="btn btn-warning">Edit</a> 
                                     <!-- <a href="{% url 'delete_session' session_year.id %}" class="btn btn-danger">Delete</a> -->
-                                    <a href="{% url 'archive_session' session_year.id %}" class="btn btn-secondary">Archive</a>
-                                    
+                                    <a href="" class="btn btn-secondary">Archive</a>
                                 </td>
                                 </tr>
                                 {% endfor %}

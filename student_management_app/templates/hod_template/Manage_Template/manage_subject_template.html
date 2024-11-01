@@ -11,7 +11,7 @@
 <section class="content">
         <div class="container-fluid">
 
-            <a class="btn btn-primary" href="{% url 'add_subject' %}" role="button">+ Add Subject</a> <br/>&nbsp;
+            <a class="btn btn-success" href="{% url 'add_subject' %}" role="button">+ Add Subject</a> <br/>&nbsp;
 
             {% if messages %}
                                 <div class="form-group">
@@ -80,8 +80,9 @@
                                         <td>{{ subject.created_at }}</td>
                                         <td>{{ subject.updated_at }}</td>
                                         <td>
-                                            <a href="{% url 'edit_subject' subject.id %}" class="btn btn-success">Edit</a> 
-                                            <a href="{% url 'delete_subject' subject.id %}" class="btn btn-danger">Delete</a>
+                                            <a href="{% url 'edit_subject' subject.id %}" class="btn btn-warning">Edit</a> 
+                                            <!-- <a href="{% url 'delete_subject' subject.id %}" class="btn btn-danger">Delete</a> -->
+                                            <a href="" class="btn btn-secondary">Archive</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

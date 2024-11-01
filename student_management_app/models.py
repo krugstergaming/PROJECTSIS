@@ -163,11 +163,8 @@ class Enrollment(models.Model):
 
 class Attachment(models.Model):
     enrollment = models.ForeignKey('Enrollment', on_delete=models.CASCADE, related_name='attachments')
-    id_picture = models.CharField(max_length=255, blank=True, null=True)
     id_picture_file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    psa = models.CharField(max_length=255, blank=True, null=True)
     psa_file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    form_138 = models.CharField(max_length=255, blank=True, null=True)
     form_138_file = models.FileField(upload_to='attachments/', blank=True, null=True)
     attachment_remarks = models.CharField(max_length=255, blank=True, null=True)  
     uploaded_at = models.DateTimeField(auto_now_add=True)

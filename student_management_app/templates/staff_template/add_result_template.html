@@ -110,10 +110,10 @@
                     var json_data = JSON.parse(response);
                     console.log(json_data);
 
-                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' name='student_list' id='student_list'>";
+                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' name='student_list' student_number='student_list'>";
 
                     for (var key in json_data) {
-                        div_data += "<option value='" + key + "'>ID: " + json_data[key]['id'] + " : " + json_data[key]['name'] + "</option>";
+                        div_data += "<option value='" + key + "'>ID: " + json_data[key]['student_number'] + " : " + json_data[key]['name'] + "</option>";
                     }
 
                     div_data += "</select></div>";

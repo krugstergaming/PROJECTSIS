@@ -61,19 +61,6 @@
                                 <input type="date" class="form-control" name="session_end_year" value="{{ session_year.session_end_year|date:'Y-m-d' }}">
                             </div>
 
-                            <div class="form-group">
-                                <label>Session Limit </label>
-                                <input type="text" class="form-control" name="session_limit" value=" {{ session_year.session_limit }}">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="session_status">School Year Status</label>
-                                <select class="form-control" name="session_status" id="session_status">
-                                    <option value="Active" {% if session_year.status == 'Active' %}selected{% endif %}>Active</option>
-                                    <option value="Inactive" {% if session_year.status == 'Inactive' %}selected{% endif %}>Inactive</option>
-                                </select>
-                            </div>
-
                         </div>
                         <!-- /.card-body -->
 
