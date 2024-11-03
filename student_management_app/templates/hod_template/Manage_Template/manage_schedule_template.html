@@ -81,14 +81,14 @@
                                         <td>{{ assignsection.created_at }}</td>
                                         <td>
                                             <!-- Action buttons can go here, for example: -->
-                                            <a href="{% url 'edit_schedule' assignsection.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="{% url 'edit_schedule' assignsection.id %}" class="btn btn-warning">Edit</a>
                                             <a href="" class="btn btn-secondary">Archive</a>
                                             
                                         </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
-                                        <td colspan="6">No records found.</td>
+                                        <td colspan="6" class="text-center">No records found.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -154,7 +154,7 @@
                                     </tr>
                                 {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center">No loads available.</td>
+                                        <td colspan="6" class="text-center">No records Found.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -223,6 +223,10 @@
                                         <a href="" class="btn btn-secondary">Archive</a>
                                     </td>
                                 </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="11" class="text-center">No records found.</td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -233,8 +237,6 @@
 
             </div>
         </div>
-
-        
 
     </div><!-- /.container-fluid -->
 </section>
