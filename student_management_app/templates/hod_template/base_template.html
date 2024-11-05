@@ -158,17 +158,6 @@
   <script src="{% static 'jqvmap/maps/jquery.vmap.usa.js' %}"></script>
   <!-- jQuery Knob Chart -->
   <script src="{% static 'jquery-knob/jquery.knob.min.js' %}"></script>
-  <!-- logout -->
-  <script>
-    let logoutTimeout;
-
-    // Use pagehide event to detect tab/window close
-    window.addEventListener("pagehide", function (event) {
-        if (!event.persisted) { // Check if pagehide is due to tab/window close
-            navigator.sendBeacon("{% url 'logout_on_close' %}");
-        }
-    });
-  </script>
   <!-- ph -->
   <script>
     var provinceUrl = "{% static 'ph-json/province.json' %}";

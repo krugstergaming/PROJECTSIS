@@ -15,7 +15,7 @@
     <h3><b>SCHOOL MANAGEMENT SYSTEM</b></h3>
   </div>
   
-  <form action="{% url 'doLogin' %}" method="POST">
+  <form id="login-form" action="{% url 'doLogin' %}" method="POST">
     {% csrf_token %}
     
     <div class="input-group">
@@ -45,5 +45,34 @@
     {% endif %}
   </form>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('login-form');
+
+    // Check login status on page load
+    fetch('/api/check_login_status_unauthenticated/')
+      .then(response => response.json())
+      .then(data => {
+        if (data.is_logged_in) {
+          alert("You are already logged in.");
+          // Redirect to home page or another suitable location
+          window.location.href = '/';  // Change to the appropriate page
+        }
+      });
+
+    // Optional: Prevent form submission if already logged in
+    loginForm.addEventListener('submit', function(event) {
+      fetch('/api/check_login_status/')
+        .then(response => response.json())
+        .then(data => {
+          if (data.is_logged_in) {
+            alert("You are already logged in. Please log out first.");
+            event.preventDefault();  // Prevent the form from submitting
+          }
+        });
+    });
+  });
+</script>
 
 {% endblock %}

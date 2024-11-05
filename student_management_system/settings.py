@@ -45,7 +45,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'student_management_app.LoginCheckMiddleWare.LoginCheckMiddleWare',
+    'student_management_app.LoginCheckMiddleWare.LoginCheckMiddleWare', 
+    # dedelete to
+    'student_management_app.middleware.RedirectAuthenticatedUserMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -150,6 +152,6 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 1800  # 30 minutes
+SESSION_COOKIE_AGE = 600
 
 
