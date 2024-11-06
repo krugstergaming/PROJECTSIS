@@ -60,6 +60,7 @@
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
+                                    <th>No. </th>
                                     <th>Student Name</th>
                                     <th>Grade Level</th>
                                     <th>Enrollment Status</th>
@@ -71,6 +72,7 @@
                             <tbody>
                                 {% for enrollment in enrollments %}
                                     <tr>
+                                        <td>{{ forloop.counter }}</td>
                                         <td>{{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</td>
                                         <td>{{ enrollment.student_id.GradeLevel_id.GradeLevel_name }}</td>
                                         <td>{{ enrollment.enrollment_status }}</td>
@@ -195,7 +197,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Your modal code here -->
+                                <!-- modal for update balance -->
                                 <div class="modal fade" id="balanceModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="balanceModalLabel{{ enrollment.id }}" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
@@ -214,7 +216,7 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="payment_balance_amount">Payment Amount:</label>
-                                                        <input type="text" class="form-control" id="payment_balance_amount" name="payment_balance_amount" value="{{ enrollment.installment_payment|intcomma }}" required oninput="this.value = formatNumber(this.value)">
+                                                        <input type="text" class="form-control" id="payment_balance_amount" name="payment_balance_amount" value="{{ enrollment.installment_payment|intcomma }}" required>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="payment_balance_date">Payment Date:</label>
@@ -250,6 +252,7 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>Date</th>
+                                                                <th>Past Balance</th>
                                                                 <th>Amount</th>
                                                                 <th>Remarks</th>
                                                             </tr>
@@ -258,8 +261,10 @@
                                                             {% for payment in enrollment.payments.all %}
                                                                 <tr>
                                                                     <td>{{ payment.payment_balance_date|date:"Y-m-d" }}</td>
+                                                                    <td>{{ payment.past_balance}}</td>
                                                                     <td>{{ payment.payment_balance_amount|intcomma }}</td>
-                                                                    <td>{{ payment.remarks }}</td>
+                                                                    <td>{{ payment.payment_balance_remarks }}</td>
+
                                                                 </tr>
                                                             {% endfor %}
                                                         </tbody>
@@ -287,26 +292,12 @@
     </div><!-- /.container-fluid -->
 </section>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('payment_balance_date').value = today;
     });
 
-function formatNumber(value) {
-value = value.replace(/[^0-9.]/g, '');
-return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function parseNumber(value) {
-    return parseFloat(value.replace(/,/g, ''));
-}
-
-document.querySelector('form').addEventListener('submit', function(event) {
-    const amountInput = document.getElementById('payment_balance_amount');
-    amountInput.value = parseNumber(amountInput.value);
-});
 </script>
 
 {% endblock main_content %}

@@ -37,7 +37,7 @@
               </a>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               {% url 'staff_take_attendance' as staff_take_attendance %}
               <a href="{{ staff_take_attendance }}" class="nav-link {% if request.path == staff_take_attendance %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-plus"></i>
@@ -46,9 +46,9 @@
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
-            </li>
+            </li> -->
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               {% url 'staff_update_attendance' as staff_update_attendance %}
               <a href="{{ staff_update_attendance }}" class="nav-link {% if request.path == staff_update_attendance %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
@@ -57,13 +57,13 @@
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
               {% url 'staff_view_schedule' as staff_view_schedule %}
               <a href="{{ staff_view_schedule }}" class="nav-link {% if request.path == staff_view_schedule %} active {% endif %}">
                   <i class="nav-icon fas fa-calendar"></i>
-                  <p>View Schedule</p>
+                  <p>Schedule</p>
               </a>
             </li>
 
@@ -78,7 +78,7 @@
               </a>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               {% url 'staff_apply_leave' as staff_apply_leave %}
               <a href="{{ staff_apply_leave }}" class="nav-link {% if request.path == staff_apply_leave %} active {% endif %}">
                 <i class="nav-icon fas fa-envelope-open-text"></i>
@@ -98,7 +98,7 @@
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
-            </li>
+            </li> -->
 
           </ul>
         </nav>

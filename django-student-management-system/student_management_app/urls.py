@@ -162,6 +162,7 @@ urlpatterns = [
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
     path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
-    path('student_view_schedule/', StudentViews.student_view_schedule, name="student_view_schedule"), 
+    path('student_view_schedule/', StudentViews.student_view_schedule, name="student_view_schedule"),
+    path('student_view_account/', StudentViews.student_view_account, name="student_view_account"), 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -5,14 +5,14 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime
+from datetime import datetime, date
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
-from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm, UpdateBalanceForm
+from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
 def admin_home(request):
@@ -904,56 +904,48 @@ def edit_enrollment_save(request, enrollment_id):
     return redirect('edit_enrollment', enrollment_id=enrollment_id)
 
 def update_balance(request, enrollment_id=None):
-    # List all enrollments
-    enrollments = Enrollment.objects.all()
+    # Fetch enrollment based on enrollment_id
+    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
 
-    if enrollment_id:
-        enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    else:
-        enrollment = None
+    if request.method == 'POST':
+        # Get form data from POST request
+        payment_balance_amount = request.POST.get('payment_balance_amount')
+        payment_balance_date = request.POST.get('payment_balance_date')
+        payment_balance_remarks = request.POST.get('payment_balance_remarks')
 
-    if request.method == 'POST' and enrollment_id:
-        form = UpdateBalanceForm(request.POST)
-        if form.is_valid():
-            payment_balance_amount = form.cleaned_data['payment_balance_amount']
-            
-            # Store the current balance before updating it
+        try:
+            # Remove commas and convert to Decimal
+            payment_balance_amount = Decimal(payment_balance_amount.replace(',', ''))
+
+            # Store previous balance
             past_balance = enrollment.balance
-            
-            try:
-                # Update the balance
-                enrollment.balance -= payment_balance_amount
-                enrollment.save()
-                
-                # Create a new Payment record with past balance
-                BalancePayment.objects.create(
-                    enrollment=enrollment, 
-                    payment_balance_amount=payment_balance_amount,
-                    payment_balance_date=form.cleaned_data['payment_balance_date'], 
-                    payment_balance_remarks=form.cleaned_data.get('payment_balance_remarks'),
-                    past_balance=past_balance 
-                )
-                
-                # Include the current balance in the success message
-                current_balance = enrollment.balance  # Get the updated balance
-                messages.success(request, f'Balance updated successfully. Current balance: {current_balance:.2f}, Past balance: {past_balance:.2f}')
-                
-                # Redirect to the same manage_enrollment page
-                return redirect('manage_enrollment')
 
-            except IntegrityError:
-                messages.error(request, 'There was an error updating the balance. Please try again.')
-            except Exception as e:
-                messages.error(request, f'An unexpected error occurred: {str(e)}')
+            # Update the balance (ensure both are Decimal for arithmetic)
+            enrollment.balance -= payment_balance_amount
+            enrollment.save()
 
-    else:
-        form = UpdateBalanceForm()
+            # Create a new payment record with past balance
+            BalancePayment.objects.create(
+                enrollment=enrollment,
+                payment_balance_amount=payment_balance_amount,
+                payment_balance_date=payment_balance_date,
+                payment_balance_remarks=payment_balance_remarks,
+                past_balance=past_balance
+            )
+
+            # Success message
+            messages.success(request, f'Balance updated successfully. Current balance: {enrollment.balance:.2f}, Past balance: {past_balance:.2f}')
+            return redirect('manage_enrollment')
+
+        except IntegrityError:
+            messages.error(request, 'There was an error updating the balance. Please try again.')
+        except Exception as e:
+            messages.error(request, f'An unexpected error occurred: {str(e)}')
 
     return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', {
-        'form': form,
-        'enrollments': enrollments,
         'enrollment': enrollment,
-    })
+        'enrollments': Enrollment.objects.all(),
+    })  
  
 # def promote_students(request):
 #     if request.method == "POST":

@@ -1,0 +1,80 @@
+{% extends 'student_template/base_template.html' %}
+
+{% block page_title %}
+    Accounts
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Account Summary</h3>
+                    </div>
+
+                    <div class="card-body">
+                        {% if enrollment %}
+                            <!-- Balance Payments Table -->
+                            {% if balance_payments %}
+                                <div class="table-responsive mt-4">
+                                    <table class="table">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>#ID</th>
+                                                <th>Payment Date</th>
+                                                <th>Amount Paid</th>
+                                                <th>Remaining Balance</th>
+                                                <th>Remarks</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for payment in balance_payments %}
+                                            <tr>
+                                                <td>{{ payment.id }}</td>
+                                                <td>{{ payment.payment_balance_date|date:"M. d, Y" }}</td>
+                                                <td>{{ payment.payment_balance_amount }}</td>
+                                                <td>{{ enrollment.balance }}</td>
+                                                <td>{{ payment.payment_balance_remarks }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No balance payment records found.
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                {{ message }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Enrollment Summary -->
+                        <h4>Enrollment Details for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h4>
+                        <p><strong>Registration Fee:</strong> {{ enrollment.registration_fee }}</p>
+                        <p><strong>Miscellaneous Fee:</strong> {{ enrollment.misc_fee }}</p>
+                        <p><strong>Tuition Fee:</strong> {{ enrollment.tuition_fee }}</p>
+                        <p><strong>Discount (%):</strong> {{ enrollment.discount }}</p>
+                        <p><strong>Discount Amount:</strong> {{ enrollment.discount_amount }}</p>
+                        <p><strong>Total Fee:</strong> {{ enrollment.total_fee }}</p>
+                        <p><strong>Downpayment:</strong> {{ enrollment.downpayment }}</p>
+                        <p><strong>Balance:</strong> {{ enrollment.balance }}</p>
+                        <p><strong>Installment Option:</strong> {{ enrollment.installment_option }}</p>
+                        <p><strong>Installment Payment:</strong> {{ enrollment.installment_payment }}</p>
+                        <p><strong>Assessed By:</strong> {{ enrollment.assessed_by }}</p>
+                        <p><strong>Assessed Date:</strong> {{ enrollment.assessed_date|date:"M. d, Y" }}</p>
+                        <p><strong>Payment Received By:</strong> {{ enrollment.payment_received_by }}</p>
+                        <p><strong>Payment Amount:</strong> {{ enrollment.payment_amount }}</p>
+                        <p><strong>Payment Date:</strong> {{ enrollment.payment_date|date:"M. d, Y" }}</p>
+                        <p><strong>Remarks:</strong> {{ enrollment.remarks }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

@@ -3,15 +3,6 @@ from django.forms import Form
 from student_management_app.models import GradeLevel, SessionYearModel, Subjects, Staffs, Curriculums, Section, Enrollment
 
 
-class UpdateBalanceForm(forms.Form):
-    payment_balance_amount = forms.DecimalField(label='Payment Amount', min_value=0, required=True)
-    payment_balance_date = forms.DateField(label='Payment Date', widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=True)
-    payment_balance_remarks = forms.CharField(label='Remarks', widget=forms.Textarea, required=False)
-
-
-
-
-
 class DateInput(forms.DateInput):
     input_type = "date"
 

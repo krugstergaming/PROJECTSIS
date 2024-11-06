@@ -141,57 +141,6 @@ def staff_feedback_save(request):
             messages.error(request, "Failed to Send Feedback.")
             return redirect('staff_feedback')
 
-
-# WE don't need csrf_token when using Ajax
-@csrf_exempt
-def get_students(request):
-    # Getting Values from Ajax POST 'Fetch Student'
-    subject_id = request.POST.get("subject")
-    session_year = request.POST.get("session_year")
-
-    load_id = request.POST.get("load_id")
-
-    # Students enroll to GradeLevel, GradeLevel has Subjects
-    # Getting all data from subject model based on subject_id
-    subject_model = Subjects.objects.get(id=subject_id)
-
-    session_model = SessionYearModel.objects.get(id=session_year)
-
-    load_model = Load.objects.get(id=load_id)
-
-    students = Students.objects.filter(GradeLevel_id=subject_model.GradeLevel_id, session_year_id=session_model)
-
-    student_results = StudentResult.objects.filter(subject_id=subject_model)
-
-    results_dict = {result.student_id.id: {
-                        "first_quarter": result.subject_first_quarter,
-                        "second_quarter": result.subject_second_quarter,
-                        "third_quarter": result.subject_third_quarter,
-                        "fourth_quarter": result.subject_fourth_quarter,
-                        "final_grade": result.subject_final_grade
-                        } for result in student_results
-                    }
-    
-    # Only Passing Student Id and Student Name Only
-    list_data = []
-
-    for student in students:
-
-        grades = results_dict.get(student.id, {})
-
-        data_small = {
-            "student_number": student.student_number,
-            "name": student.admin.first_name + " " + student.admin.last_name,
-            "first_quarter": grades.get("first_quarter", ""),
-            "second_quarter": grades.get("second_quarter", ""),
-            "third_quarter": grades.get("third_quarter", ""),
-            "fourth_quarter": grades.get("fourth_quarter", ""),
-            "final_grade": grades.get("final_grade", "")
-        }
-        list_data.append(data_small)
-
-    return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
-
 @csrf_exempt
 def save_attendance_data(request):
     # Get Values from Staf Take Attendance form via AJAX (JavaScript)
@@ -347,7 +296,6 @@ def staff_profile_update(request):
             return redirect('staff_profile')
 
 
-
 def staff_add_result(request):
     # Fetch the grading configuration to check if grading is active
     config = GradingConfiguration.objects.first()
@@ -359,21 +307,64 @@ def staff_add_result(request):
     # Fetch the loads assigned to the current staff
     loads = Load.objects.filter(staff_id=request.user.id)
 
-    # Fetch subjects related to those loads
-    subjects = Subjects.objects.filter(load__in=loads)
-
     # Fetch all session years
     session_years = SessionYearModel.objects.all()
     
     # Context data to be passed to the template
     context = {
-        "subjects": subjects,
+        "loads": loads,
         "session_years": session_years,
     }
 
     # Render the active grading template when grading is enabled
     return render(request, "staff_template/add_result_template.html", context)
 
+# WE don't need csrf_token when using Ajax
+@csrf_exempt
+def get_students(request):
+    # Getting Values from Ajax POST 'Fetch Student'
+
+    load_id = request.POST.get("load_id")
+
+    load_model = Load.objects.get(id=load_id)
+
+    # Fetch the AssignSection model associated with the Load model
+    assign_section_model = load_model.AssignSection_id
+
+    # Get the students assigned to this section through AssignSection
+    students = Students.objects.filter(id__in=AssignSection.objects.filter(section_id=assign_section_model.section_id).values('Student_id'))
+
+    student_results = StudentResult.objects.filter(load_id=load_model)
+
+    results_dict = {result.student_id.id: {
+                        "first_quarter": result.subject_first_quarter,
+                        "second_quarter": result.subject_second_quarter,
+                        "third_quarter": result.subject_third_quarter,
+                        "fourth_quarter": result.subject_fourth_quarter,
+                        "final_grade": result.subject_final_grade
+                        } for result in student_results
+                    }
+    
+    # Only Passing Student Id and Student Name Only
+    list_data = []
+
+    for student in students:
+
+        grades = results_dict.get(student.id, {})
+
+        data_small = {
+            "id": student.id,
+            "student_number": student.student_number,
+            "name": student.admin.first_name + " " + student.admin.last_name,
+            "first_quarter": grades.get("first_quarter", ""),
+            "second_quarter": grades.get("second_quarter", ""),
+            "third_quarter": grades.get("third_quarter", ""),
+            "fourth_quarter": grades.get("fourth_quarter", ""),
+            "final_grade": grades.get("final_grade", "")
+        }
+        list_data.append(data_small)
+
+    return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
 
 def staff_add_result_save(request):
     if request.method != "POST":
@@ -381,62 +372,58 @@ def staff_add_result_save(request):
         return redirect('staff_add_result')
     else:
         student_admin_id = request.POST.get('student_list')
-        
-        # assignment_marks = request.POST.get('assignment_marks')
-        # exam_marks = request.POST.get('exam_marks')
+        load_id = request.POST.get('load_id')
+
+        # Log or print the values to check
+        print(f"Student ID: {student_admin_id}, Load ID: {load_id}")
+
+        if not student_admin_id or not load_id:
+            messages.error(request, "Invalid data received!")
+            return redirect('staff_add_result')
 
         first_quarter = request.POST.get('first_quarter')
         second_quarter = request.POST.get('second_quarter')
         third_quarter = request.POST.get('third_quarter')
         fourth_quarter = request.POST.get('fourth_quarter')
-        
-        subject_id = request.POST.get('subject')
-
-        student_obj = Students.objects.get(admin=student_admin_id)
-        subject_obj = Subjects.objects.get(id=subject_id)
 
         try:
-            # Convert the grades to integers (or floats)
+            student_obj = Students.objects.get(id=student_admin_id)
+            load_obj = Load.objects.get(id=load_id)
+
+            # Convert grades to integers or 0 if empty
             first_quarter = int(first_quarter) if first_quarter else 0
             second_quarter = int(second_quarter) if second_quarter else 0
             third_quarter = int(third_quarter) if third_quarter else 0
             fourth_quarter = int(fourth_quarter) if fourth_quarter else 0
 
-            # Calculate the final grade
             final_grade = (first_quarter + second_quarter + third_quarter + fourth_quarter) / 4
 
-            # Check if Students Result Already Exists or not
-            check_exist = StudentResult.objects.filter(subject_id=subject_obj, 
-                                                       student_id=student_obj).exists()
+            # Check if the result already exists
+            check_exist = StudentResult.objects.filter(load_id=load_obj, student_id=student_obj).exists()
             if check_exist:
-                result = StudentResult.objects.get(subject_id=subject_obj, 
-                student_id=student_obj)
-                # result.subject_assignment_marks = assignment_marks
-                # result.subject_exam_marks = exam_marks
-
+                result = StudentResult.objects.get(load_id=load_obj, student_id=student_obj)
                 result.subject_first_quarter = first_quarter
                 result.subject_second_quarter = second_quarter
                 result.subject_third_quarter = third_quarter
                 result.subject_fourth_quarter = fourth_quarter
                 result.subject_final_grade = final_grade
-          
                 result.save()
                 messages.success(request, "Result Updated Successfully!")
-                return redirect('staff_add_result')
             else:
-                result = StudentResult(student_id=student_obj, 
-                                       subject_id=subject_obj, 
-                                    #    subject_exam_marks= exam_marks, 
-                                    #    subject_assignment_marks= assignment_marks,
-                                       subject_first_quarter = first_quarter,
-                                       subject_second_quarter = second_quarter,
-                                       subject_third_quarter = third_quarter,
-                                       subject_fourth_quarter = fourth_quarter,
-                                       subject_final_grade = final_grade
-                                       )
+                result = StudentResult(
+                    student_id=student_obj,
+                    load_id=load_obj,
+                    subject_first_quarter=first_quarter,
+                    subject_second_quarter=second_quarter,
+                    subject_third_quarter=third_quarter,
+                    subject_fourth_quarter=fourth_quarter,
+                    subject_final_grade=final_grade
+                )
                 result.save()
                 messages.success(request, "Result Added Successfully!")
-                return redirect('staff_add_result')
+            
+            return redirect('staff_add_result')
+
         except Exception as e:
             messages.error(request, f"Failed to Add Result! Error: {e}")
             return redirect('staff_add_result')

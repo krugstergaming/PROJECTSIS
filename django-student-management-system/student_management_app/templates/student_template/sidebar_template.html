@@ -37,7 +37,7 @@
               </a>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               {% url 'student_view_attendance' as student_view_attendance %}
               <a href="{{ student_view_attendance }}" class="nav-link {% if request.path == student_view_attendance %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
@@ -46,14 +46,24 @@
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
               {% url 'student_view_schedule' as student_view_schedule %}
               <a href="{{ student_view_schedule }}" class="nav-link {% if request.path == student_view_schedule %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>
-                  View Schedule
+                  Schedule
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+              {% url 'student_view_account' as student_view_account %}
+              <a href="{{ student_view_account }}" class="nav-link {% if request.path == student_view_account %} active {% endif %}">
+                <i class="nav-icon fas fa-user-alt"></i>
+                <p>
+                  Accounts
                 </p>
               </a>
             </li>
@@ -63,13 +73,13 @@
               <a href="{{ student_view_result }}" class="nav-link {% if request.path == student_view_result %} active {% endif %}">
                 <i class="nav-icon fas fa-tasks"></i>
                 <p>
-                  View Result
+                  Grades
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
             </li>
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               {% url 'student_apply_leave' as student_apply_leave %}
               <a href="{{ student_apply_leave }}" class="nav-link {% if request.path == student_apply_leave %} active {% endif %}">
                 <i class="nav-icon fas fa-envelope-open-text"></i>
@@ -89,7 +99,7 @@
                   {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
                 </p>
               </a>
-            </li>
+            </li> -->
 
           </ul>
         </nav>
