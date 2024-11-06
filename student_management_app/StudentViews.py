@@ -213,7 +213,7 @@ def student_view_schedule(request):
         # Query the schedule for all loads assigned to this section
         student_schedule = Schedule.objects.filter(load_id__AssignSection_id__section_id=section)
 
-        # Prepare context to pass to the template
+        # Prepare context to pass to the template 
         context = {
             "students_in_section": students_in_section,
             "student_schedule": student_schedule,

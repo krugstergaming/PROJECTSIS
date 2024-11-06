@@ -126,8 +126,6 @@ class Students(models.Model):
 class Enrollment(models.Model):
     
     id = models.AutoField(primary_key=True)
-    
-    # ForeignKey to Student
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
 
     # Registration, Miscellaneous, and Tuition Fees

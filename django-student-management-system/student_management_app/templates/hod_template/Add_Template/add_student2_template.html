@@ -365,7 +365,7 @@
 
             if(email!=""){
                 $.ajax({
-                    url : '{% url 'check_email_exist' %}',
+                    url : '{% url "check_email_exist" %}',
                     type : 'POST',
                     data : {email:email}
                 })
@@ -397,7 +397,7 @@
             
             if(username!=""){
                 $.ajax({
-                    url : '{% url 'check_username_exist' %}',
+                    url : '{% url "check_username_exist" %}',
                     type : 'POST',
                     data : {username:username}
                 })
