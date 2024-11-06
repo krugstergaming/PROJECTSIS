@@ -105,11 +105,13 @@
                                     <td>{{ staff.admin.email }}</td>
                                     <td>{{ staff.admin.is_active }}</td>
                                     <td>
-                                        <a href="{% url 'edit_staff' staff.admin.id %}" class="btn btn-success">Edit</a> 
-                                        <a href="{% url 'delete_staff' staff.admin.id %}" class="btn btn-danger">Deactivate</a>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{ staff.admin.id }}">
-                                            View Information
+                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal{{ staff.admin.id }}">
+                                            Details
                                         </button>
+                                        <!-- <a href="{% url 'edit_staff' staff.admin.id %}" class="btn btn-success">Edit</a> 
+                                        <a href="{% url 'delete_staff' staff.admin.id %}" class="btn btn-danger">Deactivate</a> -->
+                                        <a href="" class="btn btn-danger">Deactivate</a>
+                                        <a href="" class="btn btn-secondary">Archive</a>
                                     </td>
                                     <!-- Modal Structure for Each Staff -->
                                     <div class="modal fade" id="modal{{ staff.admin.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ staff.admin.id }}" aria-hidden="true">

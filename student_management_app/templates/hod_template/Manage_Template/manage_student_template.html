@@ -92,11 +92,13 @@
                                     <td>{{ student.admin.email }}</td>
                                     <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td>
                                     <td>
-                                        <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-success">Edit</a> 
-                                        <a href="{% url 'deactivate_student' student.admin.id %}" class="btn btn-danger">Archive</a>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal{{ student.admin.id }}">
-                                            View
+                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal{{ student.admin.id }}">
+                                            Details
                                         </button>
+                                        <!-- <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-success">Edit</a> 
+                                        <a href="{% url 'deactivate_student' student.admin.id %}" class="btn btn-danger">Archive</a> -->
+                                        <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-warning">Edit</a> 
+                                        <a href="" class="btn btn-secondary">Archive</a>
                                     </td>
                                     <!-- Modal Structure for Active Students -->
                                     <div class="modal fade" id="modal{{ student.admin.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ student.admin.id }}" aria-hidden="true">
