@@ -151,6 +151,15 @@
 <!-- AdminLTE for demo purposes -->
 <script src="{% static 'dist/js/demo.js'  %}"></script>
 
+<!-- ph -->
+<script>
+  var provinceUrl = "{% static 'ph-json/province.json' %}";
+  var cityUrl = "{% static 'ph-json/city.json' %}";
+  var barangayUrl = "{% static 'ph-json/barangay.json' %}";
+  var regionUrl = "{% static 'ph-json/region.json' %}";
+</script>
+<script src="{% static 'ph-json/ph-address-selector.js' %}"></script>
+
 {% comment %} For Custom JS {% endcomment %}
 {% block custom_js %}
 {% endblock custom_js %}
