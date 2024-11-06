@@ -74,6 +74,14 @@ class Curriculums(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Classroom(models.Model):
+    id = models.AutoField(primary_key=True)
+    classroom_name = models.CharField(max_length=255)
+    chair_number = models.IntegerField(blank=True, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class GradeLevel(models.Model):
     id = models.AutoField(primary_key=True)
     GradeLevel_name = models.CharField(max_length=255)

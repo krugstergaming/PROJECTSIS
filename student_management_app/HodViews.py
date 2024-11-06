@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 import cloudinary.uploader
 import openpyxl
+import requests
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment
 from django.utils.timezone import now
@@ -15,7 +16,7 @@ from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
 from django.db.models import Count
 
-from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm, UpdateBalanceForm
 
 
@@ -1679,13 +1680,18 @@ def manage_class_scheduling(request):
     loads = Load.objects.all()
     assignsections = AssignSection.objects.all()
     schedules = Schedule.objects.all()
+    classroom = Classroom.objects.all()
     context = {
         "loads": loads,
         "assignsections": assignsections,
         "schedules": schedules,
-        
+        "classroom": classroom,
     }
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
+
+def add_classroom_save(request):
+    # classroom = 
+    return redirect()
 
 
 def class_search(request):
