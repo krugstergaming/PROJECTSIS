@@ -378,7 +378,7 @@ class NotificationStaffs(models.Model):
 class StudentResult(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    load_id = models.ForeignKey(Load, on_delete=models.CASCADE)
     
     subject_first_quarter = models.FloatField(default=0)
     subject_second_quarter = models.FloatField(default=0)

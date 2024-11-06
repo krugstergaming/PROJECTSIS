@@ -46,8 +46,7 @@
                                 </div>
                                 </div>
                                 {% endif %}
-                            
-
+                        
                         <div class="card-body">
                            
                             <div class="form-group">
@@ -60,24 +59,16 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Subject </label>
-                                <select class="form-control" name="subject" id="subject">
-                                    {% for subject in subjects %}
-                                        <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Load </label>
-                                <select class="form-control" name="load" id="load">
+                                <label>Load</label>
+                                <select class="form-control" id="load_id" name="load_id" required>
+                                    <option value="">Select a Load</option>
                                     {% for load in loads %}
-                                        <option value="{{ load.id }}">{{ load.section_name }}</option>
+                                        <option value="{{ load.id }}" data-staff-id="{{ load.staff_id.id }}">
+                                            {{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }} - {{ load.subject_id.subject_name }}
+                                        </option>
                                     {% endfor %}
                                 </select>
                             </div>
-
-
                         </div>
                         <!-- /.card-body --> 
 
@@ -106,79 +97,85 @@
 
 <script>
     $(document).ready(function() {
-        $("#fetch_student").click(function() {
-            var subject = $("#subject").val();
-            var session_year = $("#session_year").val();
+    $("#fetch_student").click(function() {
+        // Get the selected load and session year
+        var load_id = $("#load_id").val();
 
-            $.ajax({
-                url: '{% url 'get_students' %}',
-                type: 'POST',
-                data: { subject: subject, session_year: session_year },
-                success: function(response) {
-                    var json_data = JSON.parse(response);
-                    console.log(json_data);
+        $.ajax({
+            url: '{% url "get_students" %}',
+            type: 'POST',
+            data: {
+                load_id: load_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'  // CSRF token for security
+            },
+            success: function(response) {
+                var json_data = JSON.parse(response);
+                console.log(json_data);
 
-                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' id='student_list' name='student_list'>";
+                var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' id='student_list' name='student_list'>";
 
+                // Check if the json_data array is not empty
+                if(json_data.length > 0) {
                     for (var i = 0; i < json_data.length; i++) {
-                        var student = json_data[i];
-                        div_data += "<option value='" + i + "'>ID: " + student['student_number'] + " : " + student['name'] + "</option>";
-                    }
-
-                    div_data += "</select></div>";
-                    div_data += "<div class='form-group'><div class='row'>";
-
-                    // Grade inputs
-                    div_data += "<div class='col-lg-6'>";
-                    div_data += "<label>First Quarter : </label><input type='text' name='first_quarter' class='form-control' id='first_quarter' placeholder='First Quarter' />";
-                    div_data += "</div>";
-
-                    div_data += "<div class='col-lg-6'>";
-                    div_data += "<label>Second Quarter : </label><input type='text' name='second_quarter' class='form-control' id='second_quarter' placeholder='Second Quarter' />";
-                    div_data += "</div>";
-
-                    div_data += "<div class='col-lg-6'>";
-                    div_data += "<label>Third Quarter : </label><input type='text' name='third_quarter' class='form-control' id='third_quarter' placeholder='Third Quarter' />";
-                    div_data += "</div>";
-
-                    div_data += "<div class='col-lg-6'>";
-                    div_data += "<label>Fourth Quarter : </label><input type='text' name='fourth_quarter' class='form-control' id='fourth_quarter' placeholder='Fourth Quarter' />";
-                    div_data += "</div>";
-
-                    div_data += "</div></div>";
-
-                    div_data += "<div class='form-group'>";
-                    div_data += "<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
-                    div_data += "</div>";
-
-                    $("#student_data").html(div_data);
-
-                    // Initialize grades for the first student in the list
-                    if (json_data.length > 0) {
-                        updateGradeFields(json_data, 0); // initialize with first student
-                    }
-
-                    // Update grades when the student selection changes
-                    $("#student_list").change(function() {
-                        var selectedIndex = $(this).val();
-                        updateGradeFields(json_data, selectedIndex);
-                    });
-                },
-                error: function() {
-                    alert("Error in Fetching Students.");
+                            var student = json_data[i];
+                            div_data += "<option value='" + student.id + "'> Student No. : " + student.student_number + " : " + student.name + "</option>";
+                        }
                 }
-            });
-        });
 
-        // Function to update grade fields based on selected student
-        function updateGradeFields(json_data, index) {
-            if (json_data[index]) {
-                $("#first_quarter").val(json_data[index]['first_quarter'] || "");
-                $("#second_quarter").val(json_data[index]['second_quarter'] || "");
-                $("#third_quarter").val(json_data[index]['third_quarter'] || "");
-                $("#fourth_quarter").val(json_data[index]['fourth_quarter'] || "");
+                div_data += "</select></div>";
+                div_data += "<div class='form-group'><div class='row'>";
+
+                // Grade inputs
+                div_data += "<div class='col-lg-6'>";
+                div_data += "<label>First Quarter : </label><input type='text' name='first_quarter' class='form-control' id='first_quarter' placeholder='First Quarter' />";
+                div_data += "</div>";
+
+                div_data += "<div class='col-lg-6'>";
+                div_data += "<label>Second Quarter : </label><input type='text' name='second_quarter' class='form-control' id='second_quarter' placeholder='Second Quarter' />";
+                div_data += "</div>";
+
+                div_data += "<div class='col-lg-6'>";
+                div_data += "<label>Third Quarter : </label><input type='text' name='third_quarter' class='form-control' id='third_quarter' placeholder='Third Quarter' />";
+                div_data += "</div>";
+
+                div_data += "<div class='col-lg-6'>";
+                div_data += "<label>Fourth Quarter : </label><input type='text' name='fourth_quarter' class='form-control' id='fourth_quarter' placeholder='Fourth Quarter' />";
+                div_data += "</div>";
+
+                div_data += "</div></div>";
+
+                div_data += "<div class='form-group'>";
+                div_data += "<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
+                div_data += "</div>";
+
+                $("#student_data").html(div_data);
+
+                // Initialize grades for the first student in the list
+                if (json_data.length > 0) {
+                    updateGradeFields(json_data, 0); // initialize with first student
+                }
+
+                // Update grades when the student selection changes
+                $("#student_list").change(function() {
+                    var selectedIndex = $(this).val();
+                    updateGradeFields(json_data, selectedIndex);
+                });
+            },
+            error: function() {
+                alert("Error in Fetching Students.");
             }
-        }
+        });
     });
+
+    // Function to update grade fields based on selected student
+    function updateGradeFields(json_data, index) {
+        if (json_data[index]) {
+            $("#first_quarter").val(json_data[index]['first_quarter'] || "");
+            $("#second_quarter").val(json_data[index]['second_quarter'] || "");
+            $("#third_quarter").val(json_data[index]['third_quarter'] || "");
+            $("#fourth_quarter").val(json_data[index]['fourth_quarter'] || "");
+        }
+    }
+});
 </script>
 {% endblock custom_js %}

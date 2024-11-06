@@ -5,7 +5,7 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 import datetime # To Parse input DateTime into Python Date Time Object
 
-from student_management_app.models import CustomUser, Staffs, GradeLevel, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+from student_management_app.models import CustomUser, Staffs, Enrollment, BalancePayment, GradeLevel, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
 
 
 def student_home(request):
@@ -195,7 +195,6 @@ def student_view_result(request):
     return render(request, "student_template/student_view_result.html", context)
 
 
-
 def student_view_schedule(request):
     # Get the student object for the currently logged-in user
     student = Students.objects.get(admin=request.user.id)
@@ -205,11 +204,18 @@ def student_view_schedule(request):
 
     # Check if the student is assigned to a section
     if assign_section:
-        # Query the schedule based on the assigned section
-        student_schedule = Schedule.objects.filter(load_id__AssignSection_id=assign_section)
+        # Get the section that the student is assigned to
+        section = assign_section.section_id  # This will give you the section object
+        
+        # Query all students assigned to the same section
+        students_in_section = Students.objects.filter(assignsection__section_id=section)
+
+        # Query the schedule for all loads assigned to this section
+        student_schedule = Schedule.objects.filter(load_id__AssignSection_id__section_id=section)
 
         # Prepare context to pass to the template
         context = {
+            "students_in_section": students_in_section,
             "student_schedule": student_schedule,
         }
     else:
@@ -222,4 +228,24 @@ def student_view_schedule(request):
     # Render the schedule template
     return render(request, "student_template/student_view_schedule.html", context)
 
+
+def student_view_account(request):
+    # Get the student object for the currently logged-in user
+    student = Students.objects.get(admin=request.user.id)
+    
+    # Query the enrollment record associated with the student
+    enrollment = Enrollment.objects.filter(student_id=student).first()
+    
+    # Query the balance payment records associated with the enrollment
+    balance_payments = BalancePayment.objects.filter(enrollment=enrollment).order_by('-payment_balance_date') if enrollment else None
+
+    # Check if the student has an enrollment record
+    context = {
+        "enrollment": enrollment,
+        "balance_payments": balance_payments,
+        "message": "No enrollment or payment records found." if not enrollment else None
+    }
+
+    # Render the accounts template
+    return render(request, "student_template/student_view_account.html", context)
 

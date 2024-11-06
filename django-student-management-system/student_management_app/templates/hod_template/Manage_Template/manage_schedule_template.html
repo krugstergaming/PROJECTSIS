@@ -193,12 +193,9 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>GradeLevel</th>
-                                    <th>Section</th>
+                                    <th>Grade level and Section</th>
                                     <th>Subject</th>
                                     <th>Staff</th>
-                                    <th>Session Start Year</th>
-                                    <th>Session End Year</th>
                                     <th>Day of Week</th>
                                     <th>Start Time</th>
                                     <th>End Time</th>
@@ -209,12 +206,9 @@
                                 {% for schedule in schedules %}
                                 <tr>
                                     <td>{{ schedule.id }}</td>
-                                    <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }}</td>
-                                    <td>{{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
+                                    <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
                                     <td>{{ schedule.load_id.subject_id.subject_name }}</td>
                                     <td>{{ schedule.staff_id.first_name }} {{ schedule.staff_id.last_name }}</td>
-                                    <td>{{ schedule.session_year_id.session_start_year }}</td>
-                                    <td>{{ schedule.session_year_id.session_end_year }}</td>
                                     <td>{{ schedule.day_of_week }}</td>
                                     <td>{{ schedule.start_time }}</td>
                                     <td>{{ schedule.end_time }}</td>
