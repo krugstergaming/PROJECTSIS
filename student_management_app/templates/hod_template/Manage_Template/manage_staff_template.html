@@ -7,94 +7,82 @@
 {% block main_content %}
 
 {% load static %}
-
 <section class="content">
     <div class="container-fluid">
-        <!-- Add Staff Button -->
+
+        <!-- Add staff and Export to Excel Buttons -->
         <div class="row">
             <div class="col-12 mb-3">
-                <a class="btn btn-primary" href="{% url 'add_staff' %}" role="button">+ Add Faculty</a>
+                <a class="btn btn-success" href="{% url 'add_staff' %}" role="button">+ Add Faculty</a>
                 <a class="btn btn-secondary" href="{% url 'export_staffs_to_excel' %}" role="button">Export to Excel</a> 
             </div>
         </div>
 
-        <!-- Activate/Deactivate Grading Button -->
-        <div class="row">
-            <div class="col-12 mb-3">
-                <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
-                    {% if grading_config.is_grading_active %}
-                        Deactivate Grading
-                    {% else %}
-                        Activate Grading
-                    {% endif %}
-                </a>
-            </div>
-        </div>
-
-        <!-- Column Toggle Checkboxes -->
-        <div class="row">
-            <div class="col-12 mb-3">
-                <label><input type="checkbox" class="column-check" value="0" checked> Name</label>
-                <label><input type="checkbox" class="column-check" value="1" checked> Username</label>
-                <label><input type="checkbox" class="column-check" value="2" checked> Email</label>
-            </div>
-        </div>
-
-        <!-- Feedback Messages -->
+        <!-- Success/Error Messages -->
         {% if messages %}
-        <div class="form-group">
-            <div class="col-12">
-                {% for message in messages %}
-                    {% if message.tags == "error" %}
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    {% elif message.tags == "success" %}
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+            <div class="form-group">
+                <div class="col-12">
+                    {% for message in messages %}
+                        {% if message.tags == "error" %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% elif message.tags == "success" %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
         {% endif %}
 
         <div class="row">
             <div class="col-md-12">
-                <!-- Faculty Details -->
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Faculty Details</h3>
-
-                        <!-- Search Input -->
                         <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" id="staffSearch" onkeyup="searchTable()" class="form-control float-right" placeholder="Search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default">
-                                        <i class="fas fa-search"></i>
-                                    </button>
+                            <div class="d-flex align-items-center">
+                                <!-- Checkbox Labels -->
+                                <div class="mr-3">
+                                    <label><input type="checkbox" class="column-check" value="0" checked> Name</label>
                                 </div>
+                                <div class="mr-3">
+                                    <label><input type="checkbox" class="column-check" value="1" checked> Username</label>
+                                </div>
+                                <div class="mr-3">
+                                    <label><input type="checkbox" class="column-check" value="2" checked> Email</label>
+                                </div>
+                        
+                                <!-- Search Bar and Button -->
+                                <form method="GET" action="{% url 'manage_staff' %}" class="form-inline">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Search staffs...">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary">Search</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
+                                            
                     </div>
-                    <!-- /.card-header -->
-
                     <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
+                        <!-- Table with staffs -->
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Username</th>
                                     <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>Actions</th> <!-- Added the Actions column -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,7 +91,7 @@
                                     <td>{{ staff.admin.last_name }}, {{ staff.admin.first_name }} {{ staff.middle_name }}</td>
                                     <td>{{ staff.admin.username }}</td>
                                     <td>{{ staff.admin.email }}</td>
-                                    <td>{{ staff.admin.is_active }}</td>
+                                    <!-- <td>{{ staff.admin.is_active }}</td> -->
                                     <td>
                                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal{{ staff.admin.id }}">
                                             Details
@@ -142,19 +130,83 @@
                                         </div>
                                     </div>
                                 </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No records Found.</td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
+
+                        <!-- Pagination Controls -->
+
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    {% if staffs.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1&search={{ search_query }}" aria-label="First">
+                                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ staffs.previous_page_number }}&search={{ search_query }}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">&laquo;&laquo;</span>
+                                        </li>
+                                        <li class="page-item disabled">
+                                            <span class="page-link">&laquo;</span>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for i in staffs.paginator.page_range %}
+                                        {% if staffs.number == i %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ i }}</span>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ i }}&search={{ search_query }}">{{ i }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if staffs.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ staffs.next_page_number }}&search={{ search_query }}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ staffs.paginator.num_pages }}&search={{ search_query }}" aria-label="Last">
+                                                <span aria-hidden="true">&raquo;&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">&raquo;</span>
+                                        </li>
+                                        <li class="page-item disabled">
+                                            <span class="page-link">&raquo;&raquo;</span>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            </div>
+                        </div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+
+    </div>
 </section>
 
-<!-- Linking JavaScript file -->
 <script src="{% static 'toggle/toggle.js' %}"></script>
 
 {% endblock main_content %}

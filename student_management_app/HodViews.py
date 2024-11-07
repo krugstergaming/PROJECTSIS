@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime, date
+from django.db.models import Q
 import cloudinary.uploader
 import openpyxl
 import requests
@@ -15,6 +16,7 @@ from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
 from django.db.models import Count
+from django.core.paginator import Paginator
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
@@ -161,11 +163,28 @@ def toggle_grading_state(request):
     return redirect('manage_staff')
 
 def manage_staff(request):
-    staffs = Staffs.objects.all()
+    search_query = request.GET.get('search', '')
+    staffs = Staffs.objects.all()  
+
+    if search_query:
+        staffs = staffs.filter(
+            Q(admin__first_name__icontains=search_query) |
+            Q(admin__last_name__icontains=search_query) |
+            Q(middle_name__icontains=search_query) |
+            Q(admin__username__icontains=search_query) |
+            Q(admin__email__icontains=search_query)
+        )
+
+    paginator = Paginator(staffs, 3) 
+    page_number = request.GET.get('page') 
+    staffs = paginator.get_page(page_number)
+
     grading_config, created = GradingConfiguration.objects.get_or_create(id=1)
+
     context = {
         "staffs": staffs,
-        "grading_config": grading_config,  # Pass the grading configuration to the template
+        "grading_config": grading_config,
+        "search_query": search_query,
     }
     return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
 
@@ -262,6 +281,9 @@ def add_curriculum_save(request):
 def manage_curriculum(request):
     curriculums = Curriculums.objects.all()
     curriculums = Curriculums.objects.filter(is_archived=False)
+    paginator = Paginator(curriculums, 3)
+    page_number = request.GET.get('page')
+    curriculums = paginator.get_page(page_number)
     context = {
         "curriculums": curriculums
     }
@@ -562,6 +584,10 @@ def export_students_to_excel(request):
 
 def manage_gradelevel(request):
     gradelevels = GradeLevel.objects.all()
+    paginator = Paginator(gradelevels, 3)
+
+    page_number = request.GET.get('page')
+    gradelevels = paginator.get_page(page_number)
     context = {
         "gradelevels": gradelevels
     }
@@ -609,6 +635,10 @@ def delete_gradelevel(request, GradeLevel_id):
 
 def manage_session(request):
     session_years = SessionYearModel.objects.filter(is_archived=False)
+    paginator = Paginator(session_years, 3)
+
+    page_number = request.GET.get('page')
+    session_years = paginator.get_page(page_number)
     context = {
         "session_years": session_years
     }
@@ -991,6 +1021,9 @@ def manage_enrollment(request):
     enrollments = Enrollment.objects.all()
     attachments = Attachment.objects.all()
     balancepayments = BalancePayment.objects.all()
+    paginator = Paginator(enrollments, 5)
+    page_number = request.GET.get('page')
+    enrollments = paginator.get_page(page_number)
     context = {
         "students": students,
         "enrollments": enrollments,
@@ -1187,10 +1220,27 @@ def update_balance(request, enrollment_id=None):
 
 
 def manage_student(request):
+    search_query = request.GET.get('search', '')
     students = Students.objects.all()
+
+    if search_query:
+        students = students.filter(
+            Q(admin__first_name__icontains=search_query) |
+            Q(admin__last_name__icontains=search_query) |
+            Q(middle_name__icontains=search_query) |
+            Q(admin__email__icontains=search_query) |
+            Q(GradeLevel_id__GradeLevel_name__icontains=search_query)
+        )
+
+    paginator = Paginator(students, 5)
+    page_number = request.GET.get('page')
+    students = paginator.get_page(page_number)
+
     context = {
-        "students": students
+        'students': students,
+        'search_query': search_query,
     }
+
     return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
 
 
@@ -1299,6 +1349,10 @@ def deactivate_student(request, student_id):
 def manage_section(request):
     gradelevels = GradeLevel.objects.all()
     sections = Section.objects.all()
+
+    paginator = Paginator(sections, 6)
+    page_number = request.GET.get('page')
+    sections = paginator.get_page(page_number)
 
     context = {
         "sections": sections,
@@ -1419,6 +1473,9 @@ def add_subject_save(request):
 
 def manage_subject(request):
     subjects = Subjects.objects.all()
+    paginator = Paginator(subjects, 5)
+    page_number = request.GET.get('page')
+    subjects = paginator.get_page(page_number)
     context = {
         "subjects": subjects
     }

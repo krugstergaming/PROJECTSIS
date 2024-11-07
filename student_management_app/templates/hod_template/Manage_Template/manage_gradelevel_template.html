@@ -11,7 +11,7 @@
 <section class="content">
     <div class="container-fluid">
 
-        <a class="btn btn-primary" href="{% url 'add_gradelevel' %}" role="button">+ Add GradeLevel</a> 
+        <a class="btn btn-success" href="{% url 'add_gradelevel' %}" role="button">+ Add GradeLevel</a> 
         <a class="btn btn-secondary" href="{% url 'export_gradelevels_to_excel' %}" role="button">Export to Excel</a> 
         <br/>&nbsp;
 
@@ -81,9 +81,58 @@
                                 <a href="" class="btn btn-secondary">Archive</a>
                             </td>
                             </tr>
-                            {% endfor %}
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No records Found.</td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                         </table>
+                        
+                        <!-- Bootstrap Pagination Controls -->
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination">
+                                        {% if gradelevels.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ gradelevels.previous_page_number }}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">&laquo;</span>
+                                            </li>
+                                        {% endif %}
+
+                                        {% for i in gradelevels.paginator.page_range %}
+                                            {% if gradelevels.number == i %}
+                                                <li class="page-item active">
+                                                    <span class="page-link">{{ i }}</span>
+                                                </li>
+                                            {% else %}
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if gradelevels.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ gradelevels.next_page_number }}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">&raquo;</span>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
                     </div>
                     <!-- /.card-body -->
                 </div>
