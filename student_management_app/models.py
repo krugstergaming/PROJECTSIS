@@ -106,7 +106,7 @@ class Students(models.Model):
     age = models.IntegerField(blank=True, null=True)
     pob = models.CharField(max_length=100, blank=True, null=True)
     sex = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
-    address = models.TextField(blank=True, null=True)
+    address = models.TextField()
     nationality = models.CharField(max_length=50, blank=True, null=True)
     religion = models.CharField(max_length=50, blank=True, null=True)
     rank_in_family = models.IntegerField(blank=True, null=True)

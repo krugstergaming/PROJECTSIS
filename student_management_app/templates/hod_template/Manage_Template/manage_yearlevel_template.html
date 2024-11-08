@@ -11,7 +11,7 @@
 <section class="content">
         <div class="container-fluid">
 
-            <a class="btn btn-success" href="{% url 'add_yearlevel' %}" role="button">+ Add Level</a> <br/>&nbsp;
+            <a class="btn btn-primary" href="{% url 'add_yearlevel' %}" role="button">+ Add Level</a> <br/>&nbsp;
 
             {% if messages %}
                                 <div class="form-group">
@@ -82,11 +82,7 @@
                                     <a href="" class="btn btn-secondary">Archive</a>
                                 </td>
                                 </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No records Found.</td>
-                                </tr>
-                            {% endfor %}
+                                {% endfor %}
                                 
                             </tbody>
                             </table>

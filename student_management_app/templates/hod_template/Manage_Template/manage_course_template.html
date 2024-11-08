@@ -8,10 +8,25 @@
 
 {% load static %}
 
+<script scr="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script scr="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/js/dataTables.js">
+
+
+<script>
+    new DataTable('#example', {
+    createdRow: (row, data, index) => {
+        if (data[5].replace(/[\$,]/g, '') * 1 > 150000) {
+            row.querySelector(':nth-child(6)').classList.add('highlight');
+        }
+    }
+});
+</script>
+
 <section class="content">
         <div class="container-fluid">
 
-            <a class="btn btn-success" href="{% url 'add_course' %}" role="button">+ Add Course</a> <br/>&nbsp;
+            <a class="btn btn-primary" href="{% url 'add_course' %}" role="button">+ Add Course</a> <br/>&nbsp;
 
             {% if messages %}
                                 <div class="form-group">
@@ -56,7 +71,7 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
-                            <table class="table table-hover text-nowrap">
+                            <table id="example" class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
                                 <th>ID</th>
@@ -78,11 +93,7 @@
                                     <a href="{% url 'delete_course' course.id %}" class="btn btn-secondary">Archive</a>
                                 </td>
                                 </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No records Found.</td>
-                                </tr>
-                            {% endfor %}
+                                {% endfor %}
                                 
                             </tbody>
                             </table>

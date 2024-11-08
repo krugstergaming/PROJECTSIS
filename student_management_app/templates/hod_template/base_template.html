@@ -29,6 +29,16 @@
   <link rel="stylesheet" href="{% static 'summernote/summernote-bs4.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <style>
+        td.highlight {
+        font-weight: bold;
+        color: blue;
+    }
+
+    html.dark td.highlight {
+        color: white;
+    }
+  </style>
 
   {% comment %} For Custom CSS {% endcomment %}
   {% block custom_css %}
