@@ -59,7 +59,7 @@
                             <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                <!-- <th>ID</th> -->
+                                <th>No. </th>
                                 <th>Grade Level Name</th>
                                 <th>Date Created</th>
                                 <th>Date Updated</th>
@@ -69,7 +69,7 @@
                             <tbody>
                                 {% for gradelevel in gradelevels %}
                                 <tr>
-                                <!-- <td>{{ gradelevel.id }}</td> -->
+                                <td>{{ forloop.counter }}</td>
                                 <td>{{ gradelevel.GradeLevel_name }}</td>
                                 <td>{{ gradelevel.created_at }}</td>
                                 <td>{{ gradelevel.updated_at }}</td>

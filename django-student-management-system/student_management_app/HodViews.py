@@ -10,6 +10,7 @@ from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
+from django.db.models import Count, F
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
@@ -707,6 +708,11 @@ def add_enrollment_save(request):
         messages.error(request, "Student not found.")
         return redirect('add_enrollment')
 
+    # Check if the student already has an enrollment record
+    if Enrollment.objects.filter(student_id=student_instance).exists():
+        messages.error(request, "Student is already enrolled.")
+        return redirect('add_enrollment')
+
     # Retrieve and convert values from the form
     def safe_decimal(value, field_name):
         """Helper function to safely convert to Decimal with error logging."""
@@ -761,6 +767,10 @@ def add_enrollment_save(request):
         
         enrollment.save()
 
+        # Update student status to "Enrolled"
+        student_instance.student_status = "Enrolled"
+        student_instance.save()
+
         # Handle file uploads from the request
         id_picture_file = request.FILES.get('id_picture_file') if request.POST.get('include_id_picture') else None
         psa_file = request.FILES.get('birth_certificate_file') if request.POST.get('include_birth_certificate') else None
@@ -779,7 +789,6 @@ def add_enrollment_save(request):
         messages.success(request, "Enrollment Added Successfully!")
     except Exception as e:
         messages.error(request, f"Failed to Add Enrollment! Error: {str(e)}")
-    
     return redirect('add_enrollment')
 
 def manage_enrollment(request):
@@ -1169,13 +1178,14 @@ def add_section_save(request):
     else:
         section_name = request.POST.get('section_name')
         section_limit = request.POST.get('section_limit')
-
+        section_soft_limit = request.POST.get('section_soft_limit')
         GradeLevel_id = request.POST.get('gradelevel')
         gradelevel = GradeLevel.objects.get(id=GradeLevel_id)
         
         try:
             section = Section(
                 section_name = section_name,
+                section_soft_limit = section_soft_limit,
                 section_limit = section_limit,
                 GradeLevel_id=gradelevel)
             section.save()
@@ -1204,6 +1214,7 @@ def edit_section_save(request):
         section_id = request.POST.get('section_id')
         section_name = request.POST.get('section_name')
         section_limit = request.POST.get('section_limit')
+        section_soft_limit = request.POST.get('section_soft_limit')
         GradeLevel_id = request.POST.get('gradelevel')
         
         try:
@@ -1214,6 +1225,7 @@ def edit_section_save(request):
             section.GradeLevel_id = gradelevel
 
             section_limit = section_limit
+            section_soft_limit = section_soft_limit
 
             section.save()
 
@@ -1329,16 +1341,29 @@ def delete_subject(request, subject_id):
         return redirect('manage_subject')
 
 def add_assignsection(request):
-    # Filter grade levels only for students present in the Enrollment table
+    # Filter grade levels for students with student_status="Enrolled"
     gradelevels = GradeLevel.objects.filter(
         id__in=Students.objects.filter(
-            id__in=Enrollment.objects.values_list('student_id', flat=True)
+            student_status="Enrolled"  # Only include enrolled students
         ).values_list('GradeLevel_id', flat=True)
     )
     context = {
         "gradelevels": gradelevels,
     }
     return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
+
+
+# def add_assignsection(request):
+#     # Filter grade levels only for students present in the Enrollment table
+#     gradelevels = GradeLevel.objects.filter(
+#         id__in=Students.objects.filter(
+#             id__in=Enrollment.objects.values_list('student_id', flat=True)
+#         ).values_list('GradeLevel_id', flat=True)
+#     )
+#     context = {
+#         "gradelevels": gradelevels,
+#     }
+#     return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
 
 def load_sections_and_students(request):
     gradelevel_id = request.GET.get('gradelevel_id')
@@ -1350,7 +1375,7 @@ def load_sections_and_students(request):
     assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
     students = Students.objects.filter(
         GradeLevel_id=gradelevel_id,
-        id__in=Enrollment.objects.values_list('student_id', flat=True)  # Only include enrolled students
+        student_status="Enrolled"  # Only include students with status "Enrolled"
     ).exclude(id__in=assigned_students)
 
     # Prepare data for response
@@ -1358,6 +1383,25 @@ def load_sections_and_students(request):
     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
     
     return JsonResponse({'sections': section_list, 'students': student_list})
+
+# def load_sections_and_students(request):
+#     gradelevel_id = request.GET.get('gradelevel_id')
+    
+#     # Fetch sections by GradeLevel
+#     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
+
+#     # Get all students in the GradeLevel who are NOT already assigned to a section
+#     assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
+#     students = Students.objects.filter(
+#         GradeLevel_id=gradelevel_id,
+#         id__in=Enrollment.objects.values_list('student_id', flat=True)  # Only include enrolled students
+#     ).exclude(id__in=assigned_students)
+
+#     # Prepare data for response
+#     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
+#     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
+    
+#     return JsonResponse({'sections': section_list, 'students': student_list})
 
 
 def add_assignsection_save(request):
@@ -1379,19 +1423,34 @@ def add_assignsection_save(request):
             messages.error(request, "No students selected! Please select students to assign to this section.")
             return redirect('add_assignsection')
 
-        # Proceed to save the assignment for each student
-        for student_id in student_ids:
-            student = Students.objects.get(id=student_id)
+        # Check the current count of students in this section
+        current_count = AssignSection.objects.filter(section_id=section).count()
+        remaining_slots = section.section_limit - current_count
 
-            # Create and save an AssignSection entry for each student
-            assignsection = AssignSection(   
+        # Filter students to add based on remaining slots
+        students_to_add = student_ids[:remaining_slots]  # Students that can be added within the limit
+        students_not_added = student_ids[remaining_slots:]  # Students exceeding the limit
+
+        # Proceed to save the assignment for each student within the limit
+        for student_id in students_to_add:
+            student = Students.objects.get(id=student_id)
+            assignsection = AssignSection(
                 GradeLevel_id=gradelevel, 
                 section_id=section,
                 Student_id=student
             )
             assignsection.save()
 
-        messages.success(request, "Assign Section Added Successfully!")
+        # Prepare a success message
+        success_message = f"{len(students_to_add)} students assigned successfully to section '{section.section_name}'."
+        
+        # If there are students that couldn't be added, prepare a warning message
+        if students_not_added:
+            not_added_names = [Students.objects.get(id=student_id).admin.get_full_name() for student_id in students_not_added]
+            warning_message = f"However, the following students could not be assigned due to the section limit of {section.section_limit}: {', '.join(not_added_names)}."
+            messages.warning(request, warning_message)
+        
+        messages.success(request, success_message)
         return redirect('add_assignsection')
 
     except Exception as e:
@@ -1447,6 +1506,17 @@ def add_load_save(request):
             staff_user = CustomUser.objects.get(id=staff_id)
 
             is_advisory = request.POST.get('is_advisory')
+
+            # Check for duplicate load entry
+            if Load.objects.filter(
+                session_year_id=session_id,
+                curriculum_id=curriculum,
+                AssignSection_id=assignsection,
+                subject_id=subject,
+                staff_id=staff_user
+            ).exists():
+                messages.error(request, "This load configuration already exists.")
+                return redirect('add_load')
 
             # Get the related Staff instance to check the max_load
             staff = Staffs.objects.get(admin=staff_user)

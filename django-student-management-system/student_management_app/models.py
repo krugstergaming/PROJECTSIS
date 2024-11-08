@@ -86,11 +86,8 @@ class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     student_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
-
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-
     middle_name = models.CharField(max_length=50, blank=True, null=True)
     suffix = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)
@@ -106,58 +103,34 @@ class Students(models.Model):
     mobile_phone_nos = models.CharField(max_length=20, blank=True, null=True)
     is_covid_vaccinated = models.BooleanField(default=False)
     date_of_vaccination = models.DateField(blank=True, null=True)
-
     student_status = models.CharField(max_length=255, blank=True, null=True)
-
     profile_pic = models.FileField(upload_to='profile_pics/', blank=True, null=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 class Enrollment(models.Model):
-    
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-
-    # Registration, Miscellaneous, and Tuition Fees
     registration_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     misc_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     tuition_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
-    # Total fee calculation
     total_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    
-    # Payments and Discounts
     downpayment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    
-    # Balance after applying downpayment and discounts
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    
-    # Installment option
     installment_option = models.CharField(max_length=50, default='Monthly', blank=True, null=True)
-
     installment_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-
-    # Assessment and Payment Details
     assessed_by = models.CharField(max_length=100, blank=True, null=True)
     assessed_date = models.DateField(blank=True, null=True)
     payment_received_by = models.CharField(max_length=100, blank=True, null=True)
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_date = models.DateField(blank=True, null=True)
-
-    # Enrollment status
     enrollment_status = models.CharField(max_length=20, default='Pending')
-
-    # Additional remarks and attachments
     remarks = models.TextField(blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
     objects = models.Manager()
 
 class Attachment(models.Model):
@@ -190,12 +163,10 @@ class StudentPromotionHistory(models.Model):
 
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
-
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-
     section_name = models.CharField(max_length=255)
+    section_soft_limit = models.IntegerField(blank=True, null= True)
     section_limit = models.IntegerField(blank=True, null=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -205,30 +176,25 @@ class Subjects(models.Model):
 
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-    
     subject_name = models.CharField(max_length=255, blank=True, null=True)
     subject_description = models.CharField(max_length=255, blank=True, null=True)
     subject_code = models.CharField(max_length=255, blank=True, null=True)
     subject_hours = models.CharField(max_length=255, blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 class AssignSection(models.Model):
     id = models.AutoField(primary_key=True)
-
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     section_id = models.ForeignKey(Section, on_delete=models.CASCADE)
     Student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 class Load(models.Model):
     id = models.AutoField(primary_key=True)
-
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
