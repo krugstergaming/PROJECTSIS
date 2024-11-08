@@ -72,7 +72,7 @@
                                 <tbody>
                                     {% for subject in subjects %}
                                     <tr>
-                                        <td>{{ subject.id }}</td>
+                                        <td>{{ forloop.counter }}</td>
                                         <td>{{ subject.subject_code }}</td>
                                         <td>{{ subject.subject_name }}</td>
                                         <td>{{ subject.GradeLevel_id.GradeLevel_name }}</td>

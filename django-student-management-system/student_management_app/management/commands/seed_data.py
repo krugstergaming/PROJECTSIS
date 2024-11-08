@@ -49,13 +49,15 @@ class Command(BaseCommand):
             grade_levels.append(grade_level)
 
         # Seed Sections for each GradeLevel
-        for index, grade_level in enumerate(grade_levels):
-            # Create sections based on the grade level number
-            section_count = index + 1  # Grade 1 has 1 section, Grade 2 has 2 sections, etc.
+        for grade_level in grade_levels:
+            # Set the section count to 3 for each grade level
+            section_count = 3
             for section_number in range(1, section_count + 1):
                 Section.objects.create(
                     section_name=f'Section {section_number}',
-                    GradeLevel_id=grade_level
+                    GradeLevel_id=grade_level,
+                    section_soft_limit=15,
+                    section_limit=20 
                 )
 
         # Seed Subjects for each GradeLevel and Curriculum
@@ -322,11 +324,7 @@ class Command(BaseCommand):
                 user.staffs.permanent_address = staff['permanent_address']
                 user.staffs.telephone_no = staff['telephone_no']
                 user.staffs.cellphone_no = staff['cellphone_no']
-
-                # Save user to ensure the Staffs model is correctly updated
                 user.save()
-
-                self.stdout.write(self.style.SUCCESS(f'Successfully added staff: {staff["username"]}'))
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Error adding staff {staff["username"]}: {str(e)}'))
@@ -353,8 +351,9 @@ class Command(BaseCommand):
                 'rank_in_family': '2',
                 'telephone_nos': '123-456-7890',
                 'mobile_phone_nos': '098-765-4321',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 1
-                'session_year_id': session_year,
+                'GradeLevel_id': grade_levels[0], # kinder
+                'session_year_id': session_year,  # current school year
+                'student_status': 'Enrolled'
             },
             {
                 'username': 'student2',
@@ -377,6 +376,7 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '987-654-3210',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 2
                 'session_year_id': session_year,
+                'student_status': 'Enrolled'
             },
             {
                 'username': 'student3',
@@ -399,6 +399,7 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '876-543-2109',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 3
                 'session_year_id': session_year,
+                'student_status': 'Enrolled'
             },
             {
                 'username': 'student4',
@@ -419,8 +420,9 @@ class Command(BaseCommand):
                 'rank_in_family': '4',
                 'telephone_nos': '456-789-0123',
                 'mobile_phone_nos': '765-432-1098',
-                'GradeLevel_id': grade_levels[3],  # Assign to Grade 4
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 4
                 'session_year_id': session_year,
+                'student_status': 'Enrolled'
             },
             {
                 'username': 'student5',
@@ -441,8 +443,9 @@ class Command(BaseCommand):
                 'rank_in_family': '5',
                 'telephone_nos': '567-890-1234',
                 'mobile_phone_nos': '654-321-0987',
-                'GradeLevel_id': grade_levels[4],  # Assign to Grade 5
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 5
                 'session_year_id': session_year,
+                'student_status': 'Enrolled'
             },
             {
                 'username': 'student6',
@@ -463,9 +466,333 @@ class Command(BaseCommand):
                 'rank_in_family': '6',
                 'telephone_nos': '678-901-2345',
                 'mobile_phone_nos': '543-210-9876',
-                'GradeLevel_id': grade_levels[5],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[0],  #5 Assign to Grade 6
                 'session_year_id': session_year,
+                'student_status': 'Enrolled'
             },
+            {
+                'username': 'student7',
+                'email': 'student7@gmail.com',
+                'password': 'std7',
+                'last_name': 'Garcia',
+                'first_name': 'Miguel',
+                'middle_name': 'G',
+                'suffix': '',
+                'student_number': '2024-0007',
+                'nickname': 'Migz',
+                'sex': 'Male',
+                'address': '654 Hepta Ave, City, Country',
+                'dob': datetime.strptime('2010-07-07', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '2',
+                'telephone_nos': '789-012-3456',
+                'mobile_phone_nos': '654-321-0987',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student8',
+                'email': 'student8@gmail.com',
+                'password': 'std8',
+                'last_name': 'Reyes',
+                'first_name': 'Sophia',
+                'middle_name': 'H',
+                'suffix': '',
+                'student_number': '2024-0008',
+                'nickname': 'Sophie',
+                'sex': 'Female',
+                'address': '321 Octa Rd, City, Country',
+                'dob': datetime.strptime('2010-08-08', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '3',
+                'telephone_nos': '890-123-4567',
+                'mobile_phone_nos': '765-432-1098',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student9',
+                'email': 'student9@gmail.com',
+                'password': 'std9',
+                'last_name': 'Cruz',
+                'first_name': 'Daniel',
+                'middle_name': 'I',
+                'suffix': '',
+                'student_number': '2024-0009',
+                'nickname': 'Dan',
+                'sex': 'Male',
+                'address': '111 Nonary Blvd, City, Country',
+                'dob': datetime.strptime('2010-09-09', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '1',
+                'telephone_nos': '901-234-5678',
+                'mobile_phone_nos': '876-543-2109',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student10',
+                'email': 'student10@gmail.com',
+                'password': 'std10',
+                'last_name': 'Lopez',
+                'first_name': 'Angela',
+                'middle_name': 'J',
+                'suffix': '',
+                'student_number': '2024-0010',
+                'nickname': 'Angie',
+                'sex': 'Female',
+                'address': '222 Deca Lane, City, Country',
+                'dob': datetime.strptime('2010-10-10', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '4',
+                'telephone_nos': '012-345-6789',
+                'mobile_phone_nos': '987-654-3210',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student11',
+                'email': 'student11@gmail.com',
+                'password': 'std11',
+                'last_name': 'Mendoza',
+                'first_name': 'Liam',
+                'middle_name': 'K',
+                'suffix': '',
+                'student_number': '2024-0011',
+                'nickname': 'Liam',
+                'sex': 'Male',
+                'address': '333 Undeca St, City, Country',
+                'dob': datetime.strptime('2010-11-11', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '5',
+                'telephone_nos': '123-456-7890',
+                'mobile_phone_nos': '098-765-4321',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student12',
+                'email': 'student12@gmail.com',
+                'password': 'std12',
+                'last_name': 'Romero',
+                'first_name': 'Ethan',
+                'middle_name': 'L',
+                'suffix': '',
+                'student_number': '2024-0012',
+                'nickname': 'Ethy',
+                'sex': 'Male',
+                'address': '444 Duodeca Blvd, City, Country',
+                'dob': datetime.strptime('2010-12-12', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '3',
+                'telephone_nos': '234-567-8901',
+                'mobile_phone_nos': '109-876-5432',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student13',
+                'email': 'student13@gmail.com',
+                'password': 'std13',
+                'last_name': 'Flores',
+                'first_name': 'Ava',
+                'middle_name': 'M',
+                'suffix': '',
+                'student_number': '2024-0013',
+                'nickname': 'Avi',
+                'sex': 'Female',
+                'address': '555 Tredeca Ave, City, Country',
+                'dob': datetime.strptime('2010-01-13', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '2',
+                'telephone_nos': '345-678-9012',
+                'mobile_phone_nos': '210-987-6543',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student14',
+                'email': 'student14@gmail.com',
+                'password': 'std14',
+                'last_name': 'Torres',
+                'first_name': 'Emily',
+                'middle_name': 'N',
+                'suffix': '',
+                'student_number': '2024-0014',
+                'nickname': 'Em',
+                'sex': 'Female',
+                'address': '666 Quadec St, City, Country',
+                'dob': datetime.strptime('2010-02-14', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '4',
+                'telephone_nos': '456-789-0123',
+                'mobile_phone_nos': '321-098-7654',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student15',
+                'email': 'student15@gmail.com',
+                'password': 'std15',
+                'last_name': 'Gomez',
+                'first_name': 'James',
+                'middle_name': 'O',
+                'suffix': '',
+                'student_number': '2024-0015',
+                'nickname': 'Jay',
+                'sex': 'Male',
+                'address': '777 Quindeca Ave, City, Country',
+                'dob': datetime.strptime('2010-03-15', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '1',
+                'telephone_nos': '567-890-1234',
+                'mobile_phone_nos': '432-109-8765',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student16',
+                'email': 'student16@gmail.com',
+                'password': 'std16',
+                'last_name': 'Castillo',
+                'first_name': 'Mia',
+                'middle_name': 'P',
+                'suffix': '',
+                'student_number': '2024-0016',
+                'nickname': 'Mimi',
+                'sex': 'Female',
+                'address': '888 Hexadeca Rd, City, Country',
+                'dob': datetime.strptime('2010-04-16', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '3',
+                'telephone_nos': '678-901-2345',
+                'mobile_phone_nos': '543-210-9876',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student17',
+                'email': 'student17@gmail.com',
+                'password': 'std17',
+                'last_name': 'Perez',
+                'first_name': 'Benjamin',
+                'middle_name': 'Q',
+                'suffix': '',
+                'student_number': '2024-0017',
+                'nickname': 'Ben',
+                'sex': 'Male',
+                'address': '999 Heptadeca St, City, Country',
+                'dob': datetime.strptime('2010-05-17', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '2',
+                'telephone_nos': '789-012-3456',
+                'mobile_phone_nos': '654-321-0987',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student18',
+                'email': 'student18@gmail.com',
+                'password': 'std18',
+                'last_name': 'Santos',
+                'first_name': 'Olivia',
+                'middle_name': 'R',
+                'suffix': '',
+                'student_number': '2024-0018',
+                'nickname': 'Liv',
+                'sex': 'Female',
+                'address': '111 Octadeca Ave, City, Country',
+                'dob': datetime.strptime('2010-06-18', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '4',
+                'telephone_nos': '890-123-4567',
+                'mobile_phone_nos': '765-432-1098',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student19',
+                'email': 'student19@gmail.com',
+                'password': 'std19',
+                'last_name': 'Rivera',
+                'first_name': 'Lucas',
+                'middle_name': 'S',
+                'suffix': '',
+                'student_number': '2024-0019',
+                'nickname': 'Luke',
+                'sex': 'Male',
+                'address': '222 Nonadeca Blvd, City, Country',
+                'dob': datetime.strptime('2010-07-19', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '5',
+                'telephone_nos': '901-234-5678',
+                'mobile_phone_nos': '876-543-2109',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            },
+            {
+                'username': 'student20',
+                'email': 'student20@gmail.com',
+                'password': 'std20',
+                'last_name': 'Delacruz',
+                'first_name': 'Grace',
+                'middle_name': 'T',
+                'suffix': '',
+                'student_number': '2024-0020',
+                'nickname': 'Gigi',
+                'sex': 'Female',
+                'address': '333 Vigintadeca St, City, Country',
+                'dob': datetime.strptime('2010-08-20', '%Y-%m-%d').date(),
+                'pob': 'City, Country',
+                'nationality': 'Filipino',
+                'religion': 'Catholic',
+                'rank_in_family': '3',
+                'telephone_nos': '012-345-6789',
+                'mobile_phone_nos': '987-654-3210',
+                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'session_year_id': session_year,
+                'student_status': 'Enrolled'
+            }
+            
         ]
         for student in student_data:
             try:
@@ -500,11 +827,8 @@ class Command(BaseCommand):
                 user.students.address = student['address']
                 user.students.telephone_nos = student['telephone_nos']
                 user.students.mobile_phone_nos = student['mobile_phone_nos']
-
-                
+                user.students.student_status = student['student_status']
                 user.save()
-
-                self.stdout.write(self.style.SUCCESS(f'Successfully added Student: {student["username"]}'))
 
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'Error adding Student {student["username"]}: {str(e)}'))
