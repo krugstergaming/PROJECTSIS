@@ -77,7 +77,6 @@ class Curriculums(models.Model):
 class Classroom(models.Model):
     id = models.AutoField(primary_key=True)
     classroom_name = models.CharField(max_length=255)
-    chair_number = models.IntegerField(blank=True, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -220,9 +219,10 @@ class Schedule(models.Model):
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     load_id = models.ForeignKey(Load, on_delete=models.CASCADE)  
-    day_of_week = models.CharField(max_length=10)                       # The day of the week (e.g., "Monday")
-    start_time = models.TimeField()                                     # The start time of the class
-    end_time = models.TimeField()                                       # The end time of the class
+    classroom_id = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    day_of_week = models.CharField(max_length=10)                       
+    start_time = models.TimeField()                                     
+    end_time = models.TimeField()                                       
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()

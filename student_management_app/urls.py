@@ -9,8 +9,6 @@ from .views import check_login_status, check_login_status_unauthenticated
 
 urlpatterns = [
     path('', views.loginPage, name="login"),
-    path('api/check_login_status/', check_login_status, name='check_login_status'),
-    path('api/check_login_status_unauthenticated/', check_login_status_unauthenticated, name='check_login_status_unauthenticated'),
     path('doLogin/', views.doLogin, name="doLogin"),
     path('get_user_details/', views.get_user_details, name="get_user_details"),
     path('logout_user/', views.logout_user, name="logout_user"),
@@ -25,6 +23,8 @@ urlpatterns = [
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', HodViews.deactivate_staff, name="delete_staff"),
 
+    path('add_classroom', HodViews.add_classroom, name="add_classroom"),
+    path('manage_classroom/', HodViews.manage_classroom, name="manage_classroom"),
 
     path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
     path('add_curriculum_save/', HodViews.add_curriculum_save, name="add_curriculum_save"),

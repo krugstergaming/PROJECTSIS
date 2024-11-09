@@ -3,11 +3,6 @@
 
 {% block content %}
 
-<div class="session-status">
-  <div class="status-circle {% if session_exists %}session-active{% else %}session-inactive{% endif %}"></div>
-  <p>{% if session_exists %}Session Active{% else %}No Session{% endif %}</p>
-</div>
-
 <div class="login-box">
   <div class="logo-section">
     <img src="{% static 'admin/img/logo.png' %}" alt="Logo" class="login-logo">
@@ -46,33 +41,5 @@
   </form>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('login-form');
-
-    // Check login status on page load
-    fetch('/api/check_login_status_unauthenticated/')
-      .then(response => response.json())
-      .then(data => {
-        if (data.is_logged_in) {
-          alert("You are already logged in.");
-          // Redirect to home page or another suitable location
-          window.location.href = '/';  // Change to the appropriate page
-        }
-      });
-
-    // Optional: Prevent form submission if already logged in
-    loginForm.addEventListener('submit', function(event) {
-      fetch('/api/check_login_status/')
-        .then(response => response.json())
-        .then(data => {
-          if (data.is_logged_in) {
-            alert("You are already logged in. Please log out first.");
-            event.preventDefault();  // Prevent the form from submitting
-          }
-        });
-    });
-  });
-</script>
 
 {% endblock %}

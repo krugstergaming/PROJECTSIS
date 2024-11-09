@@ -1,13 +1,3 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.contrib import messages
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from datetime import datetime, date
-import cloudinary.uploader
-import openpyxl
-import requests
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment
 from django.utils.timezone import now
@@ -15,6 +5,18 @@ from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
 from django.db.models import Count, F
+from django.db import transaction
+from datetime import datetime, date
+from bs4 import BeautifulSoup
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.contrib import messages
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import cloudinary.uploader
+import openpyxl
+import requests
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
@@ -726,7 +728,56 @@ def delete_session(request, session_id):
     except:
         messages.error(request, "Failed to Delete Session.")
         return redirect('manage_session')
+    
+def manage_classroom(request):
+    classrooms = Classroom.objects.all()
 
+    # Define context with headers, data, and statistics
+    context = {
+        "classrooms": classrooms
+    }
+
+    return render(request, "hod_template/Manage_Template/manage_classroom_template.html", context)
+
+def add_classroom(request):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('manage_classroom')
+    try:
+        # Fetch and parse the table data from the external website
+        r = requests.get('https://logisticsinteg.onrender.com/Depart_Inv.html')
+        soup = BeautifulSoup(r.text, 'html.parser')
+        table = soup.find('table')
+        rows = table.find_all('tr')
+        
+        # Extract data rows, skipping headers
+        data = []
+        for row in rows[1:]:  # Skips the first row (headers)
+            cols = row.find_all('td')
+            data.append([col.text.strip() for col in cols])
+
+        # Fetch existing classroom names to avoid duplicates
+        existing_names = set(Classroom.objects.values_list('classroom_name', flat=True))
+        new_classrooms = []
+
+        # Identify and prepare unique Classroom objects
+        for row_data in data:
+            if row_data:
+                classroom_name = row_data[0]
+                if classroom_name not in existing_names:
+                    new_classrooms.append(Classroom(classroom_name=classroom_name))
+                    existing_names.add(classroom_name)
+
+        # Bulk create new unique records within a transaction
+        with transaction.atomic():
+            Classroom.objects.bulk_create(new_classrooms)
+
+        messages.success(request, "Classroom Fetched Successfully!")
+        return redirect('manage_classroom')
+    
+    except Exception as e:
+        messages.error(request, f"Failed to Fetch Classroom! Error: {str(e)}")
+        return redirect('manage_classroom')
 
 def add_student(request):
     gradelevels = GradeLevel.objects.all()
@@ -1573,35 +1624,35 @@ def add_assignsection_save(request):
                 messages.error(request, "No students selected!")
                 return redirect('add_assignsection')
 
-        # Check the current count of students in this section
-        current_count = AssignSection.objects.filter(section_id=section).count()
-        remaining_slots = section.section_limit - current_count
+            # Check the current count of students in this section
+            current_count = AssignSection.objects.filter(section_id=section).count()
+            remaining_slots = section.section_limit - current_count
 
-        # Filter students to add based on remaining slots
-        students_to_add = student_ids[:remaining_slots]  # Students that can be added within the limit
-        students_not_added = student_ids[remaining_slots:]  # Students exceeding the limit
+            # Filter students to add based on remaining slots
+            students_to_add = student_ids[:remaining_slots]  # Students that can be added within the limit
+            students_not_added = student_ids[remaining_slots:]  # Students exceeding the limit
 
-        # Proceed to save the assignment for each student within the limit
-        for student_id in students_to_add:
-            student = Students.objects.get(id=student_id)
-            assignsection = AssignSection(
-                GradeLevel_id=gradelevel, 
-                section_id=section,
-                Student_id=student
-            )
-            assignsection.save()
+            # Proceed to save the assignment for each student within the limit
+            for student_id in students_to_add:
+                student = Students.objects.get(id=student_id)
+                assignsection = AssignSection(
+                    GradeLevel_id=gradelevel, 
+                    section_id=section,
+                    Student_id=student
+                )
+                assignsection.save()
 
-        # Prepare a success message
-        success_message = f"{len(students_to_add)} students assigned successfully to section '{section.section_name}'."
-        
-        # If there are students that couldn't be added, prepare a warning message
-        if students_not_added:
-            not_added_names = [Students.objects.get(id=student_id).admin.get_full_name() for student_id in students_not_added]
-            warning_message = f"However, the following students could not be assigned due to the section limit of {section.section_limit}: {', '.join(not_added_names)}."
-            messages.warning(request, warning_message)
-        
-        messages.success(request, success_message)
-        return redirect('add_assignsection')
+            # Prepare a success message
+            success_message = f"{len(students_to_add)} students assigned successfully to section '{section.section_name}'."
+            
+            # If there are students that couldn't be added, prepare a warning message
+            if students_not_added:
+                not_added_names = [Students.objects.get(id=student_id).admin.get_full_name() for student_id in students_not_added]
+                warning_message = f"However, the following students could not be assigned due to the section limit of {section.section_limit}: {', '.join(not_added_names)}."
+                messages.warning(request, warning_message)
+            
+            messages.success(request, success_message)
+            return redirect('add_assignsection')
 
         except Exception as e:
             messages.error(request, f"Failed to Assign Section! Error: {e}")
@@ -1700,11 +1751,13 @@ def add_load_save(request):
 def add_schedule(request):
     session_years = SessionYearModel.objects.all()
     staffs = CustomUser.objects.filter(user_type='2')
-    loads = Load.objects.all()  
+    loads = Load.objects.all()
+    classrooms = Classroom.objects.all()
     context = {
         "session_years": session_years,
         "staffs": staffs,
         "loads": loads,  
+        "classrooms": classrooms,
     }
     return render(request, 'hod_template/Add_Template/add_schedule_template.html', context)
 
@@ -1725,6 +1778,9 @@ def add_schedule_save(request):
             load_id = request.POST.get('load_id')
             load_id = Load.objects.get(id=load_id)
 
+            classroom_id = requests.POST.get('classroom_id')
+            classroom_id = Classroom.objects.get(id=classroom_id)
+
             day_of_week = request.POST.get('day_of_week')
             start_time = request.POST.get('start_time')
             end_time = request.POST.get('end_time')
@@ -1734,6 +1790,7 @@ def add_schedule_save(request):
                         session_year_id=session_id,
                         staff_id=staff_id, 
                         load_id=load_id,
+                        classroom_id=classroom_id,
                         day_of_week=day_of_week,
                         start_time=start_time,
                         end_time=end_time
@@ -1760,10 +1817,6 @@ def manage_class_scheduling(request):
         "classroom": classroom,
     }
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
-
-def add_classroom_save(request):
-    # classroom = 
-    return redirect()
 
 
 def class_search(request):
