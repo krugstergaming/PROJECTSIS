@@ -12,14 +12,13 @@
   
   <form id="login-form" action="{% url 'doLogin' %}" method="POST">
     {% csrf_token %}
-    
     <div class="input-group">
-      <span for="email" class="input-label">Enter Email</span>
+      <label for="email" class="input-label">Enter Email</label>
       <input type="email" id="email" class="form-control" placeholder="Email" name="email" required>
     </div>
 
     <div class="input-group">
-      <span for="password" class="input-label">Enter Password</span>
+      <label for="password" class="input-label">Enter Password</label>
       <input type="password" id="password" class="form-control" placeholder="Password" name="password" required>
     </div>
 
@@ -39,7 +38,59 @@
     </div>
     {% endif %}
   </form>
+  
+  <!-- Section to display user details (optional) -->
+  <div class="user-details" style="margin-top: 20px; display: none;" id="user-details">
+    <h4>Logged In User Details:</h4>
+    <p>Email: <span id="user-email"></span></p>
+    <p>User Type: <span id="user-type"></span></p>
+    <button id="logout-btn" class="logout-btn">Logout</button>
+  </div>
 </div>
 
+<script>
+document.getElementById('login-form').addEventListener('submit', async function (event) {
+  event.preventDefault(); // Prevent default form submission
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const formData = new URLSearchParams();
+  formData.append("email", email);
+  formData.append("password", password);
+
+  try {
+    const response = await fetch("{% url 'doLogin' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Save tokens to localStorage
+      localStorage.setItem("refresh_token", data.tokens.refresh); // Save refresh token
+      localStorage.setItem("access_token", data.tokens.access); // Save access token
+
+      // Redirect to the dashboard URL
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+      } else {
+        alert("No redirect URL provided.");
+      }
+    } else {
+      const errorData = await response.json();
+      alert(errorData.error || "Login failed.");
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    alert("An error occurred. Please try again.");
+  }
+});
+
+</script>
 
 {% endblock %}

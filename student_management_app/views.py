@@ -1,22 +1,26 @@
-# from channels.auth import login, logout
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_control
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.contrib.sessions.models import Session
+from django.utils import timezone
+from django.dispatch import receiver
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.urls import reverse
 
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
 from student_management_app.EmailBackEnd import EmailBackEnd
+from rest_framework.permissions import AllowAny
+from django.utils.decorators import method_decorator
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def loginPage(request):
-    session_exists = request.session.session_key is not None
-    context = {
-        'session_exists': session_exists,
-    }
-
     if request.user.is_authenticated:
         if request.user.user_type == '1':
             return redirect('admin_home')
@@ -27,60 +31,100 @@ def loginPage(request):
         else:
             return redirect('login')
     
-    return render(request, 'login.html', context)
+    return render(request, 'login.html')
 
- 
-def doLogin(request):
-    if request.method != "POST":
-        return HttpResponse("<h2>Method Not Allowed</h2>")
-    else:
-        user = EmailBackEnd.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
-        if user != None:
-            login(request, user)
-            user_type = user.user_type
-            #return HttpResponse("Email: "+request.POST.get('email')+ " Password: "+request.POST.get('password'))
-            if user_type == '1':
-                return redirect('admin_home')
-                
-            elif user_type == '2':
-                # return HttpResponse("Staff Login")
-                return redirect('staff_home')
-                
-            elif user_type == '3':
-                # return HttpResponse("Student Login")
-                return redirect('student_home')
-            else:
-                messages.error(request, "Invalid Login!")
-                return redirect('login')
+
+class LoginAPIView(APIView):
+    permission_classes = [AllowAny]  # Disable permissions for login view
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        # Pass email as username to authenticate
+        user = authenticate(request, username=email, password=password)
+        if not user:
+            raise AuthenticationFailed("Invalid login credentials")
+
+        if user.last_login_session_key:
+            # Check for active session
+            try:
+                active_session = Session.objects.get(session_key=user.last_login_session_key)
+                if active_session.expire_date > timezone.now():
+                    return Response({"error": "Account already logged in on another device"}, status=403)
+            except Session.DoesNotExist:
+                pass
+
+        login(request, user)
+        refresh = RefreshToken.for_user(user)
+
+        # Determine redirection URL based on user_type
+        if user.user_type == "1":
+            redirect_url = reverse('admin_home')
+        elif user.user_type == "2":
+            redirect_url = reverse('staff_home')
+        elif user.user_type == "3":
+            redirect_url = reverse('student_home')
         else:
-            messages.error(request, "Invalid Login Credentials!")
-            #return HttpResponseRedirect("/")
-            return redirect('login')
+            redirect_url = reverse('login')
 
-
+        return Response({
+            "message": "Login successful",
+            "tokens": {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            },
+            "redirect_url": redirect_url,
+        })
 
 def get_user_details(request):
-    if request.user != None:
-        return HttpResponse("User: "+request.user.email+" User Type: "+request.user.user_type)
+    """Fetch details of the logged-in user."""
+    if request.user:
+        return JsonResponse({
+            "email": request.user.email,
+            "user_type": request.user.user_type,
+        })
     else:
         return HttpResponse("Please Login First")
 
-def logout_user(request):
-    logout(request)
-    return HttpResponseRedirect('/')
-
 @csrf_exempt
-def logout_on_close(request):
-    # Logs out the user if they are authenticated, called by JavaScript when the tab is closed
-    if request.user.is_authenticated:
+def logout_user(request):
+    try:
+        # Invalidate JWT tokens (optional, if using token blacklist)
+        refresh_token = request.POST.get("refresh", None)
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except Exception as e:
+                return JsonResponse({"message": "Failed to blacklist the token", "error": str(e)}, status=400)
+        
         logout(request)
-    return HttpResponse(status=200)
+        # Redirect to the login page
+        return redirect('login')
 
-@login_required
-def check_login_status(request):
-    return JsonResponse({'is_logged_in': True})
-
-def check_login_status_unauthenticated(request):
-    return JsonResponse({'is_logged_in': False})
+    except Exception as e:
+        return JsonResponse({"message": "Logout failed", "error": str(e)}, status=500)
 
 
+@receiver(user_logged_in)
+def update_session_key(sender, user, request, **kwargs):
+    """Ensure a single active session per user."""
+    current_session_key = request.session.session_key
+    if user.last_login_session_key:
+        try:
+            old_session = Session.objects.get(session_key=user.last_login_session_key)
+            old_session.delete()
+        except Session.DoesNotExist:
+            pass
+
+    user.last_login_session_key = current_session_key
+    user.save()
+
+
+@receiver(user_logged_out)
+def clear_session_key(sender, request, user, **kwargs):
+    """Clear session key on logout."""
+    if user:
+        user.last_login_session_key = None
+        user.save()

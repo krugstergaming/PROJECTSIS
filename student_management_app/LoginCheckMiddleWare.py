@@ -3,23 +3,30 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 class LoginCheckMiddleWare(MiddlewareMixin):
-    
     def process_view(self, request, view_func, view_args, view_kwargs):
         modulename = view_func.__module__
         user = request.user
-
-        # List of allowed paths without login
+        
         allowed_paths = [
             reverse("password_reset"),
             reverse("password_reset_done"),
             reverse("password_reset_complete"),
+            reverse("login"),
+            reverse("doLogin"),
         ]
 
-        # Allow dynamic reset confirm URL
         if 'reset' in request.path and 'password_reset_confirm' in request.resolver_match.url_name:
             allowed_paths.append(request.path)
+        
+        is_api_request = request.content_type == 'application/json' or 'api' in request.path
+        
+        if is_api_request:
+            # Allow API requests without redirection
+            if not user.is_authenticated:
+                from django.http import JsonResponse
+                return JsonResponse({"detail": "Authentication credentials were not provided."}, status=401)
+            return None
 
-        # Check whether the user is logged in or not
         if user.is_authenticated:
             if user.user_type == "1":
                 if modulename == "student_management_app.HodViews":

@@ -1,15 +1,16 @@
 
 from django.urls import path, include
-from . import views
+from . import views 
 from .import HodViews, StaffViews, StudentViews
 from django.contrib.auth import views as auth_views
 from django.conf import settings
+from .views import LoginAPIView
 
-from .views import check_login_status, check_login_status_unauthenticated
 
 urlpatterns = [
     path('', views.loginPage, name="login"),
-    path('doLogin/', views.doLogin, name="doLogin"),
+    path('doLogin/', LoginAPIView.as_view(), name="doLogin"),
+    # path('api/doLogin/', views.doLogin, name="doLogin"),
     path('get_user_details/', views.get_user_details, name="get_user_details"),
     path('logout_user/', views.logout_user, name="logout_user"),
     path('admin_home/', HodViews.admin_home, name="admin_home"),
@@ -102,6 +103,7 @@ urlpatterns = [
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),
     path('manage_subject/', HodViews.manage_subject, name="manage_subject"),
+    path('manage_subject/api', HodViews.manage_subject_json, name="manage_subject_json"),
     path('edit_subject/<subject_id>/', HodViews.edit_subject, name="edit_subject"),
     path('edit_subject_save/', HodViews.edit_subject_save, name="edit_subject_save"),
     path('delete_subject/<subject_id>/', HodViews.delete_subject, name="delete_subject"),

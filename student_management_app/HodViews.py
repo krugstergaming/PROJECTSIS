@@ -17,6 +17,7 @@ import json
 import cloudinary.uploader
 import openpyxl
 import requests
+from django.contrib.auth.decorators import login_required
 
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
@@ -1485,6 +1486,30 @@ def manage_subject(request):
         "subjects": subjects
     }
     return render(request, 'hod_template/Manage_Template/manage_subject_template.html', context)
+
+@csrf_exempt
+def manage_subject_json(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"error": "You must be logged in to access this resource."}, 
+            status=401
+        )
+
+    if request.method == 'GET':
+        subjects = Subjects.objects.all().values(
+            'id',
+            'curriculum_id',
+            'GradeLevel_id',
+            'subject_name',
+            'subject_description',
+            'subject_code',
+            'subject_hours',
+            'created_at',
+            'updated_at'
+        )  # Retrieve specific fields for serialization
+
+        subjects_list = list(subjects)  # Convert QuerySet to a list
+        return JsonResponse({'subjects': subjects_list}, safe=False)
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)

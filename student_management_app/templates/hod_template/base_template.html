@@ -91,16 +91,16 @@
         </li>
 
         <!-- The icon for logout etc -->
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown" id="menu_dropdown">
           <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
             <i class="fas fa-cog"></i>
           </a>
-          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
+          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;" id="adlog_menu">
             <a href="{% url 'admin_profile' %}" class="dropdown-item">
               <i class="fas fa-user-edit mr-2"></i> Update Profile
             </a>
             <div class="dropdown-divider"></div>
-            <a href="{% url 'logout_user' %}" class="dropdown-item">
+            <a href="{% url 'logout_user' %}" class="dropdown-item" id="logout_user">
               <i class="fas fa-power-off mr-2"></i> Logout
             </a>
             <div class="dropdown-divider"></div>
@@ -191,6 +191,45 @@
   <script src="{% static 'dist/js/pages/dashboard.js' %}"></script>
   <!-- AdminLTE for demo purposes -->
   <script src="{% static 'dist/js/demo.js' %}"></script>
+  <!-- logout -->
+  <script>
+  document.getElementById('logout_user').addEventListener('click', async function () {
+    try {
+      // Assume refreshToken is stored in localStorage/sessionStorage
+      const refreshToken = localStorage.getItem("refresh_token");
+
+      if (!refreshToken) {
+        alert("No refresh token found. Please login again.");
+        return;
+      }
+
+      const response = await fetch("{% url 'logout_user' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message || "Logout successful");
+
+        // Clear tokens and update UI
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("access_token");
+        document.getElementById('user-details').style.display = "none";
+        document.getElementById('login-form').style.display = "block";
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+      alert("An error occurred. Please try again.");
+    }
+  });
+  </script>
 
   {% comment %} For Custom JS {% endcomment %}
   {% block custom_js %}
