@@ -54,7 +54,7 @@
                                     <div class="col-md-4">
                                         <!-- Dynamic Session Selection -->
                                         <div class="form-group">
-                                            <label for="session">Session</label>
+                                            <label for="session">Session <span style="color: red;">*</span></label>
                                             <select class="form-control" name="session_year_id" id="session_year_id" required>
                                                 <option value="">Select a Session</option> <!-- Optional placeholder -->
                                                 {% for session in sessions %}
@@ -66,7 +66,7 @@
                                     <div class="col-md-4">
                                         <!-- Dynamic GradeLevel Selection -->
                                         <div class="form-group">
-                                            <label for="gradelevel">Grade Level</label>
+                                            <label for="gradelevel">Grade Level <span style="color: red;">*</span></label>
                                             <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
                                                 <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
                                                 {% for gradelevel in gradelevels %}
@@ -87,19 +87,19 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="student_number">Student Number</label>
+                                            <label for="student_number">Student Number <span style="color: red;">*</span> </label>
                                             <input type="text" class="form-control" name="student_number" id="student_number" value="{{ student_number }}" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="username">Username</label>
+                                            <label for="username">Username <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="email">Email</label>
+                                            <label for="email">Email <span style="color: red;">*</span></label>
                                             <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
                                         </div>
                                     </div>
@@ -107,13 +107,13 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="last_name">Last Name</label>
+                                            <label for="last_name">Last Name <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="first_name">First Name</label>
+                                            <label for="first_name">First Name <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="dob">Date of Birth</label>
+                                            <label for="dob">Date of Birth <span style="color: red;">*</span></label>
                                             <input type="date" class="form-control" name="dob" id="dob" placeholder="Select your date of birth" onchange="calculateAge()" required>
                                         </div>
                                     </div>
@@ -151,7 +151,7 @@
                                     </div>
                                     <div class="col-md-5">
                                         <div class="form-group">
-                                            <label for="pob">Place of Birth</label>
+                                            <label for="pob">Place of Birth <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="pob" id="pob" placeholder="Enter Place of Birth" required>
                                         </div>
                                     </div>
@@ -159,7 +159,7 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         <div class="form-group d-flex align-items-start">
-                                            <label for="sex" style="margin-right: 10px; min-width: 50px;">Sex:</label>
+                                            <label for="sex" style="margin-right: 10px; min-width: 50px;">Sex: <span style="color: red;">*</span></label>
                                             <div>
                                                 <div class="form-check d-block">
                                                     <input class="form-check-input" type="radio" id="male" name="sex" value="Male">
@@ -174,7 +174,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="nationality">Nationality</label>
+                                            <label for="nationality">Nationality <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality" required>
                                         </div>
                                     </div>
@@ -208,7 +208,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="region">Region</label>
+                                                <label for="region">Region <span style="color: red;">*</span></label>
                                                 <select name="region" class="form-control form-control-md" id="region"></select>
                                                 <input type="hidden" class="form-control form-control-md" name="region_text" id="region-text" required>
                                             </div>
@@ -216,7 +216,7 @@
                                         
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="province">Province</label>
+                                                <label for="province">Province <span style="color: red;">*</span></label>
                                                 <select name="province" class="form-control form-control-md" id="province"></select>
                                                 <input type="hidden" class="form-control form-control-md" name="province_text" id="province-text" required>
                                             </div>    
@@ -225,14 +225,14 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="city">City</label>
+                                                <label for="city">City <span style="color: red;">*</span></label>
                                                     <select name="city" class="form-control form-control-md" id="city"></select>
                                                     <input type="hidden" class="form-control form-control-md" name="city_text" id="city-text" required>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="barangay">Barangay</label>
+                                                <label for="barangay">Barangay <span style="color: red;">*</span></label>
                                                 <select name="barangay" class="form-control form-control-md" id="barangay"></select>
                                                 <input type="hidden" class="form-control form-control-md" name="barangay_text" id="barangay-text" required>
                                             </div>
@@ -240,7 +240,7 @@
 
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="street">street</label>
+                                                <label for="street">street <span style="color: red;">*</span></label>
                                                 <input type="text" class="form-control form-control-md" name="street_text" id="street-text">
                                             </div>
                                         </div>
@@ -376,13 +376,13 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label for="emergency_contact_name">Contact Name</label>
+                                            <label for="emergency_contact_name">Contact Name <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="emergency_contact_name" id="emergency_contact_name" placeholder="Enter Contact Name">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="emergency_contact_relationship">Relationship</label>
+                                            <label for="emergency_contact_relationship">Relationship <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="emergency_contact_relationship" id="emergency_contact_relationship" placeholder="Enter Relationship">
                                         </div>
                                     </div>
@@ -390,13 +390,13 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label for="emergency_contact_address">Contact Address</label>
+                                            <label for="emergency_contact_address">Contact Address <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="emergency_contact_address" id="emergency_contact_address" placeholder="Enter Address">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="emergency_contact_phone">Contact Phone</label>
+                                            <label for="emergency_contact_phone">Contact Phone <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="emergency_contact_phone" id="emergency_contact_phone" placeholder="Enter Contact Phone">
                                         </div>    
                                     </div>
@@ -545,7 +545,7 @@
     });
 
     function calculateAge() {
-        const dobInput = document.getElementById('date_of_birth').value;
+        const dobInput = document.getElementById('dob').value;
         if (dobInput) {
             const dob = new Date(dobInput);
             const today = new Date();

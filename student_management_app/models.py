@@ -34,7 +34,6 @@ class AdminHOD(models.Model):
 class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=20, blank=True, null=True)
     dob = models.DateField(blank=True, null=True)  # Assuming Date of Birth is a date
@@ -42,28 +41,72 @@ class Staffs(models.Model):
     pob = models.CharField(max_length=255)
     sex = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
     civil_status = models.CharField(max_length=20, choices=[('single', 'Single'), ('married', 'Married'), ('other', 'Other')])
-    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # For height in meters
-    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)  # For weight in kilograms
+    citizenship = models.CharField(max_length=20, default='Filipino', blank=True, null=True)
+    dual_country = models.CharField(max_length=255, blank=True, null=True)  # For specifying the country if dual citizenship
+    max_load = models.IntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+class staff_contact_info(models.Model):
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    province = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    barangay = models.CharField(max_length=255, blank=True, null=True)
+    street = models.CharField(max_length=255, blank=True, null=True)
+    telephone_no = models.CharField(max_length=20, blank=True, null=True)
+    cellphone_no = models.CharField(max_length=20, blank=True, null=True)
+    emergency_contact = models.CharField(max_length=20, blank=True, null=True)
+    emergency_relationship = models.CharField(max_length=255, blank=True, null=True)
+    medical_condition = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+class staff_employment_info(models.Model):
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    employee_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
+    employee_type = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
+    employment_status = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+class staff_physical_info(models.Model):
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
     blood_type = models.CharField(max_length=10, blank=True, null=True)
+    height = models.CharField(max_length=10, blank=True, null=True)  # For height in meters
+    weight = models.CharField(max_length=10, blank=True, null=True)  # For weight in kilograms
+    eye_color = models.CharField(max_length=255, blank=True, null=True)
+    hair_color = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
+class staff_government_ID_info(models.Model):
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
     gsis_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     pagibig_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     philhealth_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     sss_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     tin_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
-    citizenship = models.CharField(max_length=20, choices=[('filipino', 'Filipino'), ('dual', 'Dual Citizenship')])
-    dual_country = models.CharField(max_length=255, blank=True, null=True)  # For specifying the country if dual citizenship
-    # permanent_address
-    permanent_address = models.TextField(blank=True, null=True)
-    # Residential address
-    telephone_no = models.CharField(max_length=20, blank=True, null=True)
-    cellphone_no = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    max_load = models.IntegerField(blank=True, null=True)
-
     objects = models.Manager()
 
+class Staffs_Educ_Background(models.Model):
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    HEA = models.CharField(max_length=255, blank=True, null=True) # Highest Educational Attainment
+    Cert_License = models.CharField(max_length=255, blank=True, null=True)
+    teaching_exp = models.CharField(max_length=255, blank=True, null=True)
+    skills_competencies = models.CharField(max_length=255, blank=True, null=True)
+    language_spoken = models.CharField(max_length=255, blank=True, null=True)
+    preferred_subject = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
 
 class Curriculums(models.Model):
     id = models.AutoField(primary_key=True)
@@ -117,9 +160,23 @@ class Students(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Enrollment_voucher(models.Model):
+    id = models.AutoField(primary_key=True)
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    registration_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    misc_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    tuition_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Enrollment(models.Model):
     id = models.AutoField(primary_key=True)
+
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+
     registration_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     misc_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     tuition_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -208,17 +265,13 @@ class Load(models.Model):
     AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-
     is_advisory = models.BooleanField(default=False)  # BooleanField with True/False for Yes/No
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 class Schedule(models.Model):
     id = models.AutoField(primary_key=True)
-    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
-    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     load_id = models.ForeignKey(Load, on_delete=models.CASCADE)  
     classroom_id = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10)                       

@@ -74,40 +74,80 @@
             </li>
 
             <li class="nav-item">
-              {% url 'add_enrollment' as add_enrollment %}
               {% url 'manage_enrollment' as manage_enrollment %}
               <a href="{{ manage_enrollment }}" class="nav-link 
-              {% if request.path == manage_enrollment %} active {% endif %}
-              {% if request.path == add_enrollment %} active {% endif %}">
-                <i class="nav-icon fas fa-user-graduate"></i>
+              {% if request.path == manage_enrollment %} active {% endif %}">
+              <i class="nav-icon fas fa-file-alt"></i>
                 <p>
                   Enrollment Management
                 </p>
               </a>
             </li>
 
-            <li class="nav-item">
-              {% url 'add_assignsection' as add_assignsection %}
-              {% url 'add_load' as add_load %}
-              {% url 'add_schedule' as add_schedule %}
-              {% url 'manage_class_scheduling' as manage_class_scheduling %}
-              {% url 'edit_schedule' schedule_id=id as edit_schedule %}
-              <a href="{{ manage_class_scheduling }}" class="nav-link 
-              {% if request.path == add_assignsection %} active {% endif %}
-              {% if request.path == add_load %} active {% endif %}
-              {% if request.path == add_schedule %} active {% endif %}
-              {% if request.path == manage_class_scheduling %} active {% endif %}
-              {% if request.path == edit_schedule %} active {% endif %}">
-                <i class="nav-icon fas fa-user-graduate"></i>
+            <!-- Class Scheduling Management -->
+            <li class="nav-item has-treeview 
+              {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 
+                  menu-open 
+              {% endif %}">
+              <a href="#" class="nav-link 
+                {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 
+                    active 
+                {% endif %}">
+                <i class="nav-icon fas fa-folder-open"></i>
                 <p>
-                  Class Scheduling 
+                  Class Management
+                  <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
+              <ul class="nav nav-treeview">
+              
+
+                <!-- Class Assign Section -->
+                <li class="nav-item">
+                  {% url 'manage_assign_section' as manage_assign_section %}
+                  {% url 'add_assignsection' as add_assignsection %}
+                  <a href="{{ manage_assign_section }}" class="nav-link 
+                    {% if request.path == add_assignsection or request.path == manage_assign_section %} 
+                      active 
+                    {% endif %}">
+                    <i class="nav-icon fas fa-list"></i>
+                    <p>Assign Section</p>
+                  </a>
+                </li>
+
+                <!-- Class Load -->
+                <li class="nav-item">
+                  {% url 'manage_load_scheduling' as manage_load_scheduling %}
+                  {% url 'add_load' as add_load %}
+                  <a href="{{ manage_load_scheduling }}" class="nav-link 
+                    {% if request.path == add_load or request.path == manage_load_scheduling %} 
+                      active 
+                    {% endif %}">
+                    <i class="nav-icon fas fa-tasks"></i>
+                    <p>Load Management</p>
+                  </a>
+                </li>
+
+                <!-- Manage Class Scheduling -->
+                <li class="nav-item">
+                    {% url 'manage_class_scheduling' as manage_class_scheduling %}
+                    {% url 'add_schedule' as add_schedule %}
+                    {% url 'edit_schedule' schedule_id=id as edit_schedule %}
+                    <a href="{{ manage_class_scheduling }}" class="nav-link 
+                      {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule %} 
+                        active 
+                      {% endif %}">
+                      <i class="nav-icon fas fa-calendar-alt"></i>
+                      <p> Class Schedule</p>
+                    </a>
+                </li>
+              </ul>
             </li>
 
+
             <!-- System Configuration -->
-            <li class="nav-item has-treeview {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section %} menu-open {% endif %}">
-              <a href="#" class="nav-link {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section %} active {% endif %}">
+            <li class="nav-item has-treeview {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section or request.path == add_enrollment %} menu-open {% endif %}">
+              <a href="#" class="nav-link {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section or request.path == add_enrollment %} active {% endif %}">
                   <i class="nav-icon fas fa-cogs"></i>
                   <p>
                       System Configuration
@@ -123,7 +163,7 @@
                       {% if request.path == add_session %} active {% endif %}
                       {% if request.path == manage_session %} active {% endif %} 
                       {% if request.path == edit_session %} active {% endif %}">
-                          <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-calendar-alt"></i>
                           <p>School Year Management</p>
                       </a>
                   </li>
@@ -137,7 +177,7 @@
                       {% if request.path == add_curriculum %} active {% endif %}
                       {% if request.path == edit_curriculum %} active {% endif %}
                       {% if request.path == archived_curriculums %} active {% endif %}">
-                          <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-book-reader"></i>
                           <p>Curriculum Management</p>
                       </a>
                   </li>
@@ -151,7 +191,7 @@
                         {% if request.path == add_gradelevel %} active {% endif %}
                         {% if request.path == manage_gradelevel %} active {% endif %} 
                         {% if request.path == edit_course %} active {% endif %}">
-                          <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-layer-group"></i>
                           <p>Grade Level Management</p>
                       </a>
                   </li>
@@ -166,12 +206,10 @@
                       {% if request.path == add_section %} active {% endif %}
                       {% if request.path == manage_section %} active {% endif %} 
                       {% if request.path == edit_section %} active {% endif %}">
-                        <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-users"></i>
                         <p>Section Management</p>
                     </a>
-                </li>
-
-                  
+                  </li>
 
                   <li class="nav-item">
                       {% url 'add_subject' as add_subject %}
@@ -181,9 +219,20 @@
                       {% if request.path == add_subject %} active {% endif %}
                       {% if request.path == manage_subject %} active {% endif %} 
                       {% if request.path == edit_subject %} active {% endif %}">
-                          <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-book"></i>
                           <p>Subject Management</p>
                       </a>
+                  </li>
+
+                  <li class="nav-item">
+                    {% url 'add_enrollment' as add_enrollment %}
+                    {% url 'manage_enrollment_voucher' as manage_enrollment_voucher %}
+                    <a href="{{ manage_enrollment_voucher }}" class="nav-link 
+                    {% if request.path == manage_enrollment_voucher %} active {% endif %}
+                    {% if request.path == add_enrollment %} active {% endif %}">
+                      <i class="nav-icon fas fa-file-alt"></i>
+                      <p>Enrollment Voucher</p>
+                    </a>
                   </li>
                   
               </ul>

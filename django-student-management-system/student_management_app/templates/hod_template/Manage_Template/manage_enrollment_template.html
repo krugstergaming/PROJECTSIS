@@ -7,17 +7,10 @@
 {% block main_content %}
 
 {% load static %}
-
 {% load humanize %}
 
 <section class="content">
     <div class="container-fluid">
-
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-success" href="{% url 'add_enrollment' %}" role="button">+ Add Enrollment</a>
-        </div>
-        <br>&nbsp;
-
         {% if messages %}
             <div class="form-group">
                 <div class="col-12">
@@ -70,547 +63,355 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for enrollment in enrollments %}
+                                {% for student in students %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</td>
-                                        <td>{{ enrollment.student_id.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ enrollment.enrollment_status }}</td>
-                                        <td>{{ enrollment.created_at }}</td>
-                                        <td>{{ enrollment.updated_at }}</td>
+                                        <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
+                                        <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
+                                        <td>{{ student.student_status }}</td>
+                                        <td>{{ student.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ student.updated_at|date:"M d, Y" }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#attachmentsModal{{ enrollment.id }}">Attachments</button>
-                                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal{{ enrollment.id }}">Details</button>
-                                            {% if enrollment.balance > 0 %}
-                                                <!-- Only show the button if there is a balance -->
-                                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#balanceModal{{ enrollment.id }}">Balance</button>
-                                                <!-- Button to show payment history -->
-                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentHistoryModal{{ enrollment.id }}">Balance Payment History</button>
-                                            {% endif %}
-
+                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#detailsModal{{ student.id }}">Details</button>
                                         </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center">No records Found.</td>
+                                        <td colspan="7" class="text-center">No Pending Students Found.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
 
-                            {% for enrollment in enrollments %}
-                                <!-- Modal for Attachments -->
-                                <div class="modal fade" id="attachmentsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="attachmentsModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="attachmentsModalLabel{{ enrollment.id }}">Attachments for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <ul class="list-group">
-                                                    {% for attachment in enrollment.attachments.all %}
-                                                        <li class="list-group-item"> 
-                                                            <strong>ID Picture:</strong> 
-                                                            {% if attachment.id_picture_file %}
-                                                                <a href="{{ attachment.id_picture_file.url }}" target="_blank">{{ attachment.id_picture_file }}</a>
-                                                                <img src="{{ attachment.id_picture_file.url }}" alt="ID Picture Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>PSA:</strong> 
-                                                            {% if attachment.psa_file %}
-                                                                <a href="{{ attachment.psa_file.url }}" target="_blank">{{ attachment.psa_file }}</a>
-                                                                <img src="{{ attachment.psa_file.url }}" alt="PSA Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>Form 138:</strong> 
-                                                            {% if attachment.form_138_file %}
-                                                                <a href="{{ attachment.form_138_file.url }}" target="_blank">{{ attachment.form_138_file }}</a>
-                                                                <img src="{{ attachment.form_138_file.url }}" alt="Form 138 Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>Remarks:</strong> 
-                                                            {% if attachment.attachment_remarks %}
-                                                                {{ attachment.attachment_remarks }}
-                                                            {% else %}
-                                                                No remarks provided
-                                                            {% endif %}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                                {% if not enrollment.attachments.exists %}
-                                                    <p>No attachments found for this enrollment.</p>
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
+                        {% for student in students %}
+                            <!-- Modal for Student Receipt Details -->
+                            <div class="modal fade" id="detailsModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel{{ student.id }}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="detailsModalLabel{{ student.id }}">
+                                                Receipt Details
+                                            </h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
                                         </div>
-                                    </div>
-                                </div>
-                                <!-- End of Modal for Attachments -->
-
-                                <!-- Modal for Enrollment Details -->
-                                <div class="modal fade" id="detailsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="detailsModalLabel{{ enrollment.id }}">Enrollment Details for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p><strong>Registration Fee:</strong> {{ enrollment.registration_fee|intcomma }}</p>
-                                                <p><strong>Miscellaneous Fee:</strong> {{ enrollment.misc_fee|intcomma }}</p>
-                                                <p><strong>Tuition Fee:</strong> {{ enrollment.tuition_fee|intcomma }}</p>
-                                                <p><strong>Discount (%):</strong> {{ enrollment.discount }} </p>
-                                                <p><strong>Discount Amount:</strong> {{ enrollment.discount_amount|intcomma }}</p>
-                                                <p><strong>Total Fee:</strong> {{ enrollment.total_fee|intcomma }}</p>
-                                                <p><strong>Downpayment:</strong> {{ enrollment.downpayment|intcomma }}</p>
-                                                <p><strong>Balance:</strong> {{ enrollment.balance|intcomma }}</p>
-                                                <p><strong>Installment Option:</strong> {{ enrollment.installment_option }}</p>
-                                                <p><strong>Installment Payment:</strong> {{ enrollment.installment_payment|intcomma }}</p>
-                                                <p><strong>Assessed By:</strong> {{ enrollment.assessed_by }}</p>
-                                                <p><strong>Assessed Date:</strong> {{ enrollment.assessed_date }}</p>
-                                                <p><strong>Payment Received By:</strong> {{ enrollment.payment_received_by }}</p>
-                                                <p><strong>Payment Amount:</strong> {{ enrollment.payment_amount|intcomma }}</p>
-                                                <p><strong>Payment Date:</strong> {{ enrollment.payment_date }}</p>
-                                                <p><strong>Remarks:</strong> {{ enrollment.remarks }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <a href="{% url 'edit_enrollment' enrollment.id %}" class="btn btn-warning">Edit</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- modal for update balance -->
-                                <div class="modal fade" id="balanceModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="balanceModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="balanceModalLabel{{ enrollment.id }}">Update Balance for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <form method="POST" action="{% url 'update_balance' enrollment.id %}">
-                                                {% csrf_token %}
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <label for="current_balance">Current Balance:</label>
-                                                        <input type="text" class="form-control" id="current_balance" name="current_balance" value="{{ enrollment.balance|intcomma }}" readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_amount">Payment Amount:</label>
-                                                        <input type="text" class="form-control" id="payment_balance_amount" name="payment_balance_amount" value="{{ enrollment.installment_payment|intcomma }}" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_date">Payment Date:</label>
-                                                        <input type="date" class="form-control" id="payment_balance_date" name="payment_balance_date" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_remarks">Remarks:</label>
-                                                        <textarea class="form-control" id="payment_balance_remarks" name="payment_balance_remarks"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Update Balance</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal for Payment History -->
-                                <div class="modal fade" id="paymentHistoryModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="paymentHistoryModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="paymentHistoryModalLabel{{ enrollment.id }}">Payment History for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                {% if enrollment.payments.count > 0 %}
-                                                    <table class="table table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Date</th>
-                                                                <th>Past Balance</th>
-                                                                <th>Amount</th>
-                                                                <th>Remarks</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for payment in enrollment.payments.all %}
-                                                                <tr>
-                                                                    <td>{{ payment.payment_balance_date|date:"Y-m-d" }}</td>
-                                                                    <td>{{ payment.past_balance}}</td>
-                                                                    <td>{{ payment.payment_balance_amount|intcomma }}</td>
-                                                                    <td>{{ payment.payment_balance_remarks }}</td>
-
-                                                                </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
+                                        <div class="modal-body">
+                                            <!-- Receipt for Cashier -->
+                                                <div id="cashierReceiptContent{{ student.id }}" class="receipt-content" style="font-family: Arial, sans-serif; padding: 10px; width: 470px; border: 2px solid #000; border-radius: 5px;">
+                                                    <h3 style="text-align: center; margin-bottom: 10px;">Payment Receipt (Cashier Copy)</h3>
+                                                    <hr style="border-top: 1px dashed #ccc;">
+                                                <p>
+                                                    <strong>Name:</strong>
+                                                    <span style="display: inline-block; width: 120px;">{{ student.admin.first_name }} {{ student.admin.last_name }}</span>
+                                                    <strong>Student Number:</strong>
+                                                    <span style="display: inline-block; width: 80px;">{{ student.student_number }}</span>
+                                                </p>
+                                                <p>
+                                                    <strong>Grade Level:  </strong>
+                                                    <span style="display: inline-block; width: 98px;">{{ student.GradeLevel_id.GradeLevel_name }}       </span>
+                                                    <strong>S.Y.:</strong>
+                                                    <span style="display: inline-block; width: 100px;">
+                                                        {{ student.session_year_id.session_start_year|date:"Y" }} - {{ student.session_year_id.session_end_year|date:"Y" }}
+                                                    </span>
+                                                </p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                {% if student.voucher %}
+                                                    <p><strong>Fees Breakdown:</strong></p>
+                                                    <ul style="list-style: none; padding: 0;">
+                                                        <li style="margin-left: 25px;"><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></li>
+                                                        <li style="margin-left: 25px;"><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span> </li>
+                                                        <li style="margin-left: 25px;"><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </li>
+                                                        <br>
+                                                        <li><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></li>
+                                                    </ul>
                                                 {% else %}
-                                                    <p>No payment history available.</p>
+                                                    <p><strong>Fees:</strong> No data available for this grade level.</p>
                                                 {% endif %}
+                                                
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                <p><strong>Less:</strong></p>
+                                                <p style="margin-left: 25px;"><strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 25px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p><strong>Balance:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                <p><strong>Installment Details:</strong></p>
+                                                <p style="margin-left: 25px;"><strong>Monthly/Quarterly:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 25px;"><strong>Installment Payment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+
+                                                <p><strong>Assessment Information:</strong></p>
+                                                <p>
+                                                    <strong>Assessed By:</strong>
+                                                    <span style="display: inline-block; width: 120px;">{{ request.user.get_full_name }}</span>
+                                                    <strong>Assessed Date:</strong>
+                                                    <span style="display: inline-block; width: 75px;">{{ now|date:"M d, Y" }}</span>
+                                                </p>
+                                                <p><strong>Payment Received By:</strong> ____________________</p>
+                                                <p>
+                                                    <strong>Payment Amount:</strong>
+                                                    <span style="display: inline-block; width: 80px;">____________</span>
+                                                    <strong>Payment Date:</strong>
+                                                    <span style="display: inline-block; width: 80px;">____________</span>
+                                                </p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                <p><strong>Remarks:</strong></p>
+                                                <p>______________________________________________________</p>
+                                                <p>______________________________________________________</p>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %} 
-                                <!-- End of Modal for Enrollment Details -->
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
 
-            </div>
-        </div>
-
-    </div><!-- /.container-fluid -->
-</section>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('payment_balance_date').value = today;
-    });
-
-</script>
-
-{% endblock main_content %}
-
-{% extends 'hod_template/base_template.html' %}
-
-{% block page_title %}
-    Manage Enrollment Records
-{% endblock page_title %}
-
-{% block main_content %}
-
-{% load static %}
-
-{% load humanize %}
-
-<section class="content">
-    <div class="container-fluid">
-
-        <div class="d-flex justify-content-between">
-            <a class="btn btn-success" href="{% url 'add_enrollment' %}" role="button">+ Add Enrollment</a>
-        </div>
-        <br>&nbsp;
-
-        {% if messages %}
-            <div class="form-group">
-                <div class="col-12">
-                    {% for message in messages %}
-                        {% if message.tags == "error" %}
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                {{ message }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        {% elif message.tags == "success" %}
-                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                {{ message }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Enrollment Details</h3>
-                        <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Student Name</th>
-                                    <th>Grade Level</th>
-                                    <th>Enrollment Status</th>
-                                    <th>Date Enrolled</th>
-                                    <th>Date Updated</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for enrollment in enrollments %}
-                                    <tr>
-                                        <td>{{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</td>
-                                        <td>{{ enrollment.student_id.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ enrollment.enrollment_status }}</td>
-                                        <td>{{ enrollment.created_at }}</td>
-                                        <td>{{ enrollment.updated_at }}</td>
-                                        <td>
-                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#attachmentsModal{{ enrollment.id }}">Attachments</button>
-                                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#detailsModal{{ enrollment.id }}">Details</button>
-                                            {% if enrollment.balance > 0 %}
-                                                <!-- Only show the button if there is a balance -->
-                                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#balanceModal{{ enrollment.id }}">Balance</button>
-                                                <!-- Button to show payment history -->
-                                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentHistoryModal{{ enrollment.id }}">Balance Payment History</button>
-                                            {% endif %}
-
-                                        </td>
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="6" class="text-center">No records Found.</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-
-                            {% for enrollment in enrollments %}
-                                <!-- Modal for Attachments -->
-                                <div class="modal fade" id="attachmentsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="attachmentsModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="attachmentsModalLabel{{ enrollment.id }}">Attachments for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <ul class="list-group">
-                                                    {% for attachment in enrollment.attachments.all %}
-                                                        <li class="list-group-item"> 
-                                                            <strong>ID Picture:</strong> 
-                                                            {% if attachment.id_picture_file %}
-                                                                <a href="{{ attachment.id_picture_file.url }}" target="_blank">{{ attachment.id_picture_file }}</a>
-                                                                <img src="{{ attachment.id_picture_file.url }}" alt="ID Picture Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>PSA:</strong> 
-                                                            {% if attachment.psa_file %}
-                                                                <a href="{{ attachment.psa_file.url }}" target="_blank">{{ attachment.psa_file }}</a>
-                                                                <img src="{{ attachment.psa_file.url }}" alt="PSA Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>Form 138:</strong> 
-                                                            {% if attachment.form_138_file %}
-                                                                <a href="{{ attachment.form_138_file.url }}" target="_blank">{{ attachment.form_138_file }}</a>
-                                                                <img src="{{ attachment.form_138_file.url }}" alt="Form 138 Preview" style="width: 250px; display: block; margin-top: 10px;">
-                                                            {% else %}
-                                                                Not Uploaded
-                                                            {% endif %}
-                                                        </li>
-                                                        <li class="list-group-item">
-                                                            <strong>Remarks:</strong> 
-                                                            {% if attachment.attachment_remarks %}
-                                                                {{ attachment.attachment_remarks }}
-                                                            {% else %}
-                                                                No remarks provided
-                                                            {% endif %}
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                                {% if not enrollment.attachments.exists %}
-                                                    <p>No attachments found for this enrollment.</p>
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- End of Modal for Attachments -->
-
-                                <!-- Modal for Enrollment Details -->
-                                <div class="modal fade" id="detailsModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="detailsModalLabel{{ enrollment.id }}">Enrollment Details for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p><strong>Registration Fee:</strong> {{ enrollment.registration_fee|intcomma }}</p>
-                                                <p><strong>Miscellaneous Fee:</strong> {{ enrollment.misc_fee|intcomma }}</p>
-                                                <p><strong>Tuition Fee:</strong> {{ enrollment.tuition_fee|intcomma }}</p>
-                                                <p><strong>Discount (%):</strong> {{ enrollment.discount }} </p>
-                                                <p><strong>Discount Amount:</strong> {{ enrollment.discount_amount|intcomma }}</p>
-                                                <p><strong>Total Fee:</strong> {{ enrollment.total_fee|intcomma }}</p>
-                                                <p><strong>Downpayment:</strong> {{ enrollment.downpayment|intcomma }}</p>
-                                                <p><strong>Balance:</strong> {{ enrollment.balance|intcomma }}</p>
-                                                <p><strong>Installment Option:</strong> {{ enrollment.installment_option }}</p>
-                                                <p><strong>Installment Payment:</strong> {{ enrollment.installment_payment|intcomma }}</p>
-                                                <p><strong>Assessed By:</strong> {{ enrollment.assessed_by }}</p>
-                                                <p><strong>Assessed Date:</strong> {{ enrollment.assessed_date }}</p>
-                                                <p><strong>Payment Received By:</strong> {{ enrollment.payment_received_by }}</p>
-                                                <p><strong>Payment Amount:</strong> {{ enrollment.payment_amount|intcomma }}</p>
-                                                <p><strong>Payment Date:</strong> {{ enrollment.payment_date }}</p>
-                                                <p><strong>Remarks:</strong> {{ enrollment.remarks }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <a href="{% url 'edit_enrollment' enrollment.id %}" class="btn btn-warning">Edit</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Your modal code here -->
-                                <div class="modal fade" id="balanceModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="balanceModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="balanceModalLabel{{ enrollment.id }}">Update Balance for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <form method="POST" action="{% url 'update_balance' enrollment.id %}">
-                                                {% csrf_token %}
-                                                <div class="modal-body">
-                                                    <div class="form-group">
-                                                        <label for="current_balance">Current Balance:</label>
-                                                        <input type="text" class="form-control" id="current_balance" name="current_balance" value="{{ enrollment.balance|intcomma }}" readonly>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_amount">Payment Amount:</label>
-                                                        <input type="text" class="form-control" id="payment_balance_amount" name="payment_balance_amount" value="{{ enrollment.installment_payment|intcomma }}" required oninput="this.value = formatNumber(this.value)">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_date">Payment Date:</label>
-                                                        <input type="date" class="form-control" id="payment_balance_date" name="payment_balance_date" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="payment_balance_remarks">Remarks:</label>
-                                                        <textarea class="form-control" id="payment_balance_remarks" name="payment_balance_remarks"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="submit" class="btn btn-primary">Update Balance</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Modal for Payment History -->
-                                <div class="modal fade" id="paymentHistoryModal{{ enrollment.id }}" tabindex="-1" role="dialog" aria-labelledby="paymentHistoryModalLabel{{ enrollment.id }}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="paymentHistoryModalLabel{{ enrollment.id }}">Payment History for {{ enrollment.student_id.admin.first_name }} {{ enrollment.student_id.admin.last_name }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                {% if enrollment.payments.count > 0 %}
-                                                    <table class="table table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Date</th>
-                                                                <th>Amount</th>
-                                                                <th>Remarks</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for payment in enrollment.payments.all %}
-                                                                <tr>
-                                                                    <td>{{ payment.payment_balance_date|date:"Y-m-d" }}</td>
-                                                                    <td>{{ payment.payment_balance_amount|intcomma }}</td>
-                                                                    <td>{{ payment.remarks }}</td>
-                                                                </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
+                                            <!-- Receipt Styling -->
+                                            <div id="studentReceiptContent{{ student.id }}" class="receipt-content" style="font-family: Arial, sans-serif; padding: 10px; width: 470px; border: 2px solid #000; border-radius: 5px; margin-bottom: 20px;">
+                                                <h3 style="text-align: center; margin-bottom: 10px;">Payment Receipt (Student Copy)</h3>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                <p>
+                                                    <strong>Name:</strong>
+                                                    <span style="display: inline-block; width: 120px;">{{ student.admin.first_name }} {{ student.admin.last_name }}</span>
+                                                    <strong>Student Number:</strong>
+                                                    <span style="display: inline-block; width: 80px;">{{ student.student_number }}</span>
+                                                </p>
+                                                <p>
+                                                    <strong>Grade Level:  </strong>
+                                                    <span style="display: inline-block; width: 98px;">{{ student.GradeLevel_id.GradeLevel_name }}       </span>
+                                                    <strong>S.Y.:</strong>
+                                                    <span style="display: inline-block; width: 100px;">
+                                                        {{ student.session_year_id.session_start_year|date:"Y" }} - {{ student.session_year_id.session_end_year|date:"Y" }}
+                                                    </span>
+                                                </p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                {% if student.voucher %}
+                                                    <p><strong>Fees Breakdown:</strong></p>
+                                                    <ul style="list-style: none; padding: 0;">
+                                                        <li style="margin-left: 25px;"><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></li>
+                                                        <li style="margin-left: 25px;"><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span> </li>
+                                                        <li style="margin-left: 25px;"><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </li>
+                                                        <br>
+                                                        <li><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></li>
+                                                    </ul>
                                                 {% else %}
-                                                    <p>No payment history available.</p>
+                                                    <p><strong>Fees:</strong> No data available for this grade level.</p>
                                                 {% endif %}
+                                                
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                <p><strong>Less:</strong></p>
+                                                <p style="margin-left: 25px;"><strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 25px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p><strong>Balance:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                <p><strong>Installment Details:</strong></p>
+                                                <p style="margin-left: 25px;"><strong>Monthly/Quarterly:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 25px;"><strong>Installment Payment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+
+                                                <p><strong>Assessment Information:</strong></p>
+                                                <p>
+                                                    <strong>Assessed By:</strong>
+                                                    <span style="display: inline-block; width: 120px;">{{ request.user.get_full_name }}</span>
+                                                    <strong>Assessed Date:</strong>
+                                                    <span style="display: inline-block; width: 75px;">{{ now|date:"M d, Y" }}</span>
+                                                </p>
+                                                <p><strong>Payment Received By:</strong> ____________________</p>
+                                                <p>
+                                                    <strong>Payment Amount:</strong>
+                                                    <span style="display: inline-block; width: 80px;">______________</span>
+                                                    <strong>Payment Date:</strong>
+                                                    <span style="display: inline-block; width: 80px;">____________</span>
+                                                </p>
+                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
+                                                <p><strong>Remarks:</strong></p>
+                                                <p>________________________________________________________</p>
+                                                <p>________________________________________________________</p>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <!-- Print Button for Individual Receipt -->
+                                            <button type="button" class="btn btn-primary" onclick="printReceipt('{{ student.id }}')">
+                                                Print Receipt
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            {% endfor %} 
-                                <!-- End of Modal for Enrollment Details -->
+                            </div>
+                        {% endfor %} 
                     </div>
-                    <!-- /.card-body -->
                 </div>
+                <!-- Batch Print Button -->
+                <button type="button" class="btn btn-success" onclick="confirmPrintBatchReceipts()">
+                    Print All Receipts
+                </button>
                 <!-- /.card -->
-
             </div>
         </div>
-
     </div><!-- /.container-fluid -->
 </section>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('payment_balance_date').value = today;
-    });
-
-function formatNumber(value) {
-value = value.replace(/[^0-9.]/g, '');
-return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function parseNumber(value) {
-    return parseFloat(value.replace(/,/g, ''));
-}
-
-document.querySelector('form').addEventListener('submit', function(event) {
-    const amountInput = document.getElementById('payment_balance_amount');
-    amountInput.value = parseNumber(amountInput.value);
-});
+    document.cookie = "csrftoken={{ csrf_token }}";
 </script>
 
-{% endblock main_content %}
+<script>
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith('csrftoken=')) {
+                    cookieValue = cookie.substring('csrftoken='.length, cookie.length);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Function to print an individual receipt
+    function printReceipt(studentId) {
+        // Get both student and cashier receipt content for the specific student
+        var studentReceiptContent = document.getElementById('studentReceiptContent' + studentId).innerHTML;
+        var cashierReceiptContent = document.getElementById('cashierReceiptContent' + studentId).innerHTML;
+
+        // Combine the content into one print page
+        var receiptContent = '<div class="receipt-item">' + studentReceiptContent + '</div>';
+        receiptContent += '<div class="receipt-item">' + cashierReceiptContent + '</div>';
+
+        // Create a new print window
+        var printWindow = window.open('', '', 'height=700,width=1000');
+
+        // Write the receipt content
+        printWindow.document.write('<html><head><title>Receipt</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write('@media print {');
+        printWindow.document.write('body { font-family: Arial, sans-serif; font-size: 12px; margin: 0; padding: 0; width: 100%; height: 100%; }');
+        printWindow.document.write('.receipt-item { width: 388px; display: inline-block; vertical-align: top; margin: 10px; padding: 5px; border: 1px solid #000; box-sizing: border-box; }');
+        printWindow.document.write('h3 { font-size: 14px; margin: 10px 0; text-align: center; }');
+        printWindow.document.write('hr { border-top: 1px dashed #ccc; margin: 5px 0; }');
+        printWindow.document.write('p { margin: 5px 0; }');
+        printWindow.document.write('strong { font-weight: bold; }');
+        printWindow.document.write('}');
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(receiptContent);
+        printWindow.document.write('</body></html>');
+
+        // Print the content
+        printWindow.document.close();
+        printWindow.print();
+
+        // Update the student status via AJAX
+        var csrfToken = getCSRFToken();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/update-student-status/", true); // Ensure the endpoint matches your Django URLconf
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("X-CSRFToken", csrfToken); // Include the CSRF token in the headers
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    alert('Student status updated successfully.');
+                    // Redirect to the manage enrollment page
+                    // window.location.href = "{% url 'manage_enrollment' %}"; // Django URL reverse tag
+                    // // Close the print window after printing
+                    // printWindow.close();
+                } else {
+                    alert('Failed to update status: ' + response.message);
+                }
+            }
+        };
+
+        // Send student ID and new status to the server
+        xhr.send("student_id=" + studentId + "&status=Paying"); // Adjust the status value as needed
+    }
+
+    // Function to show confirmation before printing
+    function confirmPrintBatchReceipts() {
+        var confirmAction = confirm("Are you sure you want to print all receipts?");
+        if (confirmAction) {
+            printBatchReceipts();
+        } else {
+            alert("Print action canceled.");
+        }
+    }
+
+    // Function to batch print all receipts and update status
+    function printBatchReceipts() {
+        var allReceiptContents = '';
+        var studentIds = [];  // Array to store student IDs for batch update
+
+        {% for student in students %}
+            // Get both student and cashier receipt content for each student
+            var studentReceiptContent = document.getElementById('studentReceiptContent{{ student.id }}').innerHTML;
+            var cashierReceiptContent = document.getElementById('cashierReceiptContent{{ student.id }}').innerHTML;
+
+            // Add student ID to the array for batch update
+            studentIds.push({{ student.id }});
+
+            // Combine both copies
+            allReceiptContents += '<div class="receipt-item">' + studentReceiptContent + '</div>';
+            allReceiptContents += '<div class="receipt-item">' + cashierReceiptContent + '</div>';
+        {% endfor %}
+
+        // Create a new window for printing
+        var printWindow = window.open('', '', 'height=700,width=1000');
+        
+        // Write the content to the new window
+        printWindow.document.write('<html><head><title>Batch Receipts</title>');
+        printWindow.document.write('<style>');
+        printWindow.document.write('@media print {');
+        printWindow.document.write('body { font-family: Arial, sans-serif; font-size: 12px; margin: 0; padding: 0; width: 100%; height: 100%; }');
+        printWindow.document.write('.receipt-item { width: 388px; display: inline-block; vertical-align: top; margin: 10px; padding: 5px; border: 1px solid #000; box-sizing: border-box; }');
+        printWindow.document.write('h3 { font-size: 14px; margin: 10px 0; text-align: center; }');
+        printWindow.document.write('hr { border-top: 1px dashed #ccc; margin: 5px 0; }');
+        printWindow.document.write('p { margin: 5px 0; }');
+        printWindow.document.write('strong { font-weight: bold; }');
+        printWindow.document.write('.page-break { page-break-after: always; }');
+        printWindow.document.write('}');
+        printWindow.document.write('</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(allReceiptContents); // Add all receipts
+        printWindow.document.write('</body></html>');
+        
+        // Print the content
+        printWindow.document.close();
+        printWindow.print();
+
+        // Now send the batch update request to update statuses
+        var csrfToken = getCSRFToken();
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/update-batch-student-status/", true);  // Ensure the endpoint matches your Django URLconf
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.setRequestHeader("X-CSRFToken", csrfToken);  // Include the CSRF token in the headers
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    alert('Batch student status updated successfully.');
+                    // Redirect to the manage enrollment page
+                    // window.location.href = "{% url 'manage_enrollment' %}";  // Django URL reverse tag
+                    // // Close the print window after printing
+                    // printWindow.close();
+                } else {
+                    alert('Failed to update status: ' + response.message);
+                }
+            }
+        };
+
+        // Send the list of student IDs to update their status
+        xhr.send("student_ids[]=" + studentIds.join("&student_ids[]="));  // Send all student IDs
+    }
+</script>
+
+
+{% endblock %}

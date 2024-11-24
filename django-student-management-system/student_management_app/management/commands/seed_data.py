@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
-from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, CustomUser
+from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, ParentGuardian, PreviousSchool, EmergencyContact, CustomUser, Enrollment_voucher
 from datetime import datetime, date
+import random
 
 class Command(BaseCommand):
     help = 'Seeds the Curriculums, GradeLevel, Section, Subject, and Student tables with initial data'
@@ -16,6 +17,21 @@ class Command(BaseCommand):
         Students.objects.all().delete()
         CustomUser.objects.filter(user_type=2).delete()
         CustomUser.objects.filter(user_type=3).delete()
+        Enrollment_voucher.objects.all().delete()
+
+        # Check if admin already exists
+        if not CustomUser.objects.filter(username='admin').exists():
+            admin = CustomUser.objects.create_superuser(
+                username='admin',
+                first_name='Levi',
+                last_name='Matudan',
+                email='admin@gmail.com',
+                password='ad',
+                user_type=1 
+            )
+            self.stdout.write(self.style.SUCCESS(f'Admin user "{admin.username}" created successfully.'))
+        else:
+            self.stdout.write(self.style.WARNING('Admin user already exists.'))
 
         # Seed SessionYearModel
         session_year = SessionYearModel.objects.create(
@@ -59,6 +75,21 @@ class Command(BaseCommand):
                     section_soft_limit=15,
                     section_limit=20 
                 )
+
+        # Seed Enrollment_voucher for each GradeLevel with randomized fee data
+        for grade_level in grade_levels:
+            registration_fee = round(random.uniform(500.00, 2000.00), 2)
+            misc_fee = round(random.uniform(200.00, 1000.00), 2)
+            tuition_fee = round(random.uniform(1500.00, 5000.00), 2)
+            total_fee = round(registration_fee + misc_fee + tuition_fee, 2)
+
+            Enrollment_voucher.objects.create(
+                GradeLevel_id=grade_level,
+                registration_fee=registration_fee,
+                misc_fee=misc_fee,
+                tuition_fee=tuition_fee,
+                total_fee=total_fee
+            )
 
         # Seed Subjects for each GradeLevel and Curriculum
         subjects_data = {
@@ -353,7 +384,7 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '098-765-4321',
                 'GradeLevel_id': grade_levels[0], # kinder
                 'session_year_id': session_year,  # current school year
-                'student_status': 'Enrolled'
+                'student_status': 'Pending'
             },
             {
                 'username': 'student2',
@@ -374,9 +405,9 @@ class Command(BaseCommand):
                 'rank_in_family': '1',
                 'telephone_nos': '234-567-8901',
                 'mobile_phone_nos': '987-654-3210',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 2
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 2
                 'session_year_id': session_year,
-                'student_status': 'Enrolled'
+                'student_status': 'Pending'
             },
             {
                 'username': 'student3',
@@ -397,9 +428,9 @@ class Command(BaseCommand):
                 'rank_in_family': '3',
                 'telephone_nos': '345-678-9012',
                 'mobile_phone_nos': '876-543-2109',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 3
+                'GradeLevel_id': grade_levels[3],  # Assign to Grade 3
                 'session_year_id': session_year,
-                'student_status': 'Enrolled'
+                'student_status': 'Pending'
             },
             {
                 'username': 'student4',
@@ -420,9 +451,9 @@ class Command(BaseCommand):
                 'rank_in_family': '4',
                 'telephone_nos': '456-789-0123',
                 'mobile_phone_nos': '765-432-1098',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 4
+                'GradeLevel_id': grade_levels[4],  # Assign to Grade 4
                 'session_year_id': session_year,
-                'student_status': 'Enrolled'
+                'student_status': 'Pending'
             },
             {
                 'username': 'student5',
@@ -443,9 +474,9 @@ class Command(BaseCommand):
                 'rank_in_family': '5',
                 'telephone_nos': '567-890-1234',
                 'mobile_phone_nos': '654-321-0987',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 5
+                'GradeLevel_id': grade_levels[5],  # Assign to Grade 5
                 'session_year_id': session_year,
-                'student_status': 'Enrolled'
+                'student_status': 'Pending'
             },
             {
                 'username': 'student6',
@@ -794,9 +825,65 @@ class Command(BaseCommand):
             }
             
         ]
-        for student in student_data:
-            try:
+        parent_guardian_data = [
+            {
+                'father_name': 'Carlos Santos',
+                'father_occupation': 'Engineer',
+                'mother_name': 'Ana Santos',
+                'mother_occupation': 'Teacher',
+                'guardian_name': 'N/A',  # No guardian
+                'guardian_occupation': 'N/A'  # No guardian
+            },
+            {
+                'father_name': 'Jose Delos Reyes',
+                'father_occupation': 'Doctor',
+                'mother_name': 'Maria Delos Reyes',
+                'mother_occupation': 'Nurse',
+                'guardian_name': 'Teresita Delos Reyes',  # Guardian for student 2
+                'guardian_occupation': 'Retired Teacher'
+            }
+        ]
 
+        previous_school_data = [
+            {
+                'previous_school_name': 'Little Stars School',
+                'previous_school_address': '789 School Rd, City, Country',
+                'previous_grade_level': 'Kindergarten',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mrs. Reyes'
+            },
+            {
+                'previous_school_name': 'Bright Minds Academy',
+                'previous_school_address': '101 Education Ln, City, Country',
+                'previous_grade_level': 'Grade 1',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mr. Dela Cruz'
+            }
+        ]
+
+        emergency_contact_data = [
+            {
+                'emergency_contact_name': 'Carlos Santos',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '123 Main St, City, Country',
+                'emergency_contact_phone': '123-456-7890',
+                'emergency_enrolling_teacher': 'Mr. Ramirez',
+                'emergency_referred_by': 'Mrs. Santos',
+                'emergency_date': datetime.strptime('2024-11-18', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Jose Delos Reyes',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '456 Secondary St, City, Country',
+                'emergency_contact_phone': '234-567-8901',
+                'emergency_enrolling_teacher': 'Ms. Lopez',
+                'emergency_referred_by': 'Mrs. Delos Reyes',
+                'emergency_date': datetime.strptime('2024-11-18', '%Y-%m-%d').date()
+            }
+        ]
+
+        for i, student in enumerate(student_data):
+            try:
                 # Calculate age based on dob
                 age = calculate_age(student['dob'])
 
@@ -807,30 +894,64 @@ class Command(BaseCommand):
                     email=student['email'],
                     first_name=student['first_name'],
                     last_name=student['last_name'],
-                    user_type=3  
+                    user_type=3  # For student type
                 )
-                
-                # Update Staffs fields via the related CustomUser instance
-                user.students.middle_name = student['middle_name']
-                user.students.suffix = student['suffix']
-                user.students.student_number = student['student_number']
-                user.students.GradeLevel_id = student['GradeLevel_id']
-                user.students.session_year_id = student['session_year_id']
-                user.students.nickname = student['nickname']
-                user.students.dob = student['dob']
-                user.students.age = age  # Dynamically calculated age
-                user.students.pob = student['pob']
-                user.students.sex = student['sex']
-                user.students.nationality = student['nationality']
-                user.students.religion = student['religion']
-                user.students.rank_in_family = student['rank_in_family']
-                user.students.address = student['address']
-                user.students.telephone_nos = student['telephone_nos']
-                user.students.mobile_phone_nos = student['mobile_phone_nos']
-                user.students.student_status = student['student_status']
-                user.save()
+
+                # Create Student instance
+                student_instance = user.students
+                student_instance.middle_name = student['middle_name']
+                student_instance.suffix = student['suffix']
+                student_instance.student_number = student['student_number']
+                student_instance.GradeLevel_id = student['GradeLevel_id']
+                student_instance.session_year_id = student['session_year_id']
+                student_instance.nickname = student['nickname']
+                student_instance.dob = student['dob']
+                student_instance.age = age
+                student_instance.pob = student['pob']
+                student_instance.sex = student['sex']
+                student_instance.nationality = student['nationality']
+                student_instance.religion = student['religion']
+                student_instance.rank_in_family = student['rank_in_family']
+                student_instance.address = student['address']
+                student_instance.telephone_nos = student['telephone_nos']
+                student_instance.mobile_phone_nos = student['mobile_phone_nos']
+                student_instance.student_status = student['student_status']
+                student_instance.save()
+
+                # Add ParentGuardian data
+                ParentGuardian.objects.create(
+                    students_id=student_instance,
+                    father_name=parent_guardian_data[i]['father_name'],
+                    father_occupation=parent_guardian_data[i]['father_occupation'],
+                    mother_name=parent_guardian_data[i]['mother_name'],
+                    mother_occupation=parent_guardian_data[i]['mother_occupation'],
+                    guardian_name=parent_guardian_data[i]['guardian_name'],
+                    guardian_occupation=parent_guardian_data[i]['guardian_occupation']
+                )
+
+                # Add PreviousSchool data
+                PreviousSchool.objects.create(
+                    students_id=student_instance,
+                    previous_school_name=previous_school_data[i]['previous_school_name'],
+                    previous_school_address=previous_school_data[i]['previous_school_address'],
+                    previous_grade_level=previous_school_data[i]['previous_grade_level'],
+                    previous_school_year_attended=previous_school_data[i]['previous_school_year_attended'],
+                    previous_teacher_name=previous_school_data[i]['previous_teacher_name']
+                )
+
+                # Add EmergencyContact data
+                EmergencyContact.objects.create(
+                    students_id=student_instance,
+                    emergency_contact_name=emergency_contact_data[i]['emergency_contact_name'],
+                    emergency_contact_relationship=emergency_contact_data[i]['emergency_contact_relationship'],
+                    emergency_contact_address=emergency_contact_data[i]['emergency_contact_address'],
+                    emergency_contact_phone=emergency_contact_data[i]['emergency_contact_phone'],
+                    emergency_enrolling_teacher=emergency_contact_data[i]['emergency_enrolling_teacher'],
+                    emergency_referred_by=emergency_contact_data[i]['emergency_referred_by'],
+                    emergency_date=emergency_contact_data[i]['emergency_date']
+                )
 
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f'Error adding Student {student["username"]}: {str(e)}'))
+                print(f"Error creating student {student['username']}: {e}")
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded the tables with initial data'))
