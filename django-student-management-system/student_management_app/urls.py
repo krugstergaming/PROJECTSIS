@@ -68,9 +68,13 @@ urlpatterns = [
     path('add_enrollment/', HodViews.add_enrollment, name="add_enrollment"),
     path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
+    path('manage_enrollment_voucher', HodViews.manage_enrollment_voucher, name="manage_enrollment_voucher"),
     path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
     path('edit_enrollment/<enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
     path('edit_enrollment_save/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
+
+    path('update-student-status/', HodViews.update_student_status, name='update-student-status'),
+    path('update-batch-student-status/', HodViews.update_batch_student_status, name='update_batch_student_status'),
 
 
     path('add_load/', HodViews.add_load, name="add_load"),
@@ -91,9 +95,17 @@ urlpatterns = [
     path('edit_schedule_save/', HodViews.edit_schedule_save, name="edit_schedule_save"),
 
     path('manage_class_scheduling/', HodViews.manage_class_scheduling, name="manage_class_scheduling"),
-    path('manage_schedule/search/', HodViews.class_search, name="class_search"),
+    path('manage_assign_section/', HodViews.manage_assign_section, name="manage_assign_section"),
+    path('manage_load_scheduling/', HodViews.manage_load_scheduling, name="manage_load_scheduling"),
 
-
+    path('filter_schedules/', HodViews.filter_schedules, name='filter_schedules'),
+    path('fetch_schedules/', HodViews.fetch_schedules, name='fetch_schedules'), 
+    path('fetch_load_data/', HodViews.fetch_load_data, name='fetch_load_data'),
+    path('save_schedule/', HodViews.save_schedule, name='save_schedule'),
+    path('search_schedule/', HodViews.search_schedule, name='search_schedule'),
+    path('check_schedule_conflict/', HodViews.check_schedule_conflict, name='check_schedule_conflict'),
+    
+    
     path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
 
     path('add_subject/', HodViews.add_subject, name="add_subject"),

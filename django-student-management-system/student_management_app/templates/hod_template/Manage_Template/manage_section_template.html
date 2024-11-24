@@ -62,6 +62,8 @@
                                 <th>No. </th>
                                 <th>Grade Level Name</th> 
                                 <th>Section Name</th>
+                                <th>Section Soft Limit</th>
+                                <th>Section Limit</th>
                                 <th>Date Created</th>
                                 <th>Date Updated</th>
                                 <th>Action</th>
@@ -73,6 +75,8 @@
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ section.GradeLevel_id.GradeLevel_name }}</td>
                                 <td>{{ section.section_name }}</td>
+                                <td>{{ section.section_soft_limit}}</td>
+                                <td>{{ section.section_limit}}</td>
                                 <td>{{ section.created_at }}</td>
                                 <td>{{ section.updated_at }}</td>
                                 <td>

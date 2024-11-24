@@ -5,14 +5,20 @@ from django.core.files.storage import FileSystemStorage #To upload Profile Pictu
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime, date
+from datetime import datetime, date, time
+from datetime import datetime as dt
 from django.utils.timezone import now
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 from decimal import Decimal, InvalidOperation
 from django.db import IntegrityError
-from django.db.models import Count, F
+from django.db.models import Q, Subquery
 
-from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact
+from student_management_app.models import CustomUser, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
+from student_management_app.models import Staffs, staff_contact_info, staff_employment_info, staff_physical_info, staff_government_ID_info, Staffs_Educ_Background, StudentPromotionHistory
+from student_management_app.models import Curriculums, GradeLevel, Enrollment, Enrollment_voucher, Subjects, Section, SessionYearModel
+from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
+
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -106,30 +112,19 @@ def add_staff_save(request):
             last_name = request.POST.get('last_name')
             username = request.POST.get('username')
             email = request.POST.get('email')
-            max_laod = request.poST.get('max_load')
+            max_laod = request.POST.get('max_load')
             middle_name = request.POST.get('middle_name')
             dob = request.POST.get('dob')
             age = request.POST.get('age')
             pob = request.POST.get('pob')
             sex = request.POST.get('sex')
             civil_status = request.POST.get('civil_status')
-            height = request.POST.get('height')
-            weight = request.POST.get('weight')
-            blood_type = request.POST.get('blood_type')
-            gsis_id = request.POST.get('gsis_id')
-            pagibig_id = request.POST.get('pagibig_id')
-            philhealth_id = request.POST.get('philhealth_id')
-            sss_id = request.POST.get('sss_id')
-            tin_id = request.POST.get('tin_id')
             citizenship = request.POST.get('citizenship')
             dual_country = request.POST.get('dual_country')
-            permanent_address = request.POST.get('permanent_address')
-            telephone_no = request.POST.get('telephone_no')
-            cellphone_no = request.POST.get('cellphone_no')
 
             # Generate a predefined password based on staff details
             current_year = now().year
-            predefined_password = f"{first_name.lower()}.{last_name.lower()}.{current_year}"
+            predefined_password = f"{first_name.lower()}{last_name.lower()}{current_year}"
 
             # Create Staff User
             user = CustomUser.objects.create_user(
@@ -147,22 +142,65 @@ def add_staff_save(request):
             user.staffs.pob = pob
             user.staffs.sex = sex
             user.staffs.civil_status = civil_status
-            user.staffs.height = height
-            user.staffs.weight = weight
-            user.staffs.blood_type = blood_type
-            user.staffs.gsis_id = gsis_id
-            user.staffs.pagibig_id = pagibig_id
-            user.staffs.philhealth_id = philhealth_id
-            user.staffs.sss_id = sss_id
-            user.staffs.tin_id = tin_id
             user.staffs.citizenship = citizenship
             user.staffs.dual_country = dual_country
-            user.staffs.permanent_address = permanent_address
-            user.staffs.telephone_no = telephone_no
-            user.staffs.cellphone_no = cellphone_no
             user.save()
-            
+
+            # save staff contact information
+            staff_contact_info.objects.create(
+                 staffs_id = user.staffs,
+                 region = request.POST.get('region-text'),
+                 province = request.POST.get('province-text'),
+                 city = request.POST.get('city-text'),
+                 barangay = request.POST.get('barangay-text'),
+                 street = request.POST.get('street'),
+                 telephone_no = request.POST.get('telephone_no'),
+                 cellphone_no = request.POST.get('cellphone_no'),
+                 emergency_contact = request.POST.get('emergency_contact'),
+                 emergency_relationship = request.POST.get('emergency_relationship'),
+                 medical_condition = request.POST.get('medical_condition'),
+            )
+            # save staff employment information
+            staff_employment_info.objects.create(
+                 staffs_id = user.staffs,
+                 employee_number = request.POST.get('employee_number'),
+                 employee_type = request.POST.get('employee_type'),
+                 position = request.POST.get('position'),
+                 employment_status = request.POST.get('employment_status'),
+            )
+            # save staff physical information
+            staff_physical_info.objects.create(
+                 staffs_id = user.staffs,
+                 blood_type = request.POST.get('blood_type'),
+                 height = request.POST.get('height'),
+                 weight = request.POST.get('weight'),
+                 eye_color = request.POST.get('eye_color'),
+                 hair_color = request.POST.get('hair_color'),
+            )
+            # save staff govenrment ID information
+            staff_government_ID_info.objects.create(
+                 staffs_id = user.staffs,
+                 gsis_id = request.POST.get('gsis_id'),
+                 philhealth_id = request.POST.get('philhealth_id'),
+                 pagibig_id = request.POST.get('pagibig_id'),
+                 sss_id = request.POST.get('sss_id'),
+                 tin_id = request.POST.get('tin_id'),
+            )
+            # save staff educational background information
+            Staffs_Educ_Background.objects.create(
+                 staffs_id = user.staffs,
+                 HEA = request.POST.get('HEA'),
+                 preferred_subject = request.POST.get('preferred_subject'),
+                 Cert_License = request.POST.get('Cert_License'),
+                 teaching_exp = request.POST.get('teaching_exp'),
+                 skills_competencies = request.POST.get('skills_competencies'),
+                 language_spoken = request.POST.get('language_spoken'),
+            )
             messages.success(request, "Faculty Added Successfully! Password: " + predefined_password)
+            return redirect('add_staff')
+        
+        except IntegrityError as e:
+            messages.error(request, f"Failed to Add Staff: Database error - {str(e)}")
             return redirect('add_staff')
         except Exception as e:
             messages.error(request, f"Failed to Add Staff: {str(e)}")
@@ -401,7 +439,6 @@ def delete_gradelevel(request, GradeLevel_id):
         messages.error(request, "Failed to Delete GradeLevel.")
         return redirect('manage_gradelevel')
 
-
 def manage_session(request):
     session_years = SessionYearModel.objects.filter(is_archived=False)
     context = {
@@ -521,7 +558,6 @@ def delete_session(request, session_id):
     except:
         messages.error(request, "Failed to Delete Session.")
         return redirect('manage_session')
-
 
 def add_student(request):
     gradelevels = GradeLevel.objects.all()
@@ -685,32 +721,17 @@ def add_student_save(request):
 
 
 def add_enrollment(request):
-    # Get all students who are NOT in the Enrollment table
-    enrolled_students_ids = Enrollment.objects.values_list('student_id', flat=True)
-    students = Students.objects.exclude(id__in=enrolled_students_ids)
-    
+    # Get all grade levels that are not already associated with an Enrollment_voucher
+    enrolled_grade_levels = Enrollment_voucher.objects.values('GradeLevel_id_id')
+    gradelevels = GradeLevel.objects.exclude(id__in=Subquery(enrolled_grade_levels))
     context = {
-        "students": students
+        "gradelevels": gradelevels,
     }
     return render(request, 'hod_template/Add_Template/add_enrollment_template.html', context)
 
 def add_enrollment_save(request):
     if request.method != "POST":
         messages.error(request, "Invalid Method!")
-        return redirect('add_enrollment')
-
-    # Retrieve student instance
-    student_id = request.POST.get('student_id')
-    
-    try:
-        student_instance = Students.objects.get(id=student_id)
-    except Students.DoesNotExist:
-        messages.error(request, "Student not found.")
-        return redirect('add_enrollment')
-
-    # Check if the student already has an enrollment record
-    if Enrollment.objects.filter(student_id=student_instance).exists():
-        messages.error(request, "Student is already enrolled.")
         return redirect('add_enrollment')
 
     # Retrieve and convert values from the form
@@ -724,85 +745,76 @@ def add_enrollment_save(request):
 
     try:
         # Convert and log values
+        GradeLevel_id = request.POST.get('GradeLevel_id')
         registration_fee = safe_decimal(request.POST.get('registration_fee', '0.00'), 'registration fee')
         misc_fee = safe_decimal(request.POST.get('misc_fee', '0.00'), 'misc fee')
         tuition_fee = safe_decimal(request.POST.get('tuition_fee', '0.00'), 'tuition fee')
         total_fee = safe_decimal(request.POST.get('total_fee', '0.00'), 'total fee')
-        downpayment = safe_decimal(request.POST.get('downpayment', '0.00'), 'downpayment')
-        discount = safe_decimal(request.POST.get('discount', '0.00'), 'discount')
-        discount_amount = safe_decimal(request.POST.get('discount_amount', '0.00'), 'discount amount')
-        balance = safe_decimal(request.POST.get('balance', '0.00'), 'balance')
-        installment_payment = safe_decimal(request.POST.get('installment_payment', '0.00'), 'installment payment')
-        payment_amount = safe_decimal(request.POST.get('payment_amount', '0.00'), 'payment amount')
-
-        installment_option = request.POST.get('installment_option', 'Monthly')
-        assessed_by = request.POST.get('assessed_by', '')
-        assessed_date = request.POST.get('assessed_date', None)  # Modify as needed for date format
-        payment_received_by = request.POST.get('payment_received_by', '')
-        payment_date = request.POST.get('payment_date', None)  # Modify as needed for date format
-        enrollment_status = request.POST.get('enrollment_status', 'Pending')
-        remarks = request.POST.get('remarks', '')
-
+        
         # Create and save the enrollment instance
-        enrollment = Enrollment(
-            student_id=student_instance,
+        enrollment = Enrollment_voucher(
+            GradeLevel_id = GradeLevel.objects.get(id=GradeLevel_id),
             registration_fee=registration_fee,
             misc_fee=misc_fee,
             tuition_fee=tuition_fee,
             total_fee=total_fee,
-            downpayment=downpayment,
-            discount=discount,
-            discount_amount=discount_amount,
-            balance=balance,
-            installment_payment=installment_payment,
-            installment_option=installment_option,
-            assessed_by=assessed_by,
-            assessed_date=assessed_date,
-            payment_received_by=payment_received_by,
-            payment_amount=payment_amount,
-            payment_date=payment_date,
-            enrollment_status=enrollment_status,
-            remarks=remarks,
         )
         
         enrollment.save()
-
-        # Update student status to "Enrolled"
-        student_instance.student_status = "Enrolled"
-        student_instance.save()
-
-        # Handle file uploads from the request
-        id_picture_file = request.FILES.get('id_picture_file') if request.POST.get('include_id_picture') else None
-        psa_file = request.FILES.get('birth_certificate_file') if request.POST.get('include_birth_certificate') else None
-        form_138_file = request.FILES.get('form_138_file') if request.POST.get('include_form_138') else None
-
-        # Create an Attachment instance
-        attachment = Attachment(
-            enrollment=enrollment,
-            id_picture_file=id_picture_file,
-            psa_file=psa_file,
-            form_138_file=form_138_file,
-            attachment_remarks=request.POST.get('attachment_remarks', '')
-        )
-
-        attachment.save()
         messages.success(request, "Enrollment Added Successfully!")
     except Exception as e:
         messages.error(request, f"Failed to Add Enrollment! Error: {str(e)}")
     return redirect('add_enrollment')
 
 def manage_enrollment(request):
-    students = Students.objects.all()
-    enrollments = Enrollment.objects.all()
-    attachments = Attachment.objects.all()
-    balancepayments = BalancePayment.objects.all()
+    # Filter students with "Pending" status
+    students = Students.objects.filter(student_status="Pending")
+
+    # Create a dictionary of vouchers by GradeLevel_id
+    enrollment_vouchers = {voucher.GradeLevel_id.id: voucher for voucher in Enrollment_voucher.objects.all()}
+
+    # Annotate each student with the relevant voucher
+    for student in students:
+        student.voucher = enrollment_vouchers.get(student.GradeLevel_id.id)
+
     context = {
         "students": students,
-        "enrollments": enrollments,
-        "attachments": attachments,
-        "balancepayments": balancepayments,
+        'now': timezone.now(),
     }
     return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', context)
+
+def update_student_status(request):
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        try:
+            student = Students.objects.get(id=student_id)
+            student.student_status = "Paying"
+            student.save()
+            return JsonResponse({'success': True, 'message': 'Status updated successfully.'})
+        except Students.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Student not found.'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request.'})
+
+# Update batch of students' statuses
+def update_batch_student_status(request):
+    if request.method == 'POST':
+        student_ids = request.POST.getlist('student_ids[]')  # A list of student IDs
+        try:
+            students = Students.objects.filter(id__in=student_ids)
+            students.update(student_status="Paying")
+            return JsonResponse({'success': True, 'message': 'Batch status updated successfully.'})
+        except Students.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Students not found.'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request.'})
+
+def manage_enrollment_voucher(request):
+    enrollment_vouchers = Enrollment_voucher.objects.all()
+    context = {
+        "enrollment_vouchers": enrollment_vouchers,
+    }
+    return render(request, 'hod_template/Manage_Template/manage_enrollment_voucher_template.html', context)
 
 def edit_enrollment(request, enrollment_id):
     # Retrieve the enrollment instance
@@ -998,42 +1010,36 @@ def manage_student(request):
     }
     return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
 
-
 def edit_student(request, student_id):
-    # Adding Student ID into Session Variable
-    request.session['student_id'] = student_id
-
     student = Students.objects.get(admin=student_id)
-    form = EditStudentForm()
-    # Filling the form with Data from Database
-    form.fields['email'].initial = student.admin.email
-    form.fields['username'].initial = student.admin.username
-    form.fields['first_name'].initial = student.admin.first_name
-    form.fields['last_name'].initial = student.admin.last_name
-    form.fields['address'].initial = student.address
-    form.fields['GradeLevel_id'].initial = student.GradeLevel_id.id
-    form.fields['sex'].initial = student.sex
-    form.fields['session_year_id'].initial = student.session_year_id.id
+    sessions = SessionYearModel.objects.all()
+    gradelevels = GradeLevel.objects.all()
+    parentguardian = ParentGuardian.objects.filter(students_id=student).first()
+    previousschool = PreviousSchool.objects.filter(students_id=student).first()
+    emergencycontact = EmergencyContact.objects.filter(students_id=student).first()
 
     context = {
-        "id": student_id,
-        "username": student.admin.username,
-        "form": form
+        "student": student,
+        "rank_in_family": student.rank_in_family,
+        "sessions": sessions,
+        "gradelevels": gradelevels,
+        "parentguardian": parentguardian, 
+        "previousschool": previousschool,
+        "emergencycontact": emergencycontact,
     }
-    return render(request, "hod_template/Edit_Template/edit_student_template.html", context)
 
+    return render(request, 'hod_template/Edit_Template/edit_student_template.html', context)
 
-def edit_student_save(request):
+def edit_student_save(request, student_id):
     if request.method != "POST":
         messages.error(request, "Method Not Allowed!")
-        return redirect('/manage_student')
-
-    student_id = request.session.get('student_id')
-    if student_id is None:
-        messages.error(request, "Student ID Missing!")
-        return redirect('/manage_student')
+        return redirect('edit_student', student_id=student_id)
 
     try:
+        # Fetch the student based on the provided student_id
+        student = Students.objects.get(id=student_id)
+        user = student.user  # The associated CustomUser instance
+
         # Extract data from request.POST
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -1067,43 +1073,44 @@ def edit_student_save(request):
             filename = fs.save(profile_pic.name, profile_pic)
             profile_pic_url = fs.url(filename)
 
-        # Create Student User
-        user = CustomUser.objects.create_user(
-            username=username, 
-            password=password, 
-            email=email,
-            first_name=first_name, 
-            last_name=last_name, 
-            user_type=3
-        )
-        user.students.address = address
+        # Update the user details
+        user.username = username
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
 
+        # Update student details
+        student.middle_name = middlename
+        student.suffix = suffix
+        student.nickname = nickname
+        student.address = address
+        student.sex = sex
+        student.age = age
+        student.dob = dob
+        student.pob = pob
+        student.nationality = nationality
+        student.religion = religion
+        student.rank_in_family = rank_in_family
+        student.telephone_nos = telephone_nos
+        student.mobile_phone_nos = mobile_phone_nos
+        student.is_covid_vaccinated = is_covid_vaccinated
+        student.date_of_vaccination = date_of_vaccination
+
+        if profile_pic_url:
+            student.profile_pic = profile_pic_url
+        
         # Assign GradeLevel and Session Year
         gradelevel_obj = GradeLevel.objects.get(id=GradeLevel_id)
         session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-        user.students.GradeLevel_id = gradelevel_obj
-        user.students.session_year_id = session_year_obj
+        student.GradeLevel_id = gradelevel_obj
+        student.session_year_id = session_year_obj
 
-        # Additional Student Details
-        user.students.middle_name = middlename
-        user.students.suffix = suffix
-        user.students.nickname = nickname
-        user.students.sex = sex
-        user.students.profile_pic = profile_pic_url
-        user.students.age = age
-        user.students.dob = dob
-        user.students.pob = pob
-        user.students.nationality = nationality
-        user.students.religion = religion
-        user.students.rank_in_family = rank_in_family
-        user.students.telephone_nos = telephone_nos
-        user.students.mobile_phone_nos = mobile_phone_nos
-        user.students.is_covid_vaccinated = is_covid_vaccinated
-        user.students.date_of_vaccination = date_of_vaccination
-        user.save()
+        # Save updated student record
+        student.save()
 
-        # Update Parent/Guardian Information
-        parent_guardian = ParentGuardian.objects.get(students_id=student)
+        # Update Parent/Guardian Information (if needed)
+        parent_guardian = ParentGuardian.objects.get_or_create(students_id=student)
         parent_guardian.father_name = request.POST.get('father_name')
         parent_guardian.father_occupation = request.POST.get('father_occupation')
         parent_guardian.mother_name = request.POST.get('mother_name')
@@ -1112,8 +1119,8 @@ def edit_student_save(request):
         parent_guardian.guardian_occupation = request.POST.get('guardian_occupation')
         parent_guardian.save()
 
-        # Update Previous School Information
-        previous_school = PreviousSchool.objects.get(students_id=student)
+        # Update Previous School Information (if needed)
+        previous_school = PreviousSchool.objects.get_or_create(students_id=student)
         previous_school.previous_school_name = request.POST.get('previous_school_name')
         previous_school.previous_school_address = request.POST.get('previous_school_address')
         previous_school.previous_grade_level = request.POST.get('previous_grade_level')
@@ -1121,8 +1128,8 @@ def edit_student_save(request):
         previous_school.previous_teacher_name = request.POST.get('previous_teacher_name')
         previous_school.save()
 
-        # Update Emergency Contact Information
-        emergency_contact = EmergencyContact.objects.get(students_id=student)
+        # Update Emergency Contact Information (if needed)
+        emergency_contact = EmergencyContact.objects.get_or_create(students_id=student)
         emergency_contact.emergency_contact_name = request.POST.get('emergency_contact_name')
         emergency_contact.emergency_contact_relationship = request.POST.get('emergency_contact_relationship')
         emergency_contact.emergency_contact_address = request.POST.get('emergency_contact_address')
@@ -1132,16 +1139,16 @@ def edit_student_save(request):
         emergency_contact.emergency_referred_by = request.POST.get('emergency_referred_by')
         emergency_contact.save()
 
-        # Clear the student_id session after updating
-        del request.session['student_id']
+        messages.success(request, "Student Information Updated Successfully!")
+        return redirect('edit_student', student_id=student_id)
 
-        messages.success(request, "Student Updated Successfully!")
-        return redirect('/edit_student/' + student_id)
+    except Students.DoesNotExist:
+        messages.error(request, "Student Not Found!")
+        return redirect('edit_student', student_id=student_id)
 
     except Exception as e:
         messages.error(request, f"Failed to Update Student! Error: {str(e)}")
-        return redirect('/edit_student/' + student_id)
-
+        return redirect('edit_student', student_id=student_id)
 
 def delete_student(request, student_id):
     student = Students.objects.get(admin=student_id)
@@ -1152,7 +1159,6 @@ def delete_student(request, student_id):
     except:
         messages.error(request, "Failed to Delete Student.")
         return redirect('manage_student')
-
 
 def manage_section(request):
     gradelevels = GradeLevel.objects.all()
@@ -1236,7 +1242,6 @@ def edit_section_save(request):
             messages.error(request, "Failed to Update Section.")
             return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
             # return redirect('/edit_subject/'+subject_id)
-
 
 def add_subject(request):
     curriculums = Curriculums.objects.all()
@@ -1489,7 +1494,7 @@ def add_load_save(request):
         return redirect('add_load')
     else:
         try:
-
+            # Retrieve form data
             session_year_id = request.POST.get('session_year_id')
             session_id = SessionYearModel.objects.get(id=session_year_id)
 
@@ -1507,7 +1512,23 @@ def add_load_save(request):
 
             is_advisory = request.POST.get('is_advisory')
 
-            # Check for duplicate load entry
+            # Check if the subject is already assigned to this section in the same session
+            conflicting_load = Load.objects.filter(
+                session_year_id=session_id,
+                AssignSection_id=assignsection,
+                subject_id=subject
+            ).first()  # Get the first conflicting load record
+
+            if conflicting_load:
+                conflict_details = (
+                    f"Conflict detected: {assignsection.GradeLevel_id.GradeLevel_name} - {assignsection.section_id.section_name} "
+                    f"already has {conflicting_load.staff_id.first_name} "
+                    f"{conflicting_load.staff_id.last_name} assigned for subject {subject.subject_name}."
+                )
+                messages.warning(request, f"WARNING!!! {conflict_details}")
+                return redirect('add_load')
+
+            # Check for duplicate load entry with the same staff
             if Load.objects.filter(
                 session_year_id=session_id,
                 curriculum_id=curriculum,
@@ -1515,7 +1536,7 @@ def add_load_save(request):
                 subject_id=subject,
                 staff_id=staff_user
             ).exists():
-                messages.error(request, "This load configuration already exists.")
+                messages.warning(request, "WARNING!!! This load record already exists for this faculty.")
                 return redirect('add_load')
 
             # Get the related Staff instance to check the max_load
@@ -1529,13 +1550,13 @@ def add_load_save(request):
 
             # Saving the load
             load = Load(
-                        session_year_id=session_id,      
-                        curriculum_id=curriculum,
-                        AssignSection_id = assignsection,
-                        subject_id=subject,
-                        staff_id=staff_user,
-                        is_advisory=is_advisory
-                        )
+                session_year_id=session_id,
+                curriculum_id=curriculum,
+                AssignSection_id=assignsection,
+                subject_id=subject,
+                staff_id=staff_user,
+                is_advisory=is_advisory
+            )
             load.save()
 
             messages.success(request, "Load Added Successfully!")
@@ -1546,112 +1567,327 @@ def add_load_save(request):
             return redirect('add_load')
 
 def add_schedule(request):
-    session_years = SessionYearModel.objects.all()
-    staffs = CustomUser.objects.filter(user_type='2')
+    gradelevels = GradeLevel.objects.all()
+    sections = Section.objects.all()
     loads = Load.objects.all()  
     context = {
-        "session_years": session_years,
-        "staffs": staffs,
+        'gradelevels': gradelevels,
+        'sections': sections,
         "loads": loads,  
     }
     return render(request, 'hod_template/Add_Template/add_schedule_template.html', context)
+
 
 def add_schedule_save(request):
     if request.method != "POST":
         messages.error(request, "Invalid Method")
         return redirect('add_schedule')
     else:
-        
         try:
-
+            # Retrieve form data
             session_year_id = request.POST.get('session_year_id')
             session_id = SessionYearModel.objects.get(id=session_year_id)
             
             staff_id = request.POST.get('staff_id')
-            staff_id = CustomUser.objects.get(id=staff_id)
+            staff = CustomUser.objects.get(id=staff_id)
 
             load_id = request.POST.get('load_id')
-            load_id = Load.objects.get(id=load_id)
+            load = Load.objects.get(id=load_id)
 
             day_of_week = request.POST.get('day_of_week')
             start_time = request.POST.get('start_time')
             end_time = request.POST.get('end_time')
-            
-            # Saving the load
-            schedule = Schedule(      
-                        session_year_id=session_id,
-                        staff_id=staff_id, 
-                        load_id=load_id,
-                        day_of_week=day_of_week,
-                        start_time=start_time,
-                        end_time=end_time
-                        )
+
+            # Convert start and end times to Python time objects
+            start_time_obj = time.fromisoformat(start_time)
+            end_time_obj = time.fromisoformat(end_time)
+
+            # Set the allowed time range
+            allowed_start = time(7, 0)  # 7:00 AM
+            allowed_end = time(17, 0)   # 5:00 PM
+
+            # Check if the times fall within the allowed range
+            if not (allowed_start <= start_time_obj < allowed_end) or not (allowed_start < end_time_obj <= allowed_end):
+                messages.warning(request, "Schedule times must be between 8:00 AM and 3:00 PM.")
+                return redirect('add_schedule')
+
+            # Check for any overlapping schedules
+            conflicting_schedules = Schedule.objects.filter(
+                session_year_id=session_id,
+                staff_id=staff,
+                day_of_week=day_of_week
+            ).filter(
+                Q(start_time__lt=end_time_obj) & Q(end_time__gt=start_time_obj)
+            )
+
+            if conflicting_schedules.exists():
+                # Get details of the first conflicting schedule for the message
+                conflict = conflicting_schedules.first()
+                conflict_details = (
+                    f"Staff {staff.first_name} {staff.last_name} already has a schedule for "
+                    f"{conflict.load_id.subject_id.subject_name} on {day_of_week} from "
+                    f"{conflict.start_time.strftime('%I:%M %p')} to {conflict.end_time.strftime('%I:%M %p')}."
+                )
+
+                messages.warning(request, f"WARNING!!! Schedule conflict detected: {conflict_details}")
+                return redirect('add_schedule')
+
+            # Save the new schedule if no conflicts
+            schedule = Schedule(
+                session_year_id=session_id,
+                staff_id=staff, 
+                load_id=load,
+                day_of_week=day_of_week,
+                start_time=start_time,
+                end_time=end_time
+            )
             schedule.save()
 
             messages.success(request, "Schedule Added Successfully!")
             return redirect('add_schedule')
         
         except Exception as e:
-            print(e)  # Print the exception for debugging purposes
-            messages.error(request, f"Failed to Add Schedule! Erro: {e}" )
+            print(e)  # For debugging
+            messages.error(request, f"Failed to Add Schedule! Error: {e}")
             return redirect('add_schedule')
 
-def manage_class_scheduling(request):
-    loads = Load.objects.all()
+    # Return the data as a JSON response
+    return JsonResponse(load_data, safe=False)
+
+def manage_assign_section(request):
     assignsections = AssignSection.objects.all()
-    schedules = Schedule.objects.all()
+    context = {
+        "assignsections": assignsections
+    }
+    return render(request, 'hod_template/Manage_Template/manage_assignsection_template.html', context)
+
+def manage_load_scheduling(request):
+    loads = Load.objects.all()
     context = {
         "loads": loads,
-        "assignsections": assignsections,
+    }
+    return render(request, 'hod_template/Manage_Template/manage_load_template.html', context)
+
+def manage_class_scheduling(request):
+    gradelevels = GradeLevel.objects.all()
+    sections = Section.objects.all()
+    schedules = Schedule.objects.all()
+    context = {
+        "gradelevels": gradelevels,
+        "sections": sections,
         "schedules": schedules,
-        
     }
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
 
+def filter_schedules(request):
+    gradelevel_id = request.GET.get('gradelevel_id')
+    section_id = request.GET.get('section_id')
 
-def class_search(request):
-    search_query = request.GET.get('search', '')
-
-    # Store search results
-    assignsections = AssignSection.objects.all()
-    loads = Load.objects.all()
-    schedules = Schedule.objects.all()
-
-    # If a search query is provided, filter the results
-    if search_query:
-        assignsections = AssignSection.objects.filter(
-            Student_id__admin__first_name__icontains=search_query
-        )
-        loads = Load.objects.filter(
-            subject_id__subject_name__icontains=search_query
-        )
+    if gradelevel_id and section_id:
         schedules = Schedule.objects.filter(
-            load_id__subject_id__subject_name__icontains=search_query
+            load_id__AssignSection_id__GradeLevel_id_id=gradelevel_id,
+            load_id__AssignSection_id__section_id_id=section_id
+        ).select_related('load_id', 'staff_id')
+
+        schedule_data = [
+            {
+                'id': schedule.id,
+                'grade_section': f"{schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name} - {schedule.load_id.AssignSection_id.section_id.section_name}",
+                'subject': schedule.load_id.subject_id.subject_name,
+                'staff': f"{schedule.staff_id.first_name} {schedule.staff_id.last_name}",
+                'day_of_week': schedule.day_of_week,
+                'start_time': schedule.start_time.strftime('%I:%M %p'),
+                'end_time': schedule.end_time.strftime('%I:%M %p')
+            }
+            for schedule in schedules
+        ]
+        return JsonResponse({'schedules': schedule_data})
+    return JsonResponse({'schedules': []})
+
+def fetch_schedules(request):
+    grade_level_id = request.GET.get('gradelevel_id')
+    section_id = request.GET.get('section_id')
+
+    if grade_level_id and section_id:
+        schedules = Schedule.objects.filter(
+            load_id__AssignSection_id__GradeLevel_id=grade_level_id,
+            load_id__AssignSection_id__section_id=section_id
+        ).select_related('load_id__AssignSection_id', 'load_id__subject_id', 'staff_id')
+        
+        schedule_data = [
+            {
+                'id': schedule.id,
+                'grade_level': schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name,
+                'section': schedule.load_id.AssignSection_id.section_id.section_name,
+                'subject': schedule.load_id.subject_id.subject_name,
+                'staff': f"{schedule.staff_id.first_name} {schedule.staff_id.last_name}",
+                'day_of_week': schedule.day_of_week,
+                'start_time': schedule.start_time.strftime("%I:%M %p"),
+                'end_time': schedule.end_time.strftime("%I:%M %p"),
+            }
+            for schedule in schedules
+        ]
+        
+        return JsonResponse({'schedules': schedule_data}, safe=False)
+
+    return JsonResponse({'schedules': []}, safe=False)
+
+
+def fetch_load_data(request):
+    grade_level_id = request.GET.get('gradelevel_id')
+    section_id = request.GET.get('section_id')
+
+    if grade_level_id and section_id:
+        # Get the load_ids that are already scheduled
+        scheduled_load_ids = Schedule.objects.values_list('load_id', flat=True)
+
+        # Filter out the loads that are already scheduled
+        loads = Load.objects.filter(
+            AssignSection_id__GradeLevel_id=grade_level_id,
+            AssignSection_id__section_id=section_id
+        ).exclude(id__in=scheduled_load_ids).select_related('AssignSection_id', 'subject_id', 'staff_id')
+        
+        load_data = [
+            {
+                'id': load.id,
+                'session_year': f"{load.session_year_id.session_start_year.year}-{load.session_year_id.session_end_year.year}",
+                'subject': load.subject_id.subject_name,
+                'staff': f"{load.staff_id.first_name} {load.staff_id.last_name}",
+                'grade_level': load.AssignSection_id.GradeLevel_id.GradeLevel_name,
+                'section': load.AssignSection_id.section_id.section_name,
+            }
+            for load in loads
+        ]
+        
+        return JsonResponse({'loads': load_data}, safe=False)
+
+    return JsonResponse({'loads': []}, safe=False)
+
+def check_schedule_conflict(request):
+    if request.method == 'GET':
+        day_of_week = request.GET.get('day_of_week')
+        start_time = request.GET.get('start_time')
+        end_time = request.GET.get('end_time')
+        gradelevel_id = request.GET.get('gradelevel_id')
+        section_id = request.GET.get('section_id')
+
+        # Ensure all required data is provided
+        if not (day_of_week and start_time and end_time and gradelevel_id and section_id):
+            return JsonResponse({"conflict": False, "message": "Incomplete data provided."})
+
+        # Convert times to time objects
+        start_time = time.fromisoformat(start_time)
+        end_time = time.fromisoformat(end_time)
+
+        # Check for schedule conflicts in the database
+        conflicts = Schedule.objects.filter(
+            load_id__AssignSection_id__GradeLevel_id=gradelevel_id,
+            load_id__AssignSection_id__section_id=section_id,
+            day_of_week=day_of_week,
+        ).filter(
+            Q(start_time__lt=end_time) & Q(end_time__gt=start_time)  # Overlapping condition
         )
 
-        # Save the search query in the session to persist it across page loads
-        request.session['search_query'] = search_query
+        # If conflicts exist, return conflict details
+        if conflicts.exists():
+            # Get the first conflicting schedule for detailed response
+            conflicting_schedule = conflicts.first()
+            
+            # Format the start and end times to include AM/PM
+            formatted_start_time = conflicting_schedule.start_time.strftime("%I:%M %p")  # Example: 02:30 PM
+            formatted_end_time = conflicting_schedule.end_time.strftime("%I:%M %p")      # Example: 03:20 PM
+            
+            return JsonResponse({
+                "conflict": True,
+                "message": (
+                    f"Time conflict detected with existing schedule for "
+                    f"{conflicting_schedule.load_id.subject_id.subject_name} taught by {conflicting_schedule.load_id.staff_id.first_name} "
+                    f"on {conflicting_schedule.day_of_week} from {formatted_start_time} to {formatted_end_time}."
+                )
+            })
+
+        # No conflicts found
+        return JsonResponse({"conflict": False, "message": "No conflicts detected."})
+
+    # Return a 405 Method Not Allowed for non-GET requests
+    return JsonResponse({"error": "Invalid request method. Only GET is allowed."}, status=405)
+
+@csrf_exempt
+def save_schedule(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print("Received Data:", data)  # Log the incoming data
+
+            schedules = data.get('schedules', [])
+            for schedule in schedules:
+                # Retrieve the Load object using the provided load_id
+                load = Load.objects.get(id=schedule['load_id'])  # Get the load associated with this schedule
+                
+                # Create the schedule entry
+                Schedule.objects.create(
+                    load_id=load,  # Use load_id directly here
+                    day_of_week=schedule['day_of_week'],
+                    start_time=schedule['start_time'],
+                    end_time=schedule['end_time']
+                )
+
+            # Set a success message in the session (you can also include this in the response if needed)
+            messages.success(request, "Schedule/s saved successfully!")
+
+            # Return a JsonResponse with the redirect URL
+            return JsonResponse({
+                "message": "Schedules saved successfully!",
+                "redirect_url": "/add_schedule/"  # Include the redirect URL in the response
+            })
+        except Exception as e:
+            print(e)
+            return JsonResponse({"message": str(e)}, status=400)
+    
+    return JsonResponse({"message": "Invalid request method"}, status=405)
+
+def search_schedule(request):
+    query = request.GET.get('query', '').strip()  # Get the query and trim spaces
+
+    # Redirect to the schedule management page if the query is empty
+    if not query:
+        return redirect('manage_class_scheduling')  # Use the name of your URL pattern for manage_class_scheduling
+
+    # Try to parse the time query (e.g., '08:00 a.m.')
+    time_query = None
+    try:
+        # Convert query to 24-hour time format
+        time_query = dt.strptime(query, '%I:%M %p').time()  # '%I:%M %p' is the format for '08:00 a.m.'
+    except ValueError:
+        pass  # If the time format doesn't match, just ignore
+
+    if time_query:
+        # If time query is valid, filter by start_time and end_time
+        schedules = Schedule.objects.filter(
+            Q(start_time__exact=time_query) | Q(end_time__exact=time_query)
+        )
     else:
-        # Clear the search query from the session if no search is provided
-        request.session.pop('search_query', None)
+        # Otherwise, perform search based on other criteria
+        schedules = Schedule.objects.filter(
+            Q(load_id__subject_id__subject_name__icontains=query) |
+            Q(load_id__staff_id__first_name__icontains=query) |
+            Q(load_id__staff_id__last_name__icontains=query) |
+            Q(load_id__AssignSection_id__GradeLevel_id__GradeLevel_name__icontains=query) |
+            Q(load_id__AssignSection_id__section_id__section_name__icontains=query)
+        )
 
-    # Check if there is a search query in the GET request and if a search has been made
-    if 'search' in request.GET:
-        # Don't redirect on the initial search
-        return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
-            'assignsections': assignsections,
-            'loads': loads,
-            'schedules': schedules,
-            'search_query': search_query,  # Pass the search query to the template if needed
-        })
+    gradelevels = GradeLevel.objects.all()
+    sections = Section.objects.all()
 
-    # Render the search results or the default page
-    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', {
-        'assignsections': assignsections,
-        'loads': loads,
-        'schedules': schedules,
-        'search_query': search_query,  # Pass the search query to the template if needed
-    })
+    context = {
+        "gradelevels": gradelevels,
+        "sections": sections,
+        "schedules": schedules,
+        "search_query": query,  # Pass the search query to the template
+    }
+
+    return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
+    
 
 
 def edit_schedule(request, schedule_id):
