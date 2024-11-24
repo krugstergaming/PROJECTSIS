@@ -93,6 +93,49 @@
                   Classroom API
                 </p>
               </a>
+              <ul class="nav nav-treeview">
+              
+
+                <!-- Class Assign Section -->
+                <li class="nav-item">
+                  {% url 'manage_assign_section' as manage_assign_section %}
+                  {% url 'add_assignsection' as add_assignsection %}
+                  <a href="{{ manage_assign_section }}" class="nav-link 
+                    {% if request.path == add_assignsection or request.path == manage_assign_section %} 
+                      active 
+                    {% endif %}">
+                    <i class="nav-icon fas fa-list"></i>
+                    <p>Assign Section</p>
+                  </a>
+                </li>
+
+                <!-- Class Load -->
+                <li class="nav-item">
+                  {% url 'manage_load_scheduling' as manage_load_scheduling %}
+                  {% url 'add_load' as add_load %}
+                  <a href="{{ manage_load_scheduling }}" class="nav-link 
+                    {% if request.path == add_load or request.path == manage_load_scheduling %} 
+                      active 
+                    {% endif %}">
+                    <i class="nav-icon fas fa-tasks"></i>
+                    <p>Load Management</p>
+                  </a>
+                </li>
+
+                <!-- Manage Class Scheduling -->
+                <li class="nav-item">
+                    {% url 'manage_class_scheduling' as manage_class_scheduling %}
+                    {% url 'add_schedule' as add_schedule %}
+                    {% url 'edit_schedule' schedule_id=id as edit_schedule %}
+                    <a href="{{ manage_class_scheduling }}" class="nav-link 
+                      {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule %} 
+                        active 
+                      {% endif %}">
+                      <i class="nav-icon fas fa-calendar-alt"></i>
+                      <p> Class Schedule</p>
+                    </a>
+                </li>
+              </ul>
             </li>
 
             <!-- Class Scheduling Management -->
