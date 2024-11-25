@@ -188,9 +188,41 @@ def student_profile_update(request):
 
 def student_view_result(request):
     student = Students.objects.get(admin=request.user.id)
-    student_result = StudentResult.objects.filter(student_id=student.id)
+    student_results = StudentResult.objects.filter(student_id=student.id)
+
+    # Organize results by academic year
+    results_by_year = {}
+    for result in student_results:
+        academic_year = result.load_id.session_year_id
+        if academic_year not in results_by_year:
+            results_by_year[academic_year] = {'results': [], 'general_averages': []}
+        results_by_year[academic_year]['results'].append(result)
+        results_by_year[academic_year]['general_averages'].append(result.general_average)
+
+    # Calculate general averages for each academic year
+    for academic_year, data in results_by_year.items():
+        general_average = sum(data['general_averages']) / len(data['general_averages']) if data['general_averages'] else 0
+        data['general_average'] = general_average
+
+    # Get the student's status from the Students model
+    student_status = student.student_status
+
+    # Get the student's GradeLevel and Section from AssignSection model
+    try:
+        assign_section = AssignSection.objects.get(Student_id=student)
+        grade_level = assign_section.GradeLevel_id.GradeLevel_name
+        section = assign_section.section_id.section_name
+    except AssignSection.DoesNotExist:
+        grade_level = "N/A"
+        section = "N/A"
+
     context = {
-        "student_result": student_result,
+        "results_by_year": results_by_year,
+        "student_status": student_status,
+        "grade_level": grade_level,
+        "section": section,
+        "student": student,
+
     }
     return render(request, "student_template/student_view_result.html", context)
 
@@ -205,24 +237,29 @@ def student_view_schedule(request):
     # Check if the student is assigned to a section
     if assign_section:
         # Get the section that the student is assigned to
-        section = assign_section.section_id  # This will give you the section object
-        
-        # Query all students assigned to the same section
-        students_in_section = Students.objects.filter(assignsection__section_id=section)
+        section = assign_section.section_id
 
         # Query the schedule for all loads assigned to this section
         student_schedule = Schedule.objects.filter(load_id__AssignSection_id__section_id=section)
 
+        # Get the academic year from the first schedule (if any)
+        academic_year = None
+        if student_schedule.exists():
+            academic_year = student_schedule.first().load_id.session_year_id
+
         # Prepare context to pass to the template 
         context = {
-            "students_in_section": students_in_section,
             "student_schedule": student_schedule,
+            "academic_year": academic_year,
+            "student": student,  # Pass student details to the template
         }
     else:
         # If the student is not assigned to any section, return a message
         context = {
             "student_schedule": None,
-            "message": "You are not assigned to any section yet."
+            "academic_year": None,
+            "message": "You are not assigned to any section yet.",
+            "student": student,  # Pass student details even if no schedule
         }
 
     # Render the schedule template

@@ -51,7 +51,8 @@
                            
                             <div class="form-group">
                                 <label>Academic Year </label>
-                                <select class="form-control" name="session_year" id="session_year">
+                                <select class="form-control" name="session_year" id="session_year" required>
+                                    <option value="">Select a Academic Year</option>
                                     {% for session_year in session_years %}
                                         <option value="{{ session_year.id }}">{{ session_year.session_start_year }} to {{ session_year.session_end_year }}</option>
                                     {% endfor %}
@@ -62,11 +63,6 @@
                                 <label>Load</label>
                                 <select class="form-control" id="load_id" name="load_id" required>
                                     <option value="">Select a Load</option>
-                                    {% for load in loads %}
-                                        <option value="{{ load.id }}" data-staff-id="{{ load.staff_id.id }}">
-                                            {{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }} - {{ load.subject_id.subject_name }}
-                                        </option>
-                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
@@ -97,85 +93,127 @@
 
 <script>
     $(document).ready(function() {
-    $("#fetch_student").click(function() {
-        // Get the selected load and session year
-        var load_id = $("#load_id").val();
+        // When the academic year is changed, fetch the loads based on the selected academic year
+        $('#session_year').change(function() {
+            var session_year_id = $(this).val(); // Get the selected academic year ID
+            if (session_year_id) {
+                $.ajax({
+                    url: '{% url "get_loads_by_academic_year" %}',  // Adjust URL to the actual view
+                    type: 'GET',
+                    data: {
+                        session_year_id: session_year_id  // Send the selected academic year ID
+                    },
+                    success: function(response) {
+                        var load_select = $('#load_id');
+                        load_select.empty();  // Clear previous options
+                        load_select.append('<option value="">Select a Load</option>');  // Default option
 
-        $.ajax({
-            url: '{% url "get_students" %}',
-            type: 'POST',
-            data: {
-                load_id: load_id,
-                csrfmiddlewaretoken: '{{ csrf_token }}'  // CSRF token for security
-            },
-            success: function(response) {
-                var json_data = JSON.parse(response);
-                console.log(json_data);
-
-                var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' id='student_list' name='student_list'>";
-
-                // Check if the json_data array is not empty
-                if(json_data.length > 0) {
-                    for (var i = 0; i < json_data.length; i++) {
-                            var student = json_data[i];
-                            div_data += "<option value='" + student.id + "'> Student No. : " + student.student_number + " : " + student.name + "</option>";
-                        }
-                }
-
-                div_data += "</select></div>";
-                div_data += "<div class='form-group'><div class='row'>";
-
-                // Grade inputs
-                div_data += "<div class='col-lg-6'>";
-                div_data += "<label>First Quarter : </label><input type='text' name='first_quarter' class='form-control' id='first_quarter' placeholder='First Quarter' />";
-                div_data += "</div>";
-
-                div_data += "<div class='col-lg-6'>";
-                div_data += "<label>Second Quarter : </label><input type='text' name='second_quarter' class='form-control' id='second_quarter' placeholder='Second Quarter' />";
-                div_data += "</div>";
-
-                div_data += "<div class='col-lg-6'>";
-                div_data += "<label>Third Quarter : </label><input type='text' name='third_quarter' class='form-control' id='third_quarter' placeholder='Third Quarter' />";
-                div_data += "</div>";
-
-                div_data += "<div class='col-lg-6'>";
-                div_data += "<label>Fourth Quarter : </label><input type='text' name='fourth_quarter' class='form-control' id='fourth_quarter' placeholder='Fourth Quarter' />";
-                div_data += "</div>";
-
-                div_data += "</div></div>";
-
-                div_data += "<div class='form-group'>";
-                div_data += "<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
-                div_data += "</div>";
-
-                $("#student_data").html(div_data);
-
-                // Initialize grades for the first student in the list
-                if (json_data.length > 0) {
-                    updateGradeFields(json_data, 0); // initialize with first student
-                }
-
-                // Update grades when the student selection changes
-                $("#student_list").change(function() {
-                    var selectedIndex = $(this).val();
-                    updateGradeFields(json_data, selectedIndex);
+                        // Append the new loads for the selected academic year
+                        $.each(response.loads, function(index, load) {
+                            load_select.append('<option value="' + load.id + '" data-staff-id="' + load.staff_id.id + '">' +
+                                load.grade_level + ' - ' + load.section_name + ' - ' + load.subject_name + '</option>');
+                        });
+                    },
+                    error: function() {
+                        alert('Error fetching loads.');
+                    }
                 });
-            },
-            error: function() {
-                alert("Error in Fetching Students.");
+            } else {
+                $('#load_id').empty().append('<option value="">Select a Load</option>');  // Clear loads if no academic year is selected
             }
         });
     });
+</script>
 
-    // Function to update grade fields based on selected student
-    function updateGradeFields(json_data, index) {
-        if (json_data[index]) {
-            $("#first_quarter").val(json_data[index]['first_quarter'] || "");
-            $("#second_quarter").val(json_data[index]['second_quarter'] || "");
-            $("#third_quarter").val(json_data[index]['third_quarter'] || "");
-            $("#fourth_quarter").val(json_data[index]['fourth_quarter'] || "");
+<script>
+    $(document).ready(function() {
+        $("#fetch_student").click(function() {
+            // Get the selected load and session year
+            var session_year_id = $("#session_year").val();
+            var load_id = $("#load_id").val();
+    
+            $.ajax({
+                url: '{% url "get_students" %}',
+                type: 'POST',
+                data: {
+                    session_year: session_year_id,
+                    load_id: load_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.error) {
+                        alert(response.error);
+                        return;
+                    }
+    
+                    var json_data = response;  // Already parsed as JSON
+                    console.log(json_data);
+    
+                    var div_data = "<div class='form-group'><label>Student List</label> <select class='student_list form-control' id='student_list' name='student_list'>";
+    
+                    if (json_data.length > 0) {
+                        for (var i = 0; i < json_data.length; i++) {
+                            var student = json_data[i];
+                            div_data += "<option value='" + student.id + "'> Student No. : " + student.student_number + " : " + student.name + "</option>";
+                        }
+                    } else {
+                        div_data += "<option value=''>No students found</option>";
+                    }
+    
+                    div_data += "</select></div>";
+                    div_data += "<div class='form-group'><div class='row'>";
+    
+                    // Grade inputs
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>First Quarter : </label><input type='text' name='first_quarter' class='form-control' id='first_quarter' placeholder='First Quarter' />";
+                    div_data += "</div>";
+    
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Second Quarter : </label><input type='text' name='second_quarter' class='form-control' id='second_quarter' placeholder='Second Quarter' />";
+                    div_data += "</div>";
+    
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Third Quarter : </label><input type='text' name='third_quarter' class='form-control' id='third_quarter' placeholder='Third Quarter' />";
+                    div_data += "</div>";
+    
+                    div_data += "<div class='col-lg-6'>";
+                    div_data += "<label>Fourth Quarter : </label><input type='text' name='fourth_quarter' class='form-control' id='fourth_quarter' placeholder='Fourth Quarter' />";
+                    div_data += "</div>";
+    
+                    div_data += "</div></div>";
+    
+                    div_data += "<div class='form-group'>";
+                    div_data += "<button id='save_attendance' class='btn btn-success' type='submit'>Save Result</button>";
+                    div_data += "</div>";
+    
+                    $("#student_data").html(div_data);
+    
+                    // Initialize grades for the first student in the list
+                    if (json_data.length > 0) {
+                        updateGradeFields(json_data, 0);  // Initialize with first student
+                    }
+    
+                    // Update grades when the student selection changes
+                    $("#student_list").change(function() {
+                        var selectedIndex = $(this).val();
+                        updateGradeFields(json_data, selectedIndex);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    alert("Error in Fetching Students: " + xhr.responseText);
+                }
+            });
+        });
+    
+        // Function to update grade fields based on selected student
+        function updateGradeFields(json_data, index) {
+            if (json_data[index]) {
+                $("#first_quarter").val(json_data[index]['first_quarter'] || "");
+                $("#second_quarter").val(json_data[index]['second_quarter'] || "");
+                $("#third_quarter").val(json_data[index]['third_quarter'] || "");
+                $("#fourth_quarter").val(json_data[index]['fourth_quarter'] || "");
+            }
         }
-    }
-});
+    });
 </script>
 {% endblock custom_js %}
