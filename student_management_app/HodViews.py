@@ -19,6 +19,15 @@ import openpyxl
 import requests
 from django.contrib.auth.decorators import login_required
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from student_management_app.EmailBackEnd import EmailBackEnd
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.permissions import AllowAny
+
 from student_management_app.models import CustomUser, Staffs, StudentPromotionHistory, Curriculums, GradeLevel, Enrollment, Attachment, BalancePayment, Subjects, Section, AssignSection, Load, Schedule, Students, SessionYearModel, FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, GradingConfiguration, ParentGuardian, PreviousSchool, EmergencyContact, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
@@ -1487,29 +1496,46 @@ def manage_subject(request):
     }
     return render(request, 'hod_template/Manage_Template/manage_subject_template.html', context)
 
-@csrf_exempt
-def manage_subject_json(request):
-    if not request.user.is_authenticated:
-        return JsonResponse(
-            {"error": "You must be logged in to access this resource."}, 
-            status=401
-        )
+class ManageSubjectsAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Only authenticated users
 
-    if request.method == 'GET':
-        subjects = Subjects.objects.all().values(
-            'id',
-            'curriculum_id',
-            'GradeLevel_id',
-            'subject_name',
-            'subject_description',
-            'subject_code',
-            'subject_hours',
-            'created_at',
-            'updated_at'
-        )  # Retrieve specific fields for serialization
+    def post(self, request):
+        refresh_token = request.data.get("refresh_token")
+        if not refresh_token:
+            return Response({"error": "Refresh token is required"}, status=400)
 
-        subjects_list = list(subjects)  # Convert QuerySet to a list
-        return JsonResponse({'subjects': subjects_list}, safe=False)
+        try:
+            token = RefreshToken(refresh_token)
+
+            if token.check_blacklist():
+                return Response({"error": "Token is blacklisted"}, status=403)
+            
+            user_id = token.get("user_id")
+
+            user = CustomUser.objects.get(id=user_id)
+
+            if user.user_type != "1":
+                return Response({"error": "You do not have permission to view this resource."}, status=403)
+
+            subjects = Subjects.objects.all().values(
+                "id", 
+                "curriculum_id__curriculum_name", 
+                "GradeLevel_id__GradeLevel_name",
+                "subject_name", 
+                "subject_description", 
+                "subject_code", 
+                "subject_hours", 
+                "created_at", 
+                "updated_at"
+            )
+            return Response({"subjects": list(subjects)}, status=200)
+        
+        except TokenError as e:
+            return Response({"error": f"Token error: {str(e)}"}, status=403)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)

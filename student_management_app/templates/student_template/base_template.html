@@ -9,23 +9,23 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{% static "fontawesome-free/css/all.min.css" %}">
+  <link rel="stylesheet" href="{% static 'fontawesome-free/css/all.min.css' %}">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Tempusdominus Bbootstrap 4 -->
+  <!-- Tempusdominus Bootstrap 4 -->
   <link rel="stylesheet" href="{% static 'tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
   <!-- iCheck -->
-  <link rel="stylesheet" href="{% static "icheck-bootstrap/icheck-bootstrap.min.css" %}">
+  <link rel="stylesheet" href="{% static 'icheck-bootstrap/icheck-bootstrap.min.css' %}">
   <!-- JQVMap -->
-  <link rel="stylesheet" href="{% static "jqvmap/jqvmap.min.css" %}">
+  <link rel="stylesheet" href="{% static 'jqvmap/jqvmap.min.css' %}">
   <!-- Theme style -->
-  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'  %}">
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
   <!-- overlayScrollbars -->
-  <link rel="stylesheet" href="{% static "overlayScrollbars/css/OverlayScrollbars.min.css" %}">
+  <link rel="stylesheet" href="{% static 'overlayScrollbars/css/OverlayScrollbars.min.css' %}">
   <!-- Daterange picker -->
-  <link rel="stylesheet" href="{% static "daterangepicker/daterangepicker.css" %}">
+  <link rel="stylesheet" href="{% static 'daterangepicker/daterangepicker.css' %}">
   <!-- summernote -->
-  <link rel="stylesheet" href="{% static "summernote/summernote-bs4.css" %}">
+  <link rel="stylesheet" href="{% static 'summernote/summernote-bs4.css' %}">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
@@ -64,9 +64,12 @@
           </a>
 
           <div class="dropdown-divider"></div>
-          <a href="{% url 'logout_user' %}" class="dropdown-item">
-            <i class="fas fa-power-off mr-2"></i> Logout
-          </a>
+          <button onclick="logout()" class="dropdown-item">
+            <i class="fas fa-power-off mr-2" ></i> Logout
+          </button>
+          <!-- <a href="{% url 'logout_user' %}" class="dropdown-item" id="logout_user" > -->
+            <!-- <i class="fas fa-power-off mr-2"></i> Logout
+          </a> -->
           <div class="dropdown-divider"></div>
         </div>
       </li>
@@ -114,44 +117,87 @@
   <!-- ./wrapper -->
 
 
-<!-- jQuery -->
-<script src="{% static "jquery/jquery.min.js"  %}"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="{% static "jquery-ui/jquery-ui.min.js"  %}"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+  <!-- jQuery -->
+  <script src="{% static 'jquery/jquery.min.js' %}"></script>
+  <!-- jQuery UI 1.11.4 -->
+  <script src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+  <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+  <script>
+    $.widget.bridge('uibutton', $.ui.button)
+  </script>
+  <!-- Bootstrap 4 -->
+  <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- ChartJS -->
+  <script src="{% static 'chart.js/Chart.min.js'  %}"></script>
+  <script src="{% static 'chart.js/Chart.js'  %}"></script>
+  <!-- Sparkline -->
+  <script src="{% static 'sparklines/sparkline.js' %}"></script>
+  <!-- JQVMap -->
+  <script src="{% static 'jqvmap/jquery.vmap.min.js' %}"></script>
+  <script src="{% static 'jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+  <!-- jQuery Knob Chart -->
+  <script src="{% static 'jquery-knob/jquery.knob.min.js' %}"></script>
+  <!-- ph -->
+  <script>
+    var provinceUrl = "{% static 'ph-json/province.json' %}";
+    var cityUrl = "{% static 'ph-json/city.json' %}";
+    var barangayUrl = "{% static 'ph-json/barangay.json' %}";
+    var regionUrl = "{% static 'ph-json/region.json' %}";
+  </script>
+  <script src="{% static 'ph-json/ph-address-selector.js' %}"></script>
+  <!-- daterangepicker -->
+  <script src="{% static 'moment/moment.min.js' %}"></script>
+  <script src="{% static 'daterangepicker/daterangepicker.js' %}"></script>
+  <!-- Tempusdominus Bootstrap 4 -->
+  <script src="{% static 'tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+  <!-- Summernote -->
+  <script src="{% static 'summernote/summernote-bs4.min.js' %}"></script>
+  <!-- overlayScrollbars -->
+  <script src="{% static 'overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+  <!-- AdminLTE App -->
+  <script src="{% static 'dist/js/adminlte.js' %}"></script>
+  <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+  <script src="{% static 'dist/js/pages/dashboard.js' %}"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="{% static 'dist/js/demo.js' %}"></script>
 <script>
-  $.widget.bridge('uibutton', $.ui.button)
+  async function logout() {
+      try {
+          // Get the refresh token
+          const refreshToken = localStorage.getItem("refresh_token");
+
+          // Send a POST request to the logout endpoint
+          const response = await fetch("{% url 'logout_user' %}", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+              },
+              body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (response.ok) {
+              // Clear tokens from localStorage
+              localStorage.removeItem("access_token");
+              localStorage.removeItem("refresh_token");
+
+              // Redirect to login page
+              window.location.href = "{% url 'login' %}";
+          } else {
+              const errorData = await response.json();
+              alert(errorData.error || "Logout failed.");
+          }
+      } catch (error) {
+          console.error("Logout error:", error);
+          alert("An error occurred while logging out. Please try again.");
+      }
+  }
 </script>
-<!-- Bootstrap 4 -->
-<script src="{% static "bootstrap/js/bootstrap.bundle.min.js"  %}"></script>
-<!-- ChartJS -->
-<script src="{% static "chart.js/Chart.min.js"  %}"></script>
-<!-- Sparkline -->
-<script src="{% static "sparklines/sparkline.js"  %}"></script>
-<!-- JQVMap -->
-<script src="{% static "jqvmap/jquery.vmap.min.js"  %}"></script>
-<script src="{% static "jqvmap/maps/jquery.vmap.usa.js"  %}"></script>
-<!-- jQuery Knob Chart -->
-<script src="{% static "jquery-knob/jquery.knob.min.js"  %}"></script>
-<!-- daterangepicker -->
-<script src="{% static "moment/moment.min.js"  %}"></script>
-<script src="{% static "daterangepicker/daterangepicker.js"  %}"></script>
-<!-- Tempusdominus Bootstrap 4 -->
-<script src="{% static "tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"  %}"></script>
-<!-- Summernote -->
-<script src="{% static "summernote/summernote-bs4.min.js"  %}"></script>
-<!-- overlayScrollbars -->
-<script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.js'  %}"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{% static 'dist/js/pages/dashboard.js'  %}"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{% static 'dist/js/demo.js'  %}"></script>
 
 {% comment %} For Custom JS {% endcomment %}
 {% block custom_js %}
 {% endblock custom_js %}
+
 
 </body>
 </html>
