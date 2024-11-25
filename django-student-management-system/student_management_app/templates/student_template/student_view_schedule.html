@@ -1,7 +1,17 @@
 {% extends 'student_template/base_template.html' %}
 
 {% block page_title %}
-    Schedule
+    <!-- Display the academic year from the first schedule -->
+    {% if academic_year %}
+    <div class="mb-3">
+        <h4>Academic Year: 
+            <strong>
+                {{ academic_year.session_start_year.year }} - 
+                {{ academic_year.session_end_year.year }}
+            </strong>
+        </h4>
+    </div>
+    {% endif %}
 {% endblock page_title %}
 
 {% block main_content %}
@@ -10,9 +20,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary">
+                <div class="card card">
                     <div class="card-header">
-                        <h3 class="card-title">Class Schedule</h3>
+                        <h3 class="card-title"> 
+                            <strong style="color: green;">
+                                {{ student.admin.last_name|upper }}, {{ student.admin.first_name|upper }} ({{ student.student_number|upper }})
+                            </strong>
+                        </h3>
                     </div>
 
                     <div class="card-body">
@@ -21,23 +35,30 @@
                                 <table class="table">
                                     <thead class="thead-light">
                                         <tr>
-                                            <th>#ID</th>
-                                            <th>Subject</th>
-                                            <th>Day</th>
+                                            <th>No.</th>
+                                            <th>Subject Code </th>
+                                            <th>Description </th>
+                                            <th>Teacher</th>
+                                            <th>Schedule</th>
+                                            <!-- <th>Day</th>
                                             <th>Start Time</th>
-                                            <th>End Time</th>
-                                            <th>Instructor</th>
+                                            <th>End Time</th> -->
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for schedule in student_schedule %}
                                         <tr>
-                                            <td>{{ schedule.id }}</td>
-                                            <td>{{ schedule.load_id.subject_id.subject_name }}</td>
-                                            <td>{{ schedule.day_of_week }}</td>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ schedule.load_id.subject_id.subject_code }}</td>
+                                            <td>
+                                                <strong> {{ schedule.load_id.subject_id.subject_name }}     </strong> - {{ schedule.load_id.subject_id.subject_description }}</td>
+                                            <td>{{ schedule.load_id.staff_id.first_name }} {{ schedule.load_id.staff_id.last_name }}</td>
+                                            <td>{{ schedule.day_of_week }} / {{ schedule.start_time|time:"h:i a" }} - {{ schedule.end_time|time:"h:i a" }}</td>
+                                            <!-- <td>{{ schedule.day_of_week }}</td>
                                             <td>{{ schedule.start_time }}</td>
-                                            <td>{{ schedule.end_time }}</td>
-                                            <td>{{ schedule.staff_id.first_name }} {{ schedule.staff_id.last_name }}</td>
+                                            <td>{{ schedule.end_time }}</td> -->
+                                            
                                         </tr>
                                         {% endfor %}
                                     </tbody>

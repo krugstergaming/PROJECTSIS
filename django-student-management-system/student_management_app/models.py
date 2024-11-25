@@ -107,6 +107,17 @@ class Staffs_Educ_Background(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class School_info(models.Model):
+    id = models.AutoField(primary_key=True)
+    school_name = models.CharField(max_length=255, blank=True, null=True)
+    school_ID_number = models.CharField(max_length=255, blank=True, null=True)
+    school_district = models.CharField(max_length=255, blank=True, null=True)
+    school_division = models.CharField(max_length=255, blank=True, null=True)
+    school_region = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Curriculums(models.Model):
     id = models.AutoField(primary_key=True)
     curriculum_name = models.CharField(max_length=255)
@@ -230,7 +241,6 @@ class Section(models.Model):
 
 class Subjects(models.Model):
     id = models.AutoField(primary_key=True)
-
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     subject_name = models.CharField(max_length=255, blank=True, null=True)
@@ -394,6 +404,7 @@ class StudentResult(models.Model):
     subject_third_quarter = models.FloatField(default=0)
     subject_fourth_quarter = models.FloatField(default=0)
     subject_final_grade = models.FloatField(default=0)
+    general_average = models.FloatField(default=0)
 
     subject_exam_marks = models.FloatField(default=0)
     subject_assignment_marks = models.FloatField(default=0)

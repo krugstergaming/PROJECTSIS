@@ -449,18 +449,18 @@ def manage_session(request):
 def add_session(request):
     # Get the latest session year if it exists
     latest_session = SessionYearModel.objects.order_by('-session_end_year').first()
-    
+
     if latest_session:
         # Use the end year of the last session as the start year of the new session
         last_end_year = latest_session.session_end_year.year
         # Set the new session years based on the last session
-        session_start_year = f"{last_end_year}-01-01"  # Start of the new session year
-        session_end_year = f"{last_end_year + 1}-12-31"  # End of the new session year
+        session_start_year = f"{last_end_year}-06-01"  # June 1 of the last session's end year
+        session_end_year = f"{last_end_year + 1}-03-31"  # March 31 of the next year
     else:
         # If no session exists, set default values, e.g., for the current year
         current_year = datetime.now().year
-        session_start_year = f"{current_year}-01-01"
-        session_end_year = f"{current_year + 1}-12-31"
+        session_start_year = f"{current_year}-06-01"  # June 1 of the current year
+        session_end_year = f"{current_year + 1}-03-31"  # March 31 of the next year
 
     print(f"Session Start Year: {session_start_year}, Session End Year: {session_end_year}")  # Debug print
 
@@ -1539,13 +1539,18 @@ def add_load_save(request):
                 messages.warning(request, "WARNING!!! This load record already exists for this faculty.")
                 return redirect('add_load')
 
-            # Get the related Staff instance to check the max_load
+            # Get the related Staff instance
             staff = Staffs.objects.get(admin=staff_user)
-            current_load = Load.objects.filter(staff_id=staff_user).count()
 
-            # Check if the current load exceeds or equals the staff's max_load
+            # Count the current number of loads for the selected academic year
+            current_load = Load.objects.filter(
+                session_year_id=session_id,
+                staff_id=staff_user
+            ).count()
+
+            # Check if the current load exceeds or equals the staff's max_load for the selected academic year
             if current_load >= staff.max_load:
-                messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load}.")
+                messages.error(request, f"{staff_user.first_name} {staff_user.last_name} has reached the maximum load limit of {staff.max_load} for the academic year {session_id.session_start_year} - {session_id.session_end_year}.")
                 return redirect('add_load')
 
             # Saving the load

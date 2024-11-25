@@ -7,6 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
+from collections import defaultdict
+
 
 from student_management_app.models import CustomUser, Staffs, GradeLevel, Section, Schedule, AssignSection, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
 
@@ -319,52 +322,93 @@ def staff_add_result(request):
     # Render the active grading template when grading is enabled
     return render(request, "staff_template/add_result_template.html", context)
 
+def get_loads_by_academic_year(request):
+    session_year_id = request.GET.get('session_year_id')
+    loads = Load.objects.filter(session_year_id=session_year_id, staff_id=request.user.id)  # Filter by academic year and staff
+
+    load_data = []
+    for load in loads:
+        load_data.append({
+            'id': load.id,
+            'staff_id': load.staff_id.id,
+            'grade_level': load.AssignSection_id.GradeLevel_id.GradeLevel_name,
+            'section_name': load.AssignSection_id.section_id.section_name,
+            'subject_name': load.subject_id.subject_name
+        })
+
+    return JsonResponse({'loads': load_data})
+
 # WE don't need csrf_token when using Ajax
 @csrf_exempt
 def get_students(request):
-    # Getting Values from Ajax POST 'Fetch Student'
+    print(f"session_year: {request.POST.get('session_year')}, load_id: {request.POST.get('load_id')}")
+    try:
+        # Getting Values from Ajax POST 'Fetch Student'
+        session_year_id = request.POST.get("session_year")  # Added session year filter
+        load_id = request.POST.get("load_id")
 
-    load_id = request.POST.get("load_id")
+        if not load_id or not session_year_id:
+            return JsonResponse({"error": "Missing load_id or session_year_id"}, status=400)
 
-    load_model = Load.objects.get(id=load_id)
+        # Fetch the Load model based on load_id
+        load_model = Load.objects.get(id=load_id)
 
-    # Fetch the AssignSection model associated with the Load model
-    assign_section_model = load_model.AssignSection_id
+        # Ensure the session year matches the one selected by the user
+        if load_model.session_year_id.id != int(session_year_id):
+            return JsonResponse({"error": "Session Year mismatch"}, status=400)
 
-    # Get the students assigned to this section through AssignSection
-    students = Students.objects.filter(id__in=AssignSection.objects.filter(section_id=assign_section_model.section_id).values('Student_id'))
+        # Get AssignSection entries based on the section in the selected load
+        assign_sections = AssignSection.objects.filter(
+            section_id__id=load_model.AssignSection_id.section_id.id,
+        )
 
-    student_results = StudentResult.objects.filter(load_id=load_model)
+        # Now, filter students based on the AssignSection records
+        students = Students.objects.filter(id__in=assign_sections.values('Student_id'))
 
-    results_dict = {result.student_id.id: {
-                        "first_quarter": result.subject_first_quarter,
-                        "second_quarter": result.subject_second_quarter,
-                        "third_quarter": result.subject_third_quarter,
-                        "fourth_quarter": result.subject_fourth_quarter,
-                        "final_grade": result.subject_final_grade
-                        } for result in student_results
-                    }
-    
-    # Only Passing Student Id and Student Name Only
-    list_data = []
+        # Fetch results for the filtered students, adjusting for session_year_id
+        student_results = StudentResult.objects.filter(
+            load_id=load_model,
+            load_id__session_year_id__id=session_year_id  # Fixed filtering by session_year
+        )
 
-    for student in students:
-
-        grades = results_dict.get(student.id, {})
-
-        data_small = {
-            "id": student.id,
-            "student_number": student.student_number,
-            "name": student.admin.first_name + " " + student.admin.last_name,
-            "first_quarter": grades.get("first_quarter", ""),
-            "second_quarter": grades.get("second_quarter", ""),
-            "third_quarter": grades.get("third_quarter", ""),
-            "fourth_quarter": grades.get("fourth_quarter", ""),
-            "final_grade": grades.get("final_grade", "")
+        # Organize the results in a dictionary for easy access
+        results_dict = {
+            result.student_id.id: {
+                "first_quarter": result.subject_first_quarter,
+                "second_quarter": result.subject_second_quarter,
+                "third_quarter": result.subject_third_quarter,
+                "fourth_quarter": result.subject_fourth_quarter,
+                "final_grade": result.subject_final_grade
+            }
+            for result in student_results
         }
-        list_data.append(data_small)
 
-    return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
+        # Prepare the data to be sent back to the front-end
+        list_data = []
+        for student in students:
+            grades = results_dict.get(student.id, {})
+
+            data_small = {
+                "id": student.id,
+                "student_number": student.student_number,
+                "name": f"{student.admin.first_name} {student.admin.last_name}",
+                "first_quarter": grades.get("first_quarter", ""),
+                "second_quarter": grades.get("second_quarter", ""),
+                "third_quarter": grades.get("third_quarter", ""),
+                "fourth_quarter": grades.get("fourth_quarter", ""),
+                "final_grade": grades.get("final_grade", "")
+            }
+            list_data.append(data_small)
+
+        # Return the data as a JSON response
+        return JsonResponse(list_data, safe=False)
+
+    except Load.DoesNotExist:
+        return JsonResponse({"error": "Load not found"}, status=404)
+    except AssignSection.DoesNotExist:
+        return JsonResponse({"error": "AssignSection not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 def staff_add_result_save(request):
     if request.method != "POST":
@@ -421,7 +465,23 @@ def staff_add_result_save(request):
                 )
                 result.save()
                 messages.success(request, "Result Added Successfully!")
-            
+
+            # Calculate the general average only for the current academic year
+            student_results = StudentResult.objects.filter(
+                student_id=student_obj,
+                load_id__session_year_id=load_obj.session_year_id  # Filter by the current academic year
+            )
+
+            if student_results.exists():
+                general_average = student_results.aggregate(Avg('subject_final_grade'))['subject_final_grade__avg']
+                
+                # Update the general average for each result in the current academic year
+                for res in student_results:
+                    res.general_average = general_average
+                    res.save()
+
+                messages.success(request, f"General Average Updated: {general_average:.2f}")
+
             return redirect('staff_add_result')
 
         except Exception as e:
@@ -430,11 +490,28 @@ def staff_add_result_save(request):
         
 
 def staff_view_schedule(request):
-    # Get the current staff member's schedules
-    schedules = Schedule.objects.filter(staff_id=request.user.id)
-    
+    # Get the currently logged-in staff member
+    staff = CustomUser.objects.get(id=request.user.id)
+
+    # Get the schedules where the staff member is assigned
+    schedules = Schedule.objects.filter(load_id__staff_id=staff).select_related(
+        'load_id', 'load_id__session_year_id', 'load_id__AssignSection_id', 'load_id__subject_id'
+    )
+
+    # Organize schedules by academic year
+    schedules_by_year = {}
+    for schedule in schedules:
+        academic_year = schedule.load_id.session_year_id
+        if academic_year not in schedules_by_year:
+            schedules_by_year[academic_year] = []
+        schedules_by_year[academic_year].append(schedule)
+
     context = {
-        "schedules": schedules
+        "schedules_by_year": schedules_by_year,
+        "staff": staff,
     }
-    
+
     return render(request, "staff_template/staff_view_schedule_template.html", context)
+
+
+

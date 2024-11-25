@@ -9,12 +9,11 @@
 {% load static %}
 
 <section class="content">
-        <div class="container-fluid">
-
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Add Academic Year</h3>
                     </div>
@@ -22,75 +21,139 @@
                     <!-- form start -->
                     <form role="form" method="POST" action="{% url 'add_session_save' %}">
                         {% csrf_token %}
-
                         
-                                {% comment %} Display Messages {% endcomment %}
-                                {% if messages %}
-                                    <div class="form-group">
-                                        <div class="col-12">
-                                            {% for message in messages %}
-                                                {% if message.tags == "error" %}
-                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                                    {{ message }}
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                    </div>
-                                                {% elif message.tags == "success" %}
-                                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                                    {{ message }}
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                    </div>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Start Year</label>
-                                        <input type="date" class="form-control" name="session_start_year" 
-                                               value="{{ session_start_year }}" required id="session_start_year">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>End Year</label>
-                                        <input type="date" class="form-control" name="session_end_year" 
-                                               value="{{ session_end_year }}" required id="session_end_year">
-                                    </div>
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Start Year (dd/mm/yyyy)</label>
+                                <input type="date" class="form-control" name="session_start_year" 
+                                       value="{{ session_start_year }}" required id="session_start_year">
+                            </div>
+                            <div class="form-group">
+                                <label>End Year (dd/mm/yyyy)</label>
+                                <input type="date" class="form-control" name="session_end_year" 
+                                       value="{{ session_end_year }}" required id="session_end_year">
+                            </div>
+                        </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                            <button type="button" class="btn btn-primary" onclick="confirmSubmission()">Add Session Year</button>
+                            <!-- Button to trigger the confirmation dialog -->
+                            <button type="button" class="btn btn-primary" onclick="showModal()">Add Session Year</button>
                             <a class="btn btn-secondary" href="{% url 'manage_session' %}" role="button">Back</a>
-
                         </div>
                     </form>
-                    </div>
-                    <!-- /.card -->
-
                 </div>
+                <!-- /.card -->
             </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
 
-        </div><!-- /.container-fluid -->
-      </section>
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure?</h3>
+        <p>Do you want to add this session year?</p>
+        <div class="modal-footer">
+            <!-- If confirmed, submit the form -->
+            <button class="btn btn-yes" onclick="confirmAction()">Yes</button>
+            <button class="btn btn-no" onclick="closeModal()">No</button>
+        </div>
+    </div>
+</div>
 
-    <script>
-    function confirmSubmission() {
-        const startYearInput = document.getElementById('session_start_year').value;
-        const endYearInput = document.getElementById('session_end_year').value;
+<script>
+// Function to show the confirmation dialog
+function showModal() {
+    document.getElementById("confirmationModal").style.display = "block";
+}
 
-        // Confirm with the user before submitting
-        const confirmation = confirm(`Are you sure you want to add this session year?\n\nStart Year: ${startYearInput}\nEnd Year: ${endYearInput}`);
-        
-        if (confirmation) {
-            // If confirmed, submit the form
-            document.querySelector('form').submit(); // Ensure this is inside a form element
-        }
-    }
-    </script>
+// Function to close the confirmation dialog
+function closeModal() {
+    document.getElementById("confirmationModal").style.display = "none";
+}
 
+// Function to handle the "Yes" action (confirm action)
+function confirmAction() {
+    // Submit the form after confirmation
+    document.querySelector('form').submit();
+}
+</script>
 
-  {% endblock main_content %}
+<style>
+/* Modal background */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0,0,0,0.4); /* Black with opacity */
+    padding-top: 60px;
+}
+
+/* Modal content box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Adjust the width as per your requirement */
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.3); /* Shadow for better visibility */
+    text-align: center; /* Center the text */
+}
+
+/* Modal buttons container */
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 10px; /* Space between buttons */
+}
+
+/* Modal buttons */
+.btn-yes, .btn-no {
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 100px; /* Set fixed width for buttons */
+}
+
+.btn-yes {
+    background-color: green;
+    color: white;
+}
+
+.btn-no {
+    background-color: red;
+    color: white;
+}
+</style>
+
+{% endblock main_content %}

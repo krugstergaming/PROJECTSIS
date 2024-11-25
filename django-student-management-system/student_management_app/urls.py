@@ -161,8 +161,10 @@ urlpatterns = [
 
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
     path('staff_add_result_save/', StaffViews.staff_add_result_save, name="staff_add_result_save"),
+    path('get_loads_by_academic_year/', StaffViews.get_loads_by_academic_year, name='get_loads_by_academic_year'),
 
     path('staff_view_schedule/', StaffViews.staff_view_schedule, name="staff_view_schedule"),
+    
 
     # URSL for Student
     path('student_home/', StudentViews.student_home, name="student_home"),

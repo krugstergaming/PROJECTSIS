@@ -1,7 +1,7 @@
 {% extends 'student_template/base_template.html' %}
 
 {% block page_title %}
-    Result
+    Grade Result
 {% endblock page_title %}
 
 {% block main_content %}
@@ -12,72 +12,115 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Result</h3>
+                <!-- First Card: Student's Name -->
+                <div class="card card-mb-3">
+                    <div class="card-header" style="color: green;">
+                        <h3 class="card-title">
+                            <strong>
+                                {{ student.admin.last_name|upper }}, {{ student.admin.first_name|upper }} ({{ student.student_number|upper }})
+                            </strong>
+                        </h3>
                     </div>
 
+                    <!-- First Card Body: Contains Academic Year Loop and Other Information -->
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th>#ID</th>
-                                        <th>Subject</th>
-                                        <!-- <th>Assignments Marks</th>
-                                        <th>Exam Marks</th> -->
-                                        <th>First Quarter</th>
-                                        <th>Second Quarter</th>
-                                        <th>Third Quarter</th>
-                                        <th>Fourth Quarter</th>
-                                        <th>Final Grade</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody>
-                                    {% for row in student_result %}
-                                    <tr>
-                                        <td>{{ row.id }}</td>
-                                        <td>{{ row.load_id.subject_id.subject_name }}</td>
-                                        <!-- <td>{{ row.subject_assignment_marks }}</td>
-                                        <td>{{ row.subject_exam_marks }}</td> -->
-                                        <td>{{ row.subject_first_quarter }}</td>
-                                        <td>{{ row.subject_second_quarter }}</td>
-                                        <td>{{ row.subject_third_quarter }}</td>
-                                        <td>{{ row.subject_fourth_quarter }}</td>
-                                        <td>
-                                            {% if row.subject_first_quarter == 0 or row.subject_second_quarter == 0 or row.subject_third_quarter == 0 or row.subject_fourth_quarter == 0 %}
-                                                N/A
-                                            {% else %}
-                                                {{ row.subject_final_grade }}
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if row.subject_first_quarter == 0 or row.subject_second_quarter == 0 or row.subject_third_quarter == 0 or row.subject_fourth_quarter == 0 %}
-                                                <span class="alert alert-warning">Pending</span>
-                                            {% else %}
-                                                {% if row.subject_final_grade > 75 %}
-                                                    <span class="alert alert-success">Pass</span>
-                                                {% elif row.subject_final_grade <= 75 %}
-                                                    <span class="alert alert-danger">Fail</span>
-                                                {% endif %}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
+                        {% for academic_year, data in results_by_year.items %}
+                            <!-- Academic Year Header -->
+                            <div class="card-header" style="background-color: #28a745; color: white;">
+                                <h3 class="card-title">
+                                    Academic Year: 
+                                    <strong>
+                                        {{ academic_year.session_start_year.year }} - {{ academic_year.session_end_year.year }}
+                                    </strong>
+                                </h3>
+                            </div>
+
+                            <!-- Academic Year Body: General Average, Admission Status, Grade Level, and Section -->
+                            <div class="card-body" style="border: 1px solid #ddd;">
+                                <div class="row">
+                                    <!-- First Column: General Average and Admission Status -->
+                                    <div class="col-md-6">
+                                        <p>
+                                            Admission Status:
+                                            <strong>
+                                                {{ student_status }}
+                                            </strong>
+                                        </p>
+                                        <p>
+                                            General Average: 
+                                            <strong>
+                                                {{ data.general_average|floatformat:2 }}
+                                            </strong>
+                                        </p>
+                                    </div>
+
+                                    <!-- Second Column: Grade Level and Section -->
+                                    <div class="col-md-6">
+                                        <p>
+                                            Grade Level and Section:
+                                            <strong>
+                                                {{ grade_level }} - {{ section }}
+                                            </strong>
+                                        </p>
+                                    </div>
+                                </div> <!-- .row -->
+
+                                <!-- Table of Results -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Subject</th>
+                                                <th>First Quarter</th>
+                                                <th>Second Quarter</th>
+                                                <th>Third Quarter</th>
+                                                <th>Fourth Quarter</th>
+                                                <th>Final Rating</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in data.results %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ row.load_id.subject_id.subject_name }}</td>
+                                                <td>{{ row.subject_first_quarter }}</td>
+                                                <td>{{ row.subject_second_quarter }}</td>
+                                                <td>{{ row.subject_third_quarter }}</td>
+                                                <td>{{ row.subject_fourth_quarter }}</td>
+                                                <td>
+                                                    {% if row.subject_final_grade %}
+                                                        {{ row.subject_final_grade }}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if row.subject_final_grade >= 75 %}
+                                                        <span class="alert alert-success">Pass</span>
+                                                    {% else %}
+                                                        <span class="alert alert-danger">Fail</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div> <!-- End of Academic Year Body -->
+                            <br>
+                        {% endfor %}
+                    </div> <!-- End of First Card Body -->
+                </div> <!-- End of First Card -->
             </div>
         </div>
     </div><!-- /.container-fluid -->
 </section>
 
-  {% endblock main_content %}
+
+
+{% endblock main_content %}
 
 {% block custom_js %}
 

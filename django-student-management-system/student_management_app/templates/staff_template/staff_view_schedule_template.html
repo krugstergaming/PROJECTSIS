@@ -1,7 +1,7 @@
 {% extends 'staff_template/base_template.html' %}
 
 {% block page_title %}
-    View Schedule
+    Schedules
 {% endblock page_title %}
 
 {% block main_content %}
@@ -10,39 +10,71 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary">
+                <div class="card card">
                     <div class="card-header">
-                        <h3 class="card-title">Your Schedule</h3>
+                        <h3 class="card-title"> 
+                            <strong style="color: green;">
+                                {{ staff.last_name|upper }}, {{ staff.first_name|upper }}
+                            </strong>
+                        </h3>
                     </div>
 
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Subject</th>
-                                        <th>Grade Level</th>
-                                        <th>Section</th>
-                                        <th>Day</th>
-                                        <th>Start Time</th>
-                                        <th>End Time</th>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody>
-                                    {% for schedule in schedules %}
-                                    <tr>
-                                        <td>{{ schedule.load_id.subject_id.subject_name }}</td>
-                                        <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
-                                        <td>{{ schedule.day_of_week }}</td>
-                                        <td>{{ schedule.start_time }}</td>
-                                        <td>{{ schedule.end_time }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                        {% if schedules_by_year %}
+                            {% for academic_year, schedules in schedules_by_year.items %}
+                                <!-- Academic Year Header -->
+                                <div class="mb-4">
+                                    <h4>Academic Year: 
+                                        <strong>
+                                            {{ academic_year.session_start_year.year }} - {{ academic_year.session_end_year.year }}
+                                        </strong>
+                                    </h4>
+                                </div>
+
+                                <!-- Schedule Table -->
+                                {% if schedules %}
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>No.</th>
+                                                    <th>Grade Level - Section</th>
+                                                    <th>Subject Code</th>
+                                                    <th>Description</th>
+                                                    <th>Schedule</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for schedule in schedules %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>
+                                                            {{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }} - 
+                                                            {{ schedule.load_id.AssignSection_id.section_id.section_name }}
+                                                        </td>
+                                                        <td>{{ schedule.load_id.subject_id.subject_code }}</td>
+                                                        <td>
+                                                            <strong>{{ schedule.load_id.subject_id.subject_name }}</strong> - 
+                                                            {{ schedule.load_id.subject_id.subject_description }}
+                                                        </td>
+                                                        <td>{{ schedule.day_of_week }} / {{ schedule.start_time|time:"h:i a" }} - {{ schedule.end_time|time:"h:i a" }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        No schedule found for {{ academic_year.session_start_year.year }} - {{ academic_year.session_end_year.year }}.
+                                    </div>
+                                {% endif %}
+                                <hr/>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                No Schedule Information found.
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
