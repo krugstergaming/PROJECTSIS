@@ -150,6 +150,19 @@
                   </p>
               </a>
               <ul class="nav nav-treeview">
+
+                  <li class="nav-item">
+                      {% url 'add_school' as add_school %}
+                      {% url 'manage_school' as manage_school %}
+                      {% url 'edit_school' edit_school=id as edit_school %}
+                      <a href="{{ manage_school }}" class="nav-link 
+                      {% if request.path == add_school %} active {% endif %}
+                      {% if request.path == manage_school %} active {% endif %} 
+                      {% if request.path == edit_school %} active {% endif %}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                          <p>School Information Management</p>
+                      </a>
+                  </li>
                   <li class="nav-item">
                       {% url 'add_session' as add_session %}
                       {% url 'manage_session' as manage_session %}
