@@ -506,8 +506,13 @@ def staff_view_schedule(request):
             schedules_by_year[academic_year] = []
         schedules_by_year[academic_year].append(schedule)
 
+    # Sort schedules_by_year by academic year in descending order
+    sorted_schedules_by_year = dict(
+        sorted(schedules_by_year.items(), key=lambda item: item[0].session_start_year, reverse=True)
+    )
+
     context = {
-        "schedules_by_year": schedules_by_year,
+        "schedules_by_year": sorted_schedules_by_year,
         "staff": staff,
     }
 

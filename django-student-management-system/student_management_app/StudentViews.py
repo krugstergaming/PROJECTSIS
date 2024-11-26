@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
-from django.core.files.storage import FileSystemStorage #To upload Profile Picture
+from django.core.files.storage import FileSystemStorage 
 from django.urls import reverse
-import datetime # To Parse input DateTime into Python Date Time Object
-
-from student_management_app.models import CustomUser, Staffs, Enrollment, BalancePayment, GradeLevel, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+import datetime 
+import math
+from student_management_app.models import CustomUser, Staffs, Enrollment, BalancePayment, GradeLevel, School_info, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
 
 
 def student_home(request):
@@ -189,6 +189,7 @@ def student_profile_update(request):
 def student_view_result(request):
     student = Students.objects.get(admin=request.user.id)
     student_results = StudentResult.objects.filter(student_id=student.id)
+    schools = School_info.objects.first()
 
     # Organize results by academic year
     results_by_year = {}
@@ -196,13 +197,25 @@ def student_view_result(request):
         academic_year = result.load_id.session_year_id
         if academic_year not in results_by_year:
             results_by_year[academic_year] = {'results': [], 'general_averages': []}
+        # Append results and general averages
         results_by_year[academic_year]['results'].append(result)
         results_by_year[academic_year]['general_averages'].append(result.general_average)
 
-    # Calculate general averages for each academic year
+    # Calculate general averages and apply rounding
     for academic_year, data in results_by_year.items():
+        # Round up each subject's final grade
+        for result in data['results']:
+            if result.subject_final_grade is not None:
+                result.subject_final_grade = math.ceil(result.subject_final_grade)
+
+        # Calculate general average and round up
         general_average = sum(data['general_averages']) / len(data['general_averages']) if data['general_averages'] else 0
-        data['general_average'] = general_average
+        data['general_average'] = math.ceil(general_average)
+
+    # Sort results_by_year by academic year in descending order
+    sorted_results_by_year = dict(
+        sorted(results_by_year.items(), key=lambda item: item[0].session_start_year, reverse=True)
+    )
 
     # Get the student's status from the Students model
     student_status = student.student_status
@@ -217,14 +230,16 @@ def student_view_result(request):
         section = "N/A"
 
     context = {
-        "results_by_year": results_by_year,
+        "results_by_year": sorted_results_by_year,
         "student_status": student_status,
         "grade_level": grade_level,
         "section": section,
         "student": student,
-
+        "schools": schools,
     }
+
     return render(request, "student_template/student_view_result.html", context)
+
 
 
 def student_view_schedule(request):

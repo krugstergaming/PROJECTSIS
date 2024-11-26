@@ -32,7 +32,7 @@ from student_management_app.EmailBackEnd import EmailBackEnd
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
 
-from student_management_app.models import CustomUser, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
+from student_management_app.models import CustomUser, School_info, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
 from student_management_app.models import Staffs, staff_contact_info, staff_employment_info, staff_physical_info, staff_government_ID_info, Staffs_Educ_Background, StudentPromotionHistory
 from student_management_app.models import Curriculums, GradeLevel, Enrollment, Enrollment_voucher, Subjects, Section, SessionYearModel
 from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Classroom
@@ -283,6 +283,41 @@ def deactivate_staff(request, staff_id):
         return redirect('manage_staff')
 
 
+
+def add_school(request):
+    return render(request, "hod_template/Add_Template/add_school_template.html")
+
+def add_school_save(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method!")
+        return redirect('add_school')
+    else:
+        school_name = request.POST.get('school_name')
+        school_ID_number = request.POST.get('school_ID_number')
+        school_district = request.POST.get('school_district')
+        school_division = request.POST.get('school_division')
+        school_region = request.POST.get('school_region')
+        try:
+            school = School_info(
+                school_name=school_name,
+                school_ID_number=school_ID_number,
+                school_district=school_district,
+                school_division=school_division,
+                school_region=school_region
+                )
+            school.save()
+            messages.success(request, "School Added Successfully!")
+            return redirect('add_school')
+        except:
+            messages.error(request, "Failed to Add School!")
+            return redirect('add_school')
+        
+def manage_school(request):
+    schools = School_info.objects.all()
+    context = {
+        "schools": schools
+    }
+    return render(request, 'hod_template/Manage_Template/manage_school_template.html', context)
 
 def add_curriculum(request):
     return render(request, "hod_template/Add_Template/add_curriculum_template.html")
