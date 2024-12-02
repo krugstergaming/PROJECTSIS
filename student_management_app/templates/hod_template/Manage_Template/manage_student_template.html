@@ -11,22 +11,8 @@
 <section class="content">
         <div class="container-fluid">
 
-            <div class="row">
-                <div class="col-12 mb-3">
-                    <a class="btn btn-primary" href="{% url 'add_student' %}" role="button">+ Add Student</a>
-                    <a class="btn btn-secondary" href="{% url 'export_students_to_excel' %}" role="button">Export to Excel</a> 
-                </div>
-            </div>
-
-            <!-- Column Toggle Checkboxes -->
-            <div class="row">
-                <div class="col-12 mb-3">
-                    <label><input type="checkbox" class="column-check" value="0" checked> Name</label>
-                    <label><input type="checkbox" class="column-check" value="1" checked> Grade Level</label>
-                    <label><input type="checkbox" class="column-check" value="2" checked> Email</label>
-                </div>
-            </div>             
-
+            <a class="btn btn-success" href="{% url 'add_student' %}" role="button">+ Add Student</a> <br/>&nbsp; 
+            
             {% if messages %}
                                 <div class="form-group">
                                 <div class="col-12">
@@ -60,14 +46,13 @@
                             <h3 class="card-title">Student Details</h3>
 
                             <div class="card-tools">
-                                <div class="input-group input-group-sm" style="width: 150px;">
-                                    <input type="text" name="table_search" id="Search" onkeyup="searchTable()" class="form-control float-right" placeholder="Search">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-default">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+
+                                <div class="input-group-append">
+                                <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
                                 </div>
+                            </div>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -75,64 +60,38 @@
                             <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                <th>Name</th>
-                                <th>Grade Level</th>
+                                <th>No.</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Username</th>
                                 <th>Email</th>
-                                <th>Profile Pic</th>
+                                <!-- <th>Profile Pic</th> -->
+                                <th>GradeLevel</th>
+                                <th>Last Login</th>
+                                <th>Date Joined</th>
                                 <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Loop for Active Students -->
                                 {% for student in students %}
-                                {% if student.admin.is_active %}
                                 <tr>
-                                    <td>{{ student.admin.last_name }}, {{ student.admin.first_name }} {{ student.middle_name }}</td>
-                                    <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
-                                    <td>{{ student.admin.email }}</td>
-                                    <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td>
-                                    <td>
-                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal{{ student.admin.id }}">
-                                            Details
-                                        </button>
-                                        <!-- <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-success">Edit</a> 
-                                        <a href="{% url 'deactivate_student' student.admin.id %}" class="btn btn-danger">Archive</a> -->
-                                        <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-warning">Edit</a> 
-                                        <a href="" class="btn btn-secondary">Archive</a>
-                                    </td>
-                                    <!-- Modal Structure for Active Students -->
-                                    <div class="modal fade" id="modal{{ student.admin.id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ student.admin.id }}" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="modalLabel{{ student.admin.id }}">Student Details for {{ student.admin.last_name }}, {{ student.admin.first_name }} {{ student.middle_name }}</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p><strong>Nickname:</strong> {{ student.nickname }}</p>
-                                                    <p><strong>Sex:</strong> {{ student.sex }}</p>
-                                                    <p><strong>Age:</strong> {{ student.age }}</p>
-                                                    <p><strong>Date of Birth:</strong> {{ student.dob }}</p>
-                                                    <p><strong>Place of Birth:</strong> {{ student.pob }}</p>
-                                                    <p><strong>Nationality:</strong> {{ student.nationality }}</p>
-                                                    <p><strong>Religion:</strong> {{ student.religion }}</p>
-                                                    <p><strong>Rank in Family:</strong> {{ student.rank_in_family }}</p>
-                                                    <p><strong>Telephone #:</strong> {{ student.telephone_nos }}</p>
-                                                    <p><strong>Mobile #:</strong> {{ student.mobile_phone_nos }}</p>
-                                                    <p><strong>Start Semester:</strong> {{ student.session_year_id.session_start_year }}</p>
-                                                    <p><strong>End Semester:</strong> {{ student.session_year_id.session_end_year }}</p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ student.admin.first_name }}</td>
+                                <td>{{ student.admin.last_name }}</td>
+                                <td>{{ student.admin.username }}</td>
+                                <td>{{ student.admin.email }}</td>
+                                <!-- <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td> -->
+                                <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
+                                <td>{{ student.admin.last_login }}</td>
+                                <td>{{ student.admin.date_joined }}</td>
+                                <td>
+                                    <a href="" class="btn btn-info">Details</a>
+                                    <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-warning">Edit</a> 
+                                    <a href="" class="btn btn-secondary">Archive</a>
+                                </td>
                                 </tr>
-                                {% endif %}
                                 {% endfor %}
+                                
                             </tbody>
                             </table>
                         </div>
@@ -146,5 +105,4 @@
         </div><!-- /.container-fluid -->
       </section>
 
-<script src="{% static 'toggle/toggle.js' %}"></script>
   {% endblock main_content %}

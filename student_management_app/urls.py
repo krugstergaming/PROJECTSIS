@@ -5,7 +5,7 @@ from .import HodViews, StaffViews, StudentViews
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from .views import LoginAPIView, LogoutView, DecodeRefreshTokenView
-from .HodViews import ManageSubjectsAPIView
+# from .HodViews import ManageSubjectsAPIView
 
 
 urlpatterns = [
@@ -24,8 +24,6 @@ urlpatterns = [
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', HodViews.deactivate_staff, name="delete_staff"),
 
-    path('add_classroom', HodViews.add_classroom, name="add_classroom"),
-    path('manage_classroom/', HodViews.manage_classroom, name="manage_classroom"),
 
     path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
     path('add_curriculum_save/', HodViews.add_curriculum_save, name="add_curriculum_save"),
@@ -102,20 +100,19 @@ urlpatterns = [
     path('manage_assign_section/', HodViews.manage_assign_section, name="manage_assign_section"),
     path('manage_load_scheduling/', HodViews.manage_load_scheduling, name="manage_load_scheduling"),
 
+    path('manage_classroom/', HodViews.manage_classroom, name="manage_classroom"),
+    path('fetch_classroom/', HodViews.fetch_classroom, name="fetch_classroom"),
     path('filter_schedules/', HodViews.filter_schedules, name='filter_schedules'),
     path('fetch_schedules/', HodViews.fetch_schedules, name='fetch_schedules'), 
     path('fetch_load_data/', HodViews.fetch_load_data, name='fetch_load_data'),
     path('save_schedule/', HodViews.save_schedule, name='save_schedule'),
     path('search_schedule/', HodViews.search_schedule, name='search_schedule'),
     path('check_schedule_conflict/', HodViews.check_schedule_conflict, name='check_schedule_conflict'),
-    
-    
-    path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
 
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),
     path('manage_subject/', HodViews.manage_subject, name="manage_subject"),
-    path('manage_subject/api', ManageSubjectsAPIView.as_view(), name="manage_subject_json"),
+    # path('manage_subject/api', ManageSubjectsAPIView.as_view(), name="manage_subject_json"),
     path('edit_subject/<subject_id>/', HodViews.edit_subject, name="edit_subject"),
     path('edit_subject_save/', HodViews.edit_subject_save, name="edit_subject_save"),
     path('delete_subject/<subject_id>/', HodViews.delete_subject, name="delete_subject"),

@@ -35,7 +35,7 @@ from rest_framework.permissions import AllowAny
 from student_management_app.models import CustomUser, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
 from student_management_app.models import Staffs, staff_contact_info, staff_employment_info, staff_physical_info, staff_government_ID_info, Staffs_Educ_Background, StudentPromotionHistory
 from student_management_app.models import Curriculums, GradeLevel, Enrollment, Enrollment_voucher, Subjects, Section, SessionYearModel
-from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport
+from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Classroom
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 
@@ -1519,46 +1519,88 @@ def manage_subject(request):
     }
     return render(request, 'hod_template/Manage_Template/manage_subject_template.html', context)
 
-class ManageSubjectsAPIView(APIView):
-    permission_classes = [IsAuthenticated]  # Only authenticated users
+def manage_classroom(request):
+    classroom = Classroom.objects.all()
+    context = {
+        "classrooms": classroom
+    }
+    return render(request, 'hod_template/Manage_Template/manage_classroom_template.html', context)
 
-    def post(self, request):
-        refresh_token = request.data.get("refresh_token")
-        if not refresh_token:
-            return Response({"error": "Refresh token is required"}, status=400)
+def fetch_classroom(request):
+    api_url = "https://inventoryapp1-o2l3.onrender.com/classroom/"
 
-        try:
-            token = RefreshToken(refresh_token)
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
 
-            if token.check_blacklist():
-                return Response({"error": "Token is blacklisted"}, status=403)
-            
-            user_id = token.get("user_id")
+        data = response.json()
+        classrooms = data.get("classrooms", [])
 
-            user = CustomUser.objects.get(id=user_id)
+        # Step 1: Fetch all IDs from the external API
+        external_ids = [classroom["id"] for classroom in classrooms]
 
-            if user.user_type != "1":
-                return Response({"error": "You do not have permission to view this resource."}, status=403)
-
-            subjects = Subjects.objects.all().values(
-                "id", 
-                "curriculum_id__curriculum_name", 
-                "GradeLevel_id__GradeLevel_name",
-                "subject_name", 
-                "subject_description", 
-                "subject_code", 
-                "subject_hours", 
-                "created_at", 
-                "updated_at"
+        # Step 2: Update or create records for all received data
+        for classroom in classrooms:
+            Classroom.objects.update_or_create(
+                id=classroom["id"],
+                defaults={"classroom_name": classroom["classroom_name"]},
             )
-            return Response({"subjects": list(subjects)}, status=200)
+
+        # Step 3: Identify and delete records that are no longer in the external API
+        Classroom.objects.exclude(id__in=external_ids).delete()
+
+        # Add a success message
+        messages.success(request, "Classrooms synchronized successfully.")
+        return redirect("manage_classroom")  # Redirect to the same page
+
+    except requests.RequestException as e:
+        messages.error(request, f"Request failed: {str(e)}")
+        return redirect("manage_classroom")
+
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return redirect("manage_classroom")
+
+# class ManageSubjectsAPIView(APIView):
+#     permission_classes = [IsAuthenticated]  # Only authenticated users
+
+#     def post(self, request):
+#         refresh_token = request.data.get("refresh_token")
+#         if not refresh_token:
+#             return Response({"error": "Refresh token is required"}, status=400)
+
+#         try:
+#             token = RefreshToken(refresh_token)
+
+#             if token.check_blacklist():
+#                 return Response({"error": "Token is blacklisted"}, status=403)
+            
+#             user_id = token.get("user_id")
+
+#             user = CustomUser.objects.get(id=user_id)
+
+#             if user.user_type != "1":
+#                 return Response({"error": "You do not have permission to view this resource."}, status=403)
+
+#             subjects = Subjects.objects.all().values(
+#                 "id", 
+#                 "curriculum_id__curriculum_name", 
+#                 "GradeLevel_id__GradeLevel_name",
+#                 "subject_name", 
+#                 "subject_description", 
+#                 "subject_code", 
+#                 "subject_hours", 
+#                 "created_at", 
+#                 "updated_at"
+#             )
+#             return Response({"subjects": list(subjects)}, status=200)
         
-        except TokenError as e:
-            return Response({"error": f"Token error: {str(e)}"}, status=403)
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
-        except Exception as e:
-            return Response({"error": str(e)}, status=400)
+#         except TokenError as e:
+#             return Response({"error": f"Token error: {str(e)}"}, status=403)
+#         except CustomUser.DoesNotExist:
+#             return Response({"error": "User not found"}, status=404)
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=400)
 
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)

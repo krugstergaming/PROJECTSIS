@@ -63,7 +63,7 @@
                             <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                <!-- <th>ID</th> -->
+                                <th>No.</th>
                                 <th>Curriculum Name</th>
                                 <th>Curriculum Status</th>
                                 <th>Date Created</th>
@@ -74,15 +74,14 @@
                             <tbody>
                                 {% for curriculum in curriculums %}
                                 <tr>
-                                <!-- <td>{{ gradelevel.id }}</td> -->
+                                <td>{{ forloop.counter }}</td>
                                 <td>{{ curriculum.curriculum_name }}</td>
                                 <td>{{ curriculum.curriculum_status }}</td>
                                 <td>{{ curriculum.created_at }}</td>
                                 <td>{{ curriculum.updated_at }}</td>
                                 <td>
                                     <a href="{% url 'edit_curriculum' curriculum.id %}" class="btn btn-warning">Edit</a>
-                                    <a href="{% url 'archive_curriculum' curriculum.id %}" class="btn btn-secondary" onclick="return confirm('Are you sure you want to archive this curriculum?');">Archive</a> 
-                                    
+                                    <a href="{% url 'archive_curriculum' curriculum.id %}" class="btn btn-secondary" onclick="return confirm('Are you sure you want to archive this curriculum?');">Archive</a>
                                 </td>
                                 </tr>
                                 {% endfor %}

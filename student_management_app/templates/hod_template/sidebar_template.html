@@ -84,6 +84,17 @@
               </a>
             </li>
 
+            <li class="nav-item">
+              {% url 'manage_classroom' as manage_classroom %}
+              <a href="{{ manage_classroom }}" class="nav-link 
+              {% if request.path == manage_classroom %} active {% endif %}">
+              <i class="nav-icon fas fa-file-alt"></i>
+                <p>
+                  Classroom API
+                </p>
+              </a>
+            </li>
+
             <!-- Class Scheduling Management -->
             <li class="nav-item has-treeview 
               {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 

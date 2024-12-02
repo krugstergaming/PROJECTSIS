@@ -15,7 +15,7 @@
                 <!-- general form elements -->
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Add Student</h3>
+                        <h3 class="card-title" style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;">REGISTRATION AND ASSESSMENT FORM</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
@@ -48,282 +48,388 @@
                         {% endif %}
 
                         <div class="card-body">
-
-                            <!-- Tabs Navigation -->
-                            <ul class="nav nav-tabs" id="studentFormTabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" id="basic-info-tab" data-toggle="tab" href="#basic-info" role="tab" aria-controls="basic-info" aria-selected="true">Basic Student Information</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="parent-info-tab" data-toggle="tab" href="#parent-info" role="tab" aria-controls="parent-info" aria-selected="false">Parent/Guardian Information</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="previous-school-tab" data-toggle="tab" href="#previous-school" role="tab" aria-controls="previous-school" aria-selected="false">Previous School Information</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" id="emergency-contact-tab" data-toggle="tab" href="#emergency-contact" role="tab" aria-controls="emergency-contact" aria-selected="false">Emergency Contact Information</a>
-                                </li>
-                            </ul>
-                        
-                            <div class="tab-content" id="studentFormContent">
-                                <!-- Basic Student Information -->
-                                <div class="tab-pane fade show active" id="basic-info" role="tabpanel" aria-labelledby="basic-info-tab">
-
-                                    <div class="form-group">
-                                        <label for="student_number">Student Number</label>
-                                        <input type="text" class="form-control" name="student_number" id="student_number" value="{{ student_number }}" readonly>
+                            <!-- Basic Student Information -->
+                            <div style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;"> I. BASIC STUDENT INFORMATION</div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <!-- Dynamic Session Selection -->
+                                        <div class="form-group">
+                                            <label for="session">Session <span style="color: red;">*</span></label>
+                                            <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                                <option value="">Select a Session</option> <!-- Optional placeholder -->
+                                                {% for session in sessions %}
+                                                    <option value="{{ session.id }}">{{ session.session_start_year }} - {{ session.session_end_year }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="username">Username</label>
-                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
+                                    <div class="col-md-4">
+                                        <!-- Dynamic GradeLevel Selection -->
+                                        <div class="form-group">
+                                            <label for="gradelevel">Grade Level <span style="color: red;">*</span></label>
+                                            <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                                <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
+                                                {% for gradelevel in gradelevels %}
+                                                    <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <!-- Profile Picture -->
+                                        <div class="form-group">
+                                            <label for="profile_pic">Profile Picture</label>
+                                            <input type="file" class="form-control" name="profile_pic" id="profile_pic">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="student_number">Student Number <span style="color: red;">*</span> </label>
+                                            <input type="text" class="form-control" name="student_number" id="student_number" value="{{ student_number }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="username">Username <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="email">Email <span style="color: red;">*</span></label>
+                                            <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="last_name">Last Name <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="first_name">First Name <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="middle_name">Middle Name</label>
+                                            <input type="text" class="form-control" name="middle_name" id="middle_name" placeholder="(optional)">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label for="suffix">Suffix</label>
+                                            <input type="text" class="form-control" name="suffix" id="suffix" placeholder="jr/sr...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="middle_name">Nickname</label>
+                                            <input type="text" class="form-control" name="nickname" id="nickname" placeholder="(optional)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="dob">Date of Birth <span style="color: red;">*</span></label>
+                                            <input type="date" class="form-control" name="dob" id="dob" placeholder="Select your date of birth" onchange="calculateAge()" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="age">Age</label>
+                                            <input type="number" class="form-control" name="age" id="age" placeholder="Age will calculate automatically" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="pob">Place of Birth <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="pob" id="pob" placeholder="Enter Place of Birth" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="form-group d-flex align-items-start">
+                                            <label for="sex" style="margin-right: 10px; min-width: 50px;">Sex: <span style="color: red;">*</span></label>
+                                            <div>
+                                                <div class="form-check d-block">
+                                                    <input class="form-check-input" type="radio" id="male" name="sex" value="Male">
+                                                    <label class="form-check-label" for="male">Male</label>
+                                                </div>
+                                                <div class="form-check d-block">
+                                                    <input class="form-check-input" type="radio" id="female" name="sex" value="Female">
+                                                    <label class="form-check-label" for="female">Female</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="nationality">Nationality <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="religion">Religion</label>
+                                            <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="rank_in_family">Rank in the Family</label>
+                                            <select class="form-control" name="rank_in_family" id="rank_in_family" required>
+                                                <option value="">Select Rank</option>
+                                                <option value="1">1st</option>
+                                                <option value="2">2nd</option>
+                                                <option value="3">3rd</option>
+                                                <option value="4">4th</option>
+                                                <option value="5">5th</option>
+                                                <option value="6">6th</option>
+                                                <option value="7">7th</option>
+                                                <option value="8">8th</option>
+                                                <option value="9">9th</option>
+                                                <option value="10">10th</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <div class="form-header">Permanent Address:</div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="region">Region <span style="color: red;">*</span></label>
+                                                <select name="region" class="form-control form-control-md" id="region"></select>
+                                                <input type="hidden" class="form-control form-control-md" name="region_text" id="region-text" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="province">Province <span style="color: red;">*</span></label>
+                                                <select name="province" class="form-control form-control-md" id="province"></select>
+                                                <input type="hidden" class="form-control form-control-md" name="province_text" id="province-text" required>
+                                            </div>    
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="city">City <span style="color: red;">*</span></label>
+                                                    <select name="city" class="form-control form-control-md" id="city"></select>
+                                                    <input type="hidden" class="form-control form-control-md" name="city_text" id="city-text" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="barangay">Barangay <span style="color: red;">*</span></label>
+                                                <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                                                <input type="hidden" class="form-control form-control-md" name="barangay_text" id="barangay-text" required>
+                                            </div>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="street">street <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control form-control-md" name="street_text" id="street-text">
+                                            </div>
+                                        </div>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <label for="first_name">First Name</label>
-                                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Enter First Name" required>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="last_name">Last Name</label>
-                                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Enter Last Name" required>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="middle_name">Middle Name</label>
-                                        <input type="text" class="form-control" name="middle_name" id="middle_name" placeholder="Enter Middle Name (optional)">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="suffix">Suffix</label>
-                                        <input type="text" class="form-control" name="suffix" id="suffix" placeholder="Enter Suffix (optional)">
-                                    </div>
+                                    <input type="hidden" name="permanent_address" id="permanent_address" required>
 
-                                    <div class="form-group">
-                                        <label for="middle_name">NickName</label>
-                                        <input type="text" class="form-control" name="nickname" id="nickname" placeholder="Enter NickName (optional)">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="gender">Sex</label>
-                                        <select class="form-control" name="sex" id="sex">
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                        </select>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="address">Address</label>
-                                        <input type="text" class="form-control" name="address" id="address" placeholder="Enter Address" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="date_of_birth">Date of Birth</label>
-                                        <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="Select your date of birth" onchange="calculateAge()" required>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="telephone_nos">Telephone Nos</label>
+                                            <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
+                                        </div>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <label for="age">Age</label>
-                                        <input type="number" class="form-control" name="age" id="age" placeholder="Age will be calculated automatically" readonly>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="mobile_phone_nos">Mobile Phone Nos</label>
+                                            <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos" required>
+                                        </div>
                                     </div>
-                        
-                                    <div class="form-group">
-                                        <label for="place_of_birth">Place of Birth</label>
-                                        <input type="text" class="form-control" name="place_of_birth" id="place_of_birth" placeholder="Enter Place of Birth" required>
+
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="is_covid_vaccinated">Is he/she COVID Vaccinated?</label>
+                                            <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
+                                                <option value="True">Yes</option>
+                                                <option value="False">No</option>
+                                            </select>
+                                        </div>
                                     </div>
-                        
-                                    <div class="form-group">
-                                        <label for="nationality">Nationality</label>
-                                        <input type="text" class="form-control" name="nationality" id="nationality" placeholder="Enter Nationality" required>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="religion">Religion</label>
-                                        <input type="text" class="form-control" name="religion" id="religion" placeholder="Enter Religion">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="rank_in_family">Rank in the Family</label>
-                                        <select class="form-control" name="rank_in_family" id="rank_in_family" required>
-                                            <option value="">Select Rank</option>
-                                            <option value="1">1st</option>
-                                            <option value="2">2nd</option>
-                                            <option value="3">3rd</option>
-                                            <option value="4">4th</option>
-                                            <option value="5">5th</option>
-                                            <option value="6">6th</option>
-                                            <option value="7">7th</option>
-                                            <option value="8">8th</option>
-                                            <option value="9">9th</option>
-                                            <option value="10">10th</option>
-                                        </select>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="telephone_nos">Telephone Nos</label>
-                                        <input type="text" class="form-control" name="telephone_nos" id="telephone_nos" placeholder="Enter Telephone Nos">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="mobile_phone_nos">Mobile Phone Nos</label>
-                                        <input type="text" class="form-control" name="mobile_phone_nos" id="mobile_phone_nos" placeholder="Enter Mobile Phone Nos" required>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="is_covid_vaccinated">Is COVID Vaccinated?</label>
-                                        <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
-                                            <option value="True">Yes</option>
-                                            <option value="False">No</option>
-                                        </select>
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="date_of_vaccination">Date of Vaccination</label>
-                                        <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
-                                    </div>
-                        
-                                    <!-- Dynamic GradeLevel Selection -->
-                                    <div class="form-group">
-                                        <label for="gradelevel">GradeLevel</label>
-                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
-                                            <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
-                                            {% for gradelevel in gradelevels %}
-                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                        
-                                    <!-- Dynamic Session Selection -->
-                                    <div class="form-group">
-                                        <label for="session">Session</label>
-                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
-                                            <option value="">Select a Session</option> <!-- Optional placeholder -->
-                                            {% for session in sessions %}
-                                                <option value="{{ session.id }}">{{ session.session_start_year }} - {{ session.session_end_year }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                        
-                                    <!-- Profile Picture -->
-                                    <div class="form-group">
-                                        <label for="profile_pic">Profile Picture</label>
-                                        <input type="file" class="form-control" name="profile_pic" id="profile_pic">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="date_of_vaccination">Date of Vaccination</label>
+                                            <input type="date" class="form-control" name="date_of_vaccination" id="date_of_vaccination">
+                                        </div>
                                     </div>
                                 </div>
                         
                                 <!-- Parent/Guardian Information -->
-                                <div class="tab-pane fade" id="parent-info" role="tabpanel" aria-labelledby="parent-info-tab">
-                                    <div class="form-group">
-                                        <label for="father_name">Father's Name</label>
-                                        <input type="text" class="form-control" name="father_name" id="father_name" placeholder="Enter Father's Name">
+                                <div style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;"> II. PARENTS/GUARDIAN</div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="father_name">Father's Name</label>
+                                            <input type="text" class="form-control" name="father_name" id="father_name" placeholder="Enter Father's Name">
+                                        </div>
                                     </div>
-                        
-                                    <div class="form-group">
-                                        <label for="father_occupation">Father's Occupation</label>
-                                        <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="mother_name">Mother's Name</label>
-                                        <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="Enter Mother's Name">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="mother_occupation">Mother's Occupation</label>
-                                        <input type="text" class="form-control" name="mother_occupation" id="mother_occupation" placeholder="Enter Mother's Occupation">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="guardian_name">Guardian's Name</label>
-                                        <input type="text" class="form-control" name="guardian_name" id="guardian_name" placeholder="Enter Guardian's Name">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="guardian_occupation">Guardian's Occupation</label>
-                                        <input type="text" class="form-control" name="guardian_occupation" id="guardian_occupation" placeholder="Enter Guardian's Occupation">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="father_occupation">Occupation</label>
+                                            <input type="text" class="form-control" name="father_occupation" id="father_occupation" placeholder="Enter Father's Occupation">
+                                        </div>   
                                     </div>
                                 </div>
-                        
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="mother_name">Mother's Name</label>
+                                            <input type="text" class="form-control" name="mother_name" id="mother_name" placeholder="Enter Mother's Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="mother_occupation">Occupation</label>
+                                            <input type="text" class="form-control" name="mother_occupation" id="mother_occupation" placeholder="Enter Mother's Occupation">
+                                        </div>   
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="guardian_name">Guardian's Name</label>
+                                            <input type="text" class="form-control" name="guardian_name" id="guardian_name" placeholder="Enter Guardian's Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="guardian_occupation">Occupation</label>
+                                            <input type="text" class="form-control" name="guardian_occupation" id="guardian_occupation" placeholder="Enter Guardian's Occupation">
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <!-- Previous School Information -->
-                                <div class="tab-pane fade" id="previous-school" role="tabpanel" aria-labelledby="previous-school-tab">
-                                    <div class="form-group">
-                                        <label for="previous_school_name">School name</label>
-                                        <input type="text" class="form-control" name="previous_school_name" id="previous_school_name" placeholder="Enter Previous School name">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="previous_school_address">School Address</label>
-                                        <input type="text" class="form-control" name="previous_school_address" id="previous_school_address" placeholder="Enter Previous School Address">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="previous_grade_level">Grade level</label>
-                                        <input type="text" class="form-control" name="previous_grade_level" id="previous_grade_level" placeholder="Enter Previous Grade level">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="previous_school_year_attended">S.Y. Attended</label>
-                                        <input type="text" class="form-control" name="previous_school_year_attended" id="previous_school_year_attended" placeholder="Enter Previoius School Year Attended">
-                                    </div>
+                                <div style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;"> III. PREVIOUS SCHOOL ATTENDED</div>
 
-                                    <div class="form-group">
-                                        <label for="previous_teacher_name">Teacher</label>
-                                        <input type="text" class="form-control" name="previous_teacher_name" id="previous_teacher_name" placeholder="Enter Previoius Teacher">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="previous_school_name">School name</label>
+                                            <input type="text" class="form-control" name="previous_school_name" id="previous_school_name" placeholder="Enter Previous School name">
+                                        </div>  
                                     </div>
                                 </div>
-                        
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="previous_school_address">School Address</label>
+                                            <input type="text" class="form-control" name="previous_school_address" id="previous_school_address" placeholder="Enter Previous School Address">
+                                        </div> 
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="previous_grade_level">Grade level</label>
+                                            <input type="text" class="form-control" name="previous_grade_level" id="previous_grade_level" placeholder="Enter Previous Grade level">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="previous_school_year_attended">S.Y. Attended</label>
+                                            <input type="text" class="form-control" name="previous_school_year_attended" id="previous_school_year_attended" placeholder="Enter Previoius School Year Attended">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="previous_teacher_name">Teacher</label>
+                                            <input type="text" class="form-control" name="previous_teacher_name" id="previous_teacher_name" placeholder="Enter Previoius Teacher">
+                                        </div>
+                                    </div>
+                                </div>
+                                    
                                 <!-- Emergency Contact Information -->
-                                <div class="tab-pane fade" id="emergency-contact" role="tabpanel" aria-labelledby="emergency-contact-tab">
-                                    <div class="form-group">
-                                        <label for="emergency_contact_name">Contact Name</label>
-                                        <input type="text" class="form-control" name="emergency_contact_name" id="emergency_contact_name" placeholder="Enter Contact Name">
+                                <div style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;"> IV. PERSON TO CONTACT IN CASE OF EMERGENCY</div>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="emergency_contact_name">Contact Name <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="emergency_contact_name" id="emergency_contact_name" placeholder="Enter Contact Name">
+                                        </div>
                                     </div>
-                        
-                                    <div class="form-group">
-                                        <label for="emergency_contact_relationship">Relationship</label>
-                                        <input type="text" class="form-control" name="emergency_contact_relationship" id="emergency_contact_relationship" placeholder="Enter Relationship">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="emergency_contact_relationship">Relationship <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="emergency_contact_relationship" id="emergency_contact_relationship" placeholder="Enter Relationship">
+                                        </div>
                                     </div>
-
-                                    <div class="form-group">
-                                        <label for="emergency_contact_address">Contact Address</label>
-                                        <input type="text" class="form-control" name="emergency_contact_address" id="emergency_contact_address" placeholder="Enter Address">
-                                    </div>
-                        
-                                    <div class="form-group">
-                                        <label for="emergency_contact_phone">Contact Phone</label>
-                                        <input type="text" class="form-control" name="emergency_contact_phone" id="emergency_contact_phone" placeholder="Enter Contact Phone">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="emergency_enrolling_teacher">Enrolling Teacher</label>
-                                        <input type="text" class="form-control" name="emergency_enrolling_teacher" id="emergency_enrolling_teacher" placeholder="Enter Enrolling Teacher">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="emergency_date">Date</label>
-                                        <input type="date" class="form-control" name="emergency_date" id="emergency_date">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="emergency_referred_by">Referred by</label>
-                                        <input type="text" class="form-control" name="emergency_referred_by" id="emergency_referred_by" placeholder="Enter Referred by">
-                                    </div>
-
                                 </div>
-                            </div> <!-- Closing tab-content div -->
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="emergency_contact_address">Contact Address <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="emergency_contact_address" id="emergency_contact_address" placeholder="Enter Address">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="emergency_contact_phone">Contact Phone <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control" name="emergency_contact_phone" id="emergency_contact_phone" placeholder="Enter Contact Phone">
+                                        </div>    
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="emergency_enrolling_teacher">Enrolling Teacher</label>
+                                            <input type="text" class="form-control" name="emergency_enrolling_teacher" id="emergency_enrolling_teacher" placeholder="Enter Enrolling Teacher">
+                                        </div> 
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="emergency_date">Date</label>
+                                            <input type="date" class="form-control" name="emergency_date" id="emergency_date">
+                                        </div> 
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="emergency_referred_by">Referred by</label>
+                                            <input type="text" class="form-control" name="emergency_referred_by" id="emergency_referred_by" placeholder="Enter Referred by">
+                                        </div> 
+                                    </div>
+                                </div>
+                            <!-- Save Button -->
+                            <div class="form-group row">
+                                <div class="col-sm-12 text-center">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <a href="{% url 'add_student' %}" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </div>
                         </div> <!-- Closing card-body div -->
                         <!-- /.card-body -->
-
-                        <div class="card-footer">
-                            <button type="button" class="btn btn-primary" id="prevBtn">Previous</button>
-                            <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
-                            <button type="submit" class="btn btn-success" id="saveBtn">Save</button>
-                        </div>
-                        
                     </form>
                 </div>
                 <!-- /.card -->
@@ -343,29 +449,42 @@
 
 
 <script>
+
+    function concatenateAddress() {
+            // Get the values of the input fields
+            var region = document.getElementById('region-text').value;
+            var province = document.getElementById('province-text').value;
+            var city = document.getElementById('city-text').value;
+            var barangay = document.getElementById('barangay-text').value;
+            var street = document.getElementById('street-text').value;
+
+            // Concatenate the values
+            var fullAddress = street + ", " + barangay + ", " + city + ", " + province + ", " + region;
+
+            // Set the concatenated address to the hidden input
+            document.getElementById('address').value = fullAddress;
+        }
+
+        // Call the function initially (in case values are already set)
+        concatenateAddress();
+
+        // Add event listeners to update the address when any input changes
+        document.getElementById('region-text').addEventListener('input', concatenateAddress);
+        document.getElementById('province-text').addEventListener('input', concatenateAddress);
+        document.getElementById('city-text').addEventListener('input', concatenateAddress);
+        document.getElementById('barangay-text').addEventListener('input', concatenateAddress);
+        document.getElementById('street-text').addEventListener('input', concatenateAddress);
+
+
     $(document).ready(function(){
-
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 100) {
-                $('#scrollUpButton').fadeIn();
-            } else {
-                $('#scrollUpButton').fadeOut();
-            }
-        });
-
-        // Scroll to the top when the button is clicked
-        $('#scrollUpButton').click(function () {
-            $('html, body').animate({ scrollTop: 0 }, 'slow');
-            return false;
-        });
-
+        
         // keyup event will be triggered when user leaves keyboard
         $("#id_email").keyup(function(){
             var email = $(this).val();
 
             if(email!=""){
                 $.ajax({
-                    url : '{% url 'check_email_exist' %}',
+                    url : '{% url "check_email_exist" %}',
                     type : 'POST',
                     data : {email:email}
                 })
@@ -397,7 +516,7 @@
             
             if(username!=""){
                 $.ajax({
-                    url : '{% url 'check_username_exist' %}',
+                    url : '{% url "check_username_exist" %}',
                     type : 'POST',
                     data : {username:username}
                 })
@@ -423,82 +542,10 @@
             }
             
         })
-
-        var $tabs = $('#studentFormTabs a');
-        var $tabContent = $('#studentFormContent .tab-pane');
-        var $prevBtn = $('#prevBtn');
-        var $nextBtn = $('#nextBtn');
-        var $saveBtn = $('#saveBtn');
-
-        function validateTab(index) {
-            var $currentTab = $tabContent.eq(index);
-            var $requiredFields = $currentTab.find('[required]');
-            var isValid = true;
-            var firstMissingField = null;
-
-            $requiredFields.each(function() {
-                var $field = $(this);
-                if ($field.val().trim() === '') {
-                    if (!firstMissingField) {
-                        firstMissingField = $field;
-                    }
-                    isValid = false;
-                }
-            });
-
-            if (!isValid) {
-                // Scroll to and focus on the first missing field
-                $('html, body').animate({
-                    scrollTop: firstMissingField.offset().top - 100 // Adjust as needed
-                }, 500);
-                firstMissingField.focus();
-            }
-
-            return isValid;
-        }
-
-        function showTab(index) {
-            if (validateTab(index - 1) || index === 0) { // Allow navigation if current tab is valid or it's the first tab
-                $tabs.removeClass('active');
-                $tabContent.removeClass('show active');
-                $tabs.eq(index).addClass('active');
-                $tabContent.eq(index).addClass('show active');
-
-                // Show or hide buttons based on the tab index
-                if (index === 0) {
-                    $prevBtn.hide(); // Hide Previous button on the first tab
-                } else {
-                    $prevBtn.show(); // Show Previous button on other tabs
-                }
-
-                if (index === $tabs.length - 1) {
-                    $saveBtn.show(); // Show Save button on the last tab
-                } else {
-                    $saveBtn.hide(); // Hide Save button on other tabs
-                }
-            }
-        }
-
-        $('#nextBtn').click(function(){
-            var currentIndex = $tabs.index($tabs.filter('.active'));
-            if (currentIndex < $tabs.length - 1) {
-                showTab(currentIndex + 1);
-            }
-        });
-
-        $('#prevBtn').click(function(){
-            var currentIndex = $tabs.index($tabs.filter('.active'));
-            if (currentIndex > 0) {
-                showTab(currentIndex - 1);
-            }
-        });
-
-        // Initial state
-        showTab(0); // Start with the first tab
     });
 
     function calculateAge() {
-        const dobInput = document.getElementById('date_of_birth').value;
+        const dobInput = document.getElementById('dob').value;
         if (dobInput) {
             const dob = new Date(dobInput);
             const today = new Date();

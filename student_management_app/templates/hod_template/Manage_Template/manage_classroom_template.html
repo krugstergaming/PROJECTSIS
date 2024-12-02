@@ -86,16 +86,21 @@
 
       <script>
         document.getElementById('add-classroom-btn').addEventListener('click', function() {
-            fetch("{% url 'add_classroom' %}", {
-                method: "POST",
+            fetch("{% url 'fetch_classroom' %}", {
+                method: "GET",
                 headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",  // CSRF token for security
-                }
-            }).then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;  // Redirect based on the response from the view
+                    "Authorization": `Bearer ${localStorage.getItem("access_token")}`
                 }
             })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // Reload page to show messages
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An unexpected error occurred.");
+            });
         });
     </script>
 

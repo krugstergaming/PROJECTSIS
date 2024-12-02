@@ -273,7 +273,6 @@ class Load(models.Model):
 class Schedule(models.Model):
     id = models.AutoField(primary_key=True)
     load_id = models.ForeignKey(Load, on_delete=models.CASCADE)  
-    classroom_id = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10)                       
     start_time = models.TimeField()                                     
     end_time = models.TimeField()                                       
