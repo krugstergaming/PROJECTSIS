@@ -1,21 +1,16 @@
 {% load static %}
 
-<aside class="main-sidebar sidebar-dark-primary" style="background-color: #93C572; color: #000;">
-      
-    {% comment %} <!-- Brand Logo -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
       <a href="{% url 'admin_home' %}" class="brand-link">
         <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
             style="opacity: .8">
-          
-    <!--C:\Users\arla1\OneDrive\Desktop\Repo-SIS\GroupSIS\media\fdg.jpg-->
-
-        <!-- SHOOL NAME -->
-        <span class="brand-text font-weight-light">Flor de Grace School</span>
-      </a> {% endcomment %}
+        <span class="brand-text font-weight-light">Flor De Grace </span>
+      </a>
 
       <!-- Sidebar -->
       <div class="sidebar">
-        {% comment %} <!-- Sidebar user panel (optional) -->
+        <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
             <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
@@ -23,7 +18,7 @@
           <div class="info">
             <a href="{% url 'admin_profile' %}" class="d-block">{{ user.first_name }} {{ user.last_name }}</a>
           </div>
-        </div> {% endcomment %}
+        </div>
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
@@ -82,60 +77,6 @@
                   Enrollment Management
                 </p>
               </a>
-            </li>
-
-            <li class="nav-item">
-              {% url 'manage_classroom' as manage_classroom %}
-              <a href="{{ manage_classroom }}" class="nav-link 
-              {% if request.path == manage_classroom %} active {% endif %}">
-              <i class="nav-icon fas fa-file-alt"></i>
-                <p>
-                  Classroom API
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-              
-
-                <!-- Class Assign Section -->
-                <li class="nav-item">
-                  {% url 'manage_assign_section' as manage_assign_section %}
-                  {% url 'add_assignsection' as add_assignsection %}
-                  <a href="{{ manage_assign_section }}" class="nav-link 
-                    {% if request.path == add_assignsection or request.path == manage_assign_section %} 
-                      active 
-                    {% endif %}">
-                    <i class="nav-icon fas fa-list"></i>
-                    <p>Assign Section</p>
-                  </a>
-                </li>
-
-                <!-- Class Load -->
-                <li class="nav-item">
-                  {% url 'manage_load_scheduling' as manage_load_scheduling %}
-                  {% url 'add_load' as add_load %}
-                  <a href="{{ manage_load_scheduling }}" class="nav-link 
-                    {% if request.path == add_load or request.path == manage_load_scheduling %} 
-                      active 
-                    {% endif %}">
-                    <i class="nav-icon fas fa-tasks"></i>
-                    <p>Load Management</p>
-                  </a>
-                </li>
-
-                <!-- Manage Class Scheduling -->
-                <li class="nav-item">
-                    {% url 'manage_class_scheduling' as manage_class_scheduling %}
-                    {% url 'add_schedule' as add_schedule %}
-                    {% url 'edit_schedule' schedule_id=id as edit_schedule %}
-                    <a href="{{ manage_class_scheduling }}" class="nav-link 
-                      {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule %} 
-                        active 
-                      {% endif %}">
-                      <i class="nav-icon fas fa-calendar-alt"></i>
-                      <p> Class Schedule</p>
-                    </a>
-                </li>
-              </ul>
             </li>
 
             <!-- Class Scheduling Management -->
@@ -209,6 +150,19 @@
                   </p>
               </a>
               <ul class="nav nav-treeview">
+
+                  <li class="nav-item">
+                      {% url 'add_school' as add_school %}
+                      {% url 'manage_school' as manage_school %}
+                      {% url 'edit_school' edit_school=id as edit_school %}
+                      <a href="{{ manage_school }}" class="nav-link 
+                      {% if request.path == add_school %} active {% endif %}
+                      {% if request.path == manage_school %} active {% endif %} 
+                      {% if request.path == edit_school %} active {% endif %}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                          <p>School Information Management</p>
+                      </a>
+                  </li>
                   <li class="nav-item">
                       {% url 'add_session' as add_session %}
                       {% url 'manage_session' as manage_session %}
