@@ -1540,8 +1540,6 @@ def view_promotion_history(request, student_id):
     promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
     return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
 
-
-
 def edit_student(request, student_id):
     student = Students.objects.get(admin=student_id)
     sessions = SessionYearModel.objects.all()
@@ -2183,6 +2181,42 @@ def add_assignsection_save(request):
             return redirect('add_assignsection')
 
 
+def manage_assign_section(request):
+    assignsections = AssignSection.objects.all()
+    context = {
+        "assignsections": assignsections
+    }
+    return render(request, 'hod_template/Manage_Template/manage_assignsection_template.html', context)
+
+def get_sections_by_grade(request, grade_level_id):
+    sections = Section.objects.filter(GradeLevel_id=grade_level_id).values('id', 'section_name')
+    return JsonResponse({'sections': list(sections)})
+
+def edit_assignsection(request):
+    if request.method == 'POST':
+        assignsection_id = request.POST.get('id')
+        section_id = request.POST.get('section_id')
+
+        # Debugging: Print received values
+        print("assignsection_id:", assignsection_id)
+        print("section_id:", section_id)
+
+        # Validate inputs
+        if not assignsection_id or not section_id:
+            messages.error(request, "Invalid data received.")
+            return redirect('manage_assign_section')
+
+        # Update the assigned section
+        try:
+            assign_section = get_object_or_404(AssignSection, id=assignsection_id)
+            assign_section.section_id_id = section_id
+            assign_section.save()
+
+            messages.success(request, "Section updated successfully!")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+
+        return redirect('manage_assign_section')
 
 def add_load(request):
     # Fetch all necessary data for the context
@@ -2207,7 +2241,6 @@ def add_load(request):
         "loads": loads,
     }
     return render(request, 'hod_template/Add_Template/add_load_template.html', context)
-
 
 def get_subject_data(request):
     curriculum_id = request.GET.get('curriculum_id')
@@ -2448,12 +2481,7 @@ def add_schedule_save(request):
     # Return the data as a JSON response
     return JsonResponse(load_data, safe=False)
 
-def manage_assign_section(request):
-    assignsections = AssignSection.objects.all()
-    context = {
-        "assignsections": assignsections
-    }
-    return render(request, 'hod_template/Manage_Template/manage_assignsection_template.html', context)
+
 
 def manage_load_scheduling(request):
     loads = Load.objects.all()
@@ -2628,8 +2656,6 @@ def search_schedule(request):
 
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
     
-
-
 def edit_schedule(request, schedule_id):
     # Adding Schedule ID into Session Variable
     request.session['schedule_id'] = schedule_id

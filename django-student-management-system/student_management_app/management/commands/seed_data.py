@@ -97,8 +97,8 @@ class Command(BaseCommand):
                 Section.objects.create(
                     section_name=f'Section {section_number}',
                     GradeLevel_id=grade_level,
-                    section_soft_limit=15,
-                    section_limit=20 
+                    section_soft_limit=10,
+                    section_limit=15 
                 )
 
         # Seed Enrollment_voucher for each GradeLevel with randomized fee data

@@ -85,8 +85,6 @@ urlpatterns = [
     path('promote_sections_and_students/', HodViews.promote_sections_and_students, name="promote_sections_and_students"),
     path('add_promotion_save/', HodViews.add_promotion_save, name="add_promotion_save"),
 
-
-
     path('add_load/', HodViews.add_load, name="add_load"), 
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
 
@@ -102,7 +100,8 @@ urlpatterns = [
     path('add_assignsection/', HodViews.add_assignsection, name="add_assignsection"),
     path('load_sections_and_students/', HodViews.load_sections_and_students, name='load_sections_and_students'),
     path('add_assignsection_save/', HodViews.add_assignsection_save, name="add_assignsection_save"),
-    
+    path('get_sections_by_grade/<int:grade_level_id>/', HodViews.get_sections_by_grade, name='get_sections_by_grade'),
+    path('edit_assignsection/', HodViews.edit_assignsection, name='edit_assignsection'),
 
     
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
