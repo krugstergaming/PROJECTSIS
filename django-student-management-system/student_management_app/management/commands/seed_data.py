@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, ParentGuardian, PreviousSchool, EmergencyContact, CustomUser, Enrollment_voucher
+from student_management_app.models import School_info, Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Students, ParentGuardian, PreviousSchool, EmergencyContact, CustomUser, Enrollment_voucher
 from datetime import datetime, date
 import random
 
@@ -8,42 +8,67 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Delete existing data (optional)
+        
+        School_info.objects.all().delete()
         Curriculums.objects.all().delete()
         GradeLevel.objects.all().delete()
         Section.objects.all().delete()
         SessionYearModel.objects.all().delete()
         Subjects.objects.all().delete()
-        Staffs.objects.all().delete()
         Students.objects.all().delete()
-        CustomUser.objects.filter(user_type=2).delete()
         CustomUser.objects.filter(user_type=3).delete()
         Enrollment_voucher.objects.all().delete()
 
-        # Check if admin already exists
-        if not CustomUser.objects.filter(username='admin').exists():
-            admin = CustomUser.objects.create_superuser(
-                username='admin',
-                first_name='Levi',
-                last_name='Matudan',
-                email='admin@gmail.com',
-                password='ad',
-                user_type=1 
-            )
-            self.stdout.write(self.style.SUCCESS(f'Admin user "{admin.username}" created successfully.'))
-        else:
-            self.stdout.write(self.style.WARNING('Admin user already exists.'))
+        school_info_data = [
+            {
+            "school_name": 'Flor De Grace',
+            "school_ID_number": '123456',
+            "school_district": 'District 2',
+            "school_division": 'Division 1',
+            "school_region": 'NCR',
+            "region": 'NCR',
+            "province": 'Eastern Manila District',
+            "city": 'Quezon City',
+            "barangay": 'Commonwealth',
+            "street": '74 Gold Street',
+            "school_email": 'floordegrace.school@yahoo.com',
+            "school_cellphone": '09952573373',
+            "school_telephone": '09682200677',
+            }
+        ]
+        # Seed the data into School Information
+        for school_datas in school_info_data:
+            School_info.objects.create(**school_datas)
 
-        # Seed SessionYearModel
-        session_year = SessionYearModel.objects.create(
-            session_start_year=datetime.strptime('13-09-2024', '%d-%m-%Y').date(),
-            session_end_year=datetime.strptime('13-09-2025', '%d-%m-%Y').date(),
-            session_limit='120',
-            session_status='Active'
-        )
+        # Array of session year data
+        session_year_data = [
+            {
+                "session_start_year": datetime.strptime('01-06-2023', '%d-%m-%Y').date(),
+                "session_end_year": datetime.strptime('30-03-2024', '%d-%m-%Y').date(),
+                "session_limit": '120',
+                "session_status": 'Active'
+            },
+            {
+                "session_start_year": datetime.strptime('01-06-2024', '%d-%m-%Y').date(),
+                "session_end_year": datetime.strptime('30-03-2025', '%d-%m-%Y').date(),
+                "session_limit": '110',
+                "session_status": 'Active'
+            },
+            {
+                "session_start_year": datetime.strptime('01-06-2025', '%d-%m-%Y').date(),
+                "session_end_year": datetime.strptime('30-03-2026', '%d-%m-%Y').date(),
+                "session_limit": '130',
+                "session_status": 'Active'
+            }
+        ]
+
+        # Seed the data into SessionYearModel
+        for session_data in session_year_data:
+            session_year = SessionYearModel.objects.create(**session_data)
 
         # Seed Curriculums
         curriculum1 = Curriculums.objects.create(
-            curriculum_name='matatag',
+            curriculum_name='Matatag',
             curriculum_description='A well-rounded curriculum focused on strengthening foundational skills.',
             curriculum_status='active'
         )
@@ -79,7 +104,7 @@ class Command(BaseCommand):
         # Seed Enrollment_voucher for each GradeLevel with randomized fee data
         for grade_level in grade_levels:
             registration_fee = round(random.uniform(500.00, 2000.00), 2)
-            misc_fee = round(random.uniform(200.00, 1000.00), 2)
+            misc_fee = round(random.uniform(500.00, 1000.00), 2)
             tuition_fee = round(random.uniform(1500.00, 5000.00), 2)
             total_fee = round(registration_fee + misc_fee + tuition_fee, 2)
 
@@ -183,182 +208,6 @@ class Command(BaseCommand):
         def calculate_age(dob):
             today = date.today()
             return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-        
-        # Seed Faculty
-        faculty_data = [
-            {
-                'max_load': '5',
-                'username': 'jdoe',
-                'email': 'jdoe@example.com',
-                'password': 'fac1',
-                'last_name': 'Doe',
-                'first_name': 'John',
-                'middle_name': 'A',
-                'dob': datetime.strptime('1990-01-01', '%Y-%m-%d').date(),
-                'pob': 'City, Country',
-                'sex': 'Male',
-                'civil_status': 'Single',
-                'height': '1.75',
-                'weight': '70',
-                'blood_type': 'O+',
-                'gsis_id': '123456789',
-                'pagibig_id': '987654321',
-                'philhealth_id': '5555555555',
-                'sss_id': '4444444444',
-                'tin_id': '3333333333',
-                'citizenship': 'Filipino',
-                'dual_country': '',
-                'permanent_address': '123 Main St, City, Country',
-                'telephone_no': '123-456-7890',
-                'cellphone_no': '098-765-4321'
-            },
-            {
-                'max_load': '5',
-                'username': 'asmith',
-                'email': 'asmith@example.com',
-                'password': 'fac2',
-                'last_name': 'Smith',
-                'first_name': 'Alice',
-                'middle_name': 'B',
-                'dob': datetime.strptime('1985-05-15', '%Y-%m-%d').date(),
-                'pob': 'Townsville, Country',
-                'sex': 'Female',
-                'civil_status': 'Married',
-                'height': '1.65',
-                'weight': '60',
-                'blood_type': 'A-',
-                'gsis_id': '987654321',
-                'pagibig_id': '123456789',
-                'philhealth_id': '4444444444',
-                'sss_id': '5555555555',
-                'tin_id': '6666666666',
-                'citizenship': 'Filipino',
-                'dual_country': '',
-                'permanent_address': '456 Elm St, Townsville, Country',
-                'telephone_no': '234-567-8901',
-                'cellphone_no': '097-654-3210'
-            },
-            {
-                'max_load': '5',
-                'username': 'bjohnson',
-                'email': 'bjohnson@example.com',
-                'password': 'fac3',
-                'last_name': 'Johnson',
-                'first_name': 'Bob',
-                'middle_name': 'C',
-                'dob': datetime.strptime('1980-09-25', '%Y-%m-%d').date(),
-                'pob': 'Village, Country',
-                'sex': 'Male',
-                'civil_status': 'Divorced',
-                'height': '1.80',
-                'weight': '80',
-                'blood_type': 'B+',
-                'gsis_id': '555555555',
-                'pagibig_id': '666666666',
-                'philhealth_id': '7777777777',
-                'sss_id': '8888888888',
-                'tin_id': '9999999999',
-                'citizenship': 'Filipino',
-                'dual_country': '',
-                'permanent_address': '789 Oak St, Village, Country',
-                'telephone_no': '345-678-9012',
-                'cellphone_no': '096-543-2109'
-            },
-            {
-                'max_load': '5',
-                'username': 'cjones',
-                'email': 'cjones@example.com',
-                'password': 'fac4',
-                'last_name': 'Jones',
-                'first_name': 'Carol',
-                'middle_name': 'D',
-                'dob': datetime.strptime('1992-12-30', '%Y-%m-%d').date(),
-                'pob': 'Cityville, Country',
-                'sex': 'Female',
-                'civil_status': 'Widowed',
-                'height': '1.70',
-                'weight': '65',
-                'blood_type': 'AB-',
-                'gsis_id': '444444444',
-                'pagibig_id': '555555555',
-                'philhealth_id': '6666666666',
-                'sss_id': '7777777777',
-                'tin_id': '8888888888',
-                'citizenship': 'Filipino',
-                'dual_country': '',
-                'permanent_address': '101 Pine St, Cityville, Country',
-                'telephone_no': '456-789-0123',
-                'cellphone_no': '095-432-1098'
-            },
-            {
-                'max_load': '5',
-                'username': 'dlee',
-                'email': 'dlee@example.com',
-                'password': 'fac5',
-                'last_name': 'Lee',
-                'first_name': 'David',
-                'middle_name': 'E',
-                'dob': datetime.strptime('1988-11-11', '%Y-%m-%d').date(),
-                'pob': 'Metropolis, Country',
-                'sex': 'Male',
-                'civil_status': 'Single',
-                'height': '1.85',
-                'weight': '85',
-                'blood_type': 'O-',
-                'gsis_id': '333333333',
-                'pagibig_id': '444444444',
-                'philhealth_id': '5555555555',
-                'sss_id': '666666666',
-                'tin_id': '7777777777',
-                'citizenship': 'Filipino',
-                'dual_country': '',
-                'permanent_address': '202 Maple St, Metropolis, Country',
-                'telephone_no': '567-890-1234',
-                'cellphone_no': '094-321-0987'
-            }
-        ]
-
-        for staff in faculty_data:
-            try:
-
-                # Calculate age based on dob
-                age = calculate_age(staff['dob'])
-
-                # Create CustomUser instance
-                user = CustomUser.objects.create_user(
-                    username=staff['username'],
-                    password=staff['password'],
-                    email=staff['email'],
-                    first_name=staff['first_name'],
-                    last_name=staff['last_name'],
-                    user_type=2  # Staff
-                )
-                
-                # Update Staffs fields via the related CustomUser instance
-                user.staffs.max_load = staff['max_load']
-                user.staffs.middle_name = staff['middle_name']
-                user.staffs.dob = staff['dob']
-                user.staffs.age = age  # Dynamically calculated age
-                user.staffs.pob = staff['pob']
-                user.staffs.sex = staff['sex']
-                user.staffs.civil_status = staff['civil_status']
-                user.staffs.height = staff['height']
-                user.staffs.weight = staff['weight']
-                user.staffs.blood_type = staff['blood_type']
-                user.staffs.gsis_id = staff['gsis_id']
-                user.staffs.pagibig_id = staff['pagibig_id']
-                user.staffs.philhealth_id = staff['philhealth_id']
-                user.staffs.sss_id = staff['sss_id']
-                user.staffs.tin_id = staff['tin_id']
-                user.staffs.citizenship = staff['citizenship']
-                user.staffs.dual_country = staff['dual_country']
-                user.staffs.permanent_address = staff['permanent_address']
-                user.staffs.telephone_no = staff['telephone_no']
-                user.staffs.cellphone_no = staff['cellphone_no']
-                user.save()
-
-            except Exception as e:
-                self.stdout.write(self.style.ERROR(f'Error adding staff {staff["username"]}: {str(e)}'))
 
         # Seed Student
         # Define the student data with correct GradeLevel references
@@ -841,9 +690,152 @@ class Command(BaseCommand):
                 'mother_occupation': 'Nurse',
                 'guardian_name': 'Teresita Delos Reyes',  # Guardian for student 2
                 'guardian_occupation': 'Retired Teacher'
+            },
+            {
+                'father_name': 'Miguel Cruz',
+                'father_occupation': 'Architect',
+                'mother_name': 'Rosa Cruz',
+                'mother_occupation': 'Lawyer',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Eduardo Garcia',
+                'father_occupation': 'Chef',
+                'mother_name': 'Clara Garcia',
+                'mother_occupation': 'Accountant',
+                'guardian_name': 'Isabel Garcia',  # Guardian for student 4
+                'guardian_occupation': 'Retired Bank Manager'
+            },
+            {
+                'father_name': 'Carlos Rivera',
+                'father_occupation': 'Police Officer',
+                'mother_name': 'Lucia Rivera',
+                'mother_occupation': 'Secretary',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Julio Fernandez',
+                'father_occupation': 'Farmer',
+                'mother_name': 'Elena Fernandez',
+                'mother_occupation': 'Homemaker',
+                'guardian_name': 'Juan Fernandez',  # Guardian for student 6
+                'guardian_occupation': 'Retired Military'
+            },
+            {
+                'father_name': 'Luis Perez',
+                'father_occupation': 'Pilot',
+                'mother_name': 'Maria Perez',
+                'mother_occupation': 'Engineer',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Antonio Reyes',
+                'father_occupation': 'Sales Manager',
+                'mother_name': 'Lina Reyes',
+                'mother_occupation': 'Doctor',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Fernando Lopez',
+                'father_occupation': 'Teacher',
+                'mother_name': 'Raquel Lopez',
+                'mother_occupation': 'Nurse',
+                'guardian_name': 'Rosalia Lopez',  # Guardian for student 9
+                'guardian_occupation': 'Retired Teacher'
+            },
+            {
+                'father_name': 'Alberto Morales',
+                'father_occupation': 'Electrician',
+                'mother_name': 'Gabriela Morales',
+                'mother_occupation': 'Cashier',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Manuel Sanchez',
+                'father_occupation': 'Journalist',
+                'mother_name': 'Patricia Sanchez',
+                'mother_occupation': 'Artist',
+                'guardian_name': 'Carlos Sanchez',  # Guardian for student 11
+                'guardian_occupation': 'Retired Professor'
+            },
+            {
+                'father_name': 'Ricardo Mendoza',
+                'father_occupation': 'Dentist',
+                'mother_name': 'Carmen Mendoza',
+                'mother_occupation': 'Teacher',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Juan Garcia',
+                'father_occupation': 'Pharmacist',
+                'mother_name': 'Gloria Garcia',
+                'mother_occupation': 'Pharmacist',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Felipe Ramirez',
+                'father_occupation': 'Farmer',
+                'mother_name': 'Beatriz Ramirez',
+                'mother_occupation': 'Nurse',
+                'guardian_name': 'Patricia Ramirez',  # Guardian for student 14
+                'guardian_occupation': 'Retired Nurse'
+            },
+            {
+                'father_name': 'Hector Navarro',
+                'father_occupation': 'Engineer',
+                'mother_name': 'Tina Navarro',
+                'mother_occupation': 'Teacher',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Ricardo Santos',
+                'father_occupation': 'Scientist',
+                'mother_name': 'Estela Santos',
+                'mother_occupation': 'Doctor',
+                'guardian_name': 'Manuel Santos',  # Guardian for student 16
+                'guardian_occupation': 'Retired Soldier'
+            },
+            {
+                'father_name': 'Francisco Ramirez',
+                'father_occupation': 'Driver',
+                'mother_name': 'Ana Ramirez',
+                'mother_occupation': 'Salesperson',
+                'guardian_name': 'N/A',
+                'guardian_occupation': 'N/A'
+            },
+            {
+                'father_name': 'Antonio Morales',
+                'father_occupation': 'Entrepreneur',
+                'mother_name': 'Veronica Morales',
+                'mother_occupation': 'Professor',
+                'guardian_name': 'Claudia Morales',  # Guardian for student 18
+                'guardian_occupation': 'Business Owner'
+            },
+            {
+                'father_name': 'David Cruz',
+                'father_occupation': 'Architect',
+                'mother_name': 'Julia Cruz',
+                'mother_occupation': 'Psychologist',
+                'guardian_name': 'N/A',  # No guardian
+                'guardian_occupation': 'N/A'  # No guardian
+            },
+            {
+                'father_name': 'Antonio Morales',
+                'father_occupation': 'Entrepreneur',
+                'mother_name': 'Veronica Morales',
+                'mother_occupation': 'Professor',
+                'guardian_name': 'Claudia Morales',  # Guardian for student 18
+                'guardian_occupation': 'Business Owner'
             }
         ]
-
         previous_school_data = [
             {
                 'previous_school_name': 'Little Stars School',
@@ -858,9 +850,134 @@ class Command(BaseCommand):
                 'previous_grade_level': 'Grade 1',
                 'previous_school_year_attended': '2022-2023',
                 'previous_teacher_name': 'Mr. Dela Cruz'
+            },
+            {
+                'previous_school_name': 'Green Valley High School',
+                'previous_school_address': '123 Green Valley St, City, Country',
+                'previous_grade_level': 'Grade 3',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mrs. Tan'
+            },
+            {
+                'previous_school_name': 'Sunrise Academy',
+                'previous_school_address': '456 Sunrise Ave, City, Country',
+                'previous_grade_level': 'Grade 2',
+                'previous_school_year_attended': '2021-2022',
+                'previous_teacher_name': 'Ms. Johnson'
+            },
+            {
+                'previous_school_name': 'Mountain Peak School',
+                'previous_school_address': '789 Mountain Rd, City, Country',
+                'previous_grade_level': 'Grade 4',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mr. Santos'
+            },
+            {
+                'previous_school_name': 'Seaside Elementary',
+                'previous_school_address': '321 Seaside Blvd, City, Country',
+                'previous_grade_level': 'Grade 5',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mrs. Garcia'
+            },
+            {
+                'previous_school_name': 'Maple Leaf International School',
+                'previous_school_address': '654 Maple St, City, Country',
+                'previous_grade_level': 'Grade 6',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mr. Mendoza'
+            },
+            {
+                'previous_school_name': 'Riverdale School',
+                'previous_school_address': '987 River Rd, City, Country',
+                'previous_grade_level': 'Kindergarten',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Ms. Alvarez'
+            },
+            {
+                'previous_school_name': 'Blue Sky High School',
+                'previous_school_address': '654 Blue Sky Ave, City, Country',
+                'previous_grade_level': 'Grade 2',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mr. Lee'
+            },
+            {
+                'previous_school_name': 'Golden Gate Academy',
+                'previous_school_address': '123 Golden Gate Rd, City, Country',
+                'previous_grade_level': 'Grade 4',
+                'previous_school_year_attended': '2021-2022',
+                'previous_teacher_name': 'Mrs. Martinez'
+            },
+            {
+                'previous_school_name': 'Silver Lake School',
+                'previous_school_address': '432 Silver Lake Dr, City, Country',
+                'previous_grade_level': 'Grade 5',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mr. Cruz'
+            },
+            {
+                'previous_school_name': 'Harmony School',
+                'previous_school_address': '876 Harmony St, City, Country',
+                'previous_grade_level': 'Grade 3',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mrs. Robinson'
+            },
+            {
+                'previous_school_name': 'Evergreen Academy',
+                'previous_school_address': '321 Evergreen Blvd, City, Country',
+                'previous_grade_level': 'Grade 6',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mr. Perez'
+            },
+            {
+                'previous_school_name': 'Valley Forge School',
+                'previous_school_address': '654 Valley Rd, City, Country',
+                'previous_grade_level': 'Kindergarten',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Ms. Taylor'
+            },
+            {
+                'previous_school_name': 'North Star School',
+                'previous_school_address': '789 North St, City, Country',
+                'previous_grade_level': 'Grade 1',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mr. Davis'
+            },
+            {
+                'previous_school_name': 'Ocean Breeze Academy',
+                'previous_school_address': '234 Ocean Blvd, City, Country',
+                'previous_grade_level': 'Grade 2',
+                'previous_school_year_attended': '2021-2022',
+                'previous_teacher_name': 'Mrs. Wilson'
+            },
+            {
+                'previous_school_name': 'Sunset High School',
+                'previous_school_address': '876 Sunset Ave, City, Country',
+                'previous_grade_level': 'Grade 3',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mr. Wright'
+            },
+            {
+                'previous_school_name': 'Crystal Clear School',
+                'previous_school_address': '987 Crystal Blvd, City, Country',
+                'previous_grade_level': 'Grade 4',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Ms. Carter'
+            },
+            {
+                'previous_school_name': 'Riverstone Academy',
+                'previous_school_address': '543 Riverstone Rd, City, Country',
+                'previous_grade_level': 'Grade 5',
+                'previous_school_year_attended': '2023-2024',
+                'previous_teacher_name': 'Mr. Smith'
+            },
+            {
+                'previous_school_name': 'Bright Future Academy',
+                'previous_school_address': '876 Bright Future Rd, City, Country',
+                'previous_grade_level': 'Grade 6',
+                'previous_school_year_attended': '2022-2023',
+                'previous_teacher_name': 'Mrs. Harris'
             }
         ]
-
         emergency_contact_data = [
             {
                 'emergency_contact_name': 'Carlos Santos',
@@ -879,7 +996,170 @@ class Command(BaseCommand):
                 'emergency_enrolling_teacher': 'Ms. Lopez',
                 'emergency_referred_by': 'Mrs. Delos Reyes',
                 'emergency_date': datetime.strptime('2024-11-18', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Ana Santos',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '789 Elm St, City, Country',
+                'emergency_contact_phone': '345-678-9012',
+                'emergency_enrolling_teacher': 'Mr. Reyes',
+                'emergency_referred_by': 'Mrs. Santos',
+                'emergency_date': datetime.strptime('2024-11-19', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Maria Delos Reyes',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '101 Pine St, City, Country',
+                'emergency_contact_phone': '456-789-0123',
+                'emergency_enrolling_teacher': 'Mr. Cruz',
+                'emergency_referred_by': 'Mrs. Delos Reyes',
+                'emergency_date': datetime.strptime('2024-11-19', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Teresita Delos Reyes',
+                'emergency_contact_relationship': 'Grandmother',
+                'emergency_contact_address': '234 Oak St, City, Country',
+                'emergency_contact_phone': '567-890-1234',
+                'emergency_enrolling_teacher': 'Ms. Garcia',
+                'emergency_referred_by': 'Mr. Delos Reyes',
+                'emergency_date': datetime.strptime('2024-11-20', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Luis Hernandez',
+                'emergency_contact_relationship': 'Uncle',
+                'emergency_contact_address': '567 Birch St, City, Country',
+                'emergency_contact_phone': '678-901-2345',
+                'emergency_enrolling_teacher': 'Ms. Morales',
+                'emergency_referred_by': 'Mr. Hernandez',
+                'emergency_date': datetime.strptime('2024-11-20', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Isabel Mendoza',
+                'emergency_contact_relationship': 'Aunt',
+                'emergency_contact_address': '678 Cedar St, City, Country',
+                'emergency_contact_phone': '789-012-3456',
+                'emergency_enrolling_teacher': 'Mr. Perez',
+                'emergency_referred_by': 'Mrs. Mendoza',
+                'emergency_date': datetime.strptime('2024-11-21', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Roberto Garcia',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '789 Maple St, City, Country',
+                'emergency_contact_phone': '890-123-4567',
+                'emergency_enrolling_teacher': 'Ms. Reyes',
+                'emergency_referred_by': 'Mrs. Garcia',
+                'emergency_date': datetime.strptime('2024-11-21', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Clara Fernandez',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '321 Pine Ave, City, Country',
+                'emergency_contact_phone': '901-234-5678',
+                'emergency_enrolling_teacher': 'Mr. Torres',
+                'emergency_referred_by': 'Mrs. Fernandez',
+                'emergency_date': datetime.strptime('2024-11-22', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Carlos Gutierrez',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '432 Birch Blvd, City, Country',
+                'emergency_contact_phone': '123-345-6789',
+                'emergency_enrolling_teacher': 'Ms. Lopez',
+                'emergency_referred_by': 'Mrs. Gutierrez',
+                'emergency_date': datetime.strptime('2024-11-22', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Julia Reyes',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '876 Oak Rd, City, Country',
+                'emergency_contact_phone': '234-456-7890',
+                'emergency_enrolling_teacher': 'Mr. Ramos',
+                'emergency_referred_by': 'Mrs. Reyes',
+                'emergency_date': datetime.strptime('2024-11-23', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Eduardo Alvarez',
+                'emergency_contact_relationship': 'Uncle',
+                'emergency_contact_address': '987 Elm Blvd, City, Country',
+                'emergency_contact_phone': '345-567-8901',
+                'emergency_enrolling_teacher': 'Ms. Torres',
+                'emergency_referred_by': 'Mr. Alvarez',
+                'emergency_date': datetime.strptime('2024-11-23', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Veronica Cruz',
+                'emergency_contact_relationship': 'Aunt',
+                'emergency_contact_address': '654 Willow St, City, Country',
+                'emergency_contact_phone': '456-678-9012',
+                'emergency_enrolling_teacher': 'Mr. Garcia',
+                'emergency_referred_by': 'Mrs. Cruz',
+                'emergency_date': datetime.strptime('2024-11-24', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'David Perez',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '234 Pine St, City, Country',
+                'emergency_contact_phone': '567-789-0123',
+                'emergency_enrolling_teacher': 'Ms. Sanchez',
+                'emergency_referred_by': 'Mr. Perez',
+                'emergency_date': datetime.strptime('2024-11-24', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Sofia Rodriguez',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '345 Maple Ave, City, Country',
+                'emergency_contact_phone': '678-890-1234',
+                'emergency_enrolling_teacher': 'Mr. Lopez',
+                'emergency_referred_by': 'Mrs. Rodriguez',
+                'emergency_date': datetime.strptime('2024-11-25', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Pedro Martinez',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '567 Oak Dr, City, Country',
+                'emergency_contact_phone': '789-901-2345',
+                'emergency_enrolling_teacher': 'Ms. Hernandez',
+                'emergency_referred_by': 'Mr. Martinez',
+                'emergency_date': datetime.strptime('2024-11-25', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Diana Valdez',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '678 Birch Rd, City, Country',
+                'emergency_contact_phone': '890-012-3456',
+                'emergency_enrolling_teacher': 'Mr. Silva',
+                'emergency_referred_by': 'Mrs. Valdez',
+                'emergency_date': datetime.strptime('2024-11-26', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Elena Gutierrez',
+                'emergency_contact_relationship': 'Aunt',
+                'emergency_contact_address': '789 Cedar St, City, Country',
+                'emergency_contact_phone': '901-234-5678',
+                'emergency_enrolling_teacher': 'Ms. Lopez',
+                'emergency_referred_by': 'Mr. Gutierrez',
+                'emergency_date': datetime.strptime('2024-11-26', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Gabriel Cruz',
+                'emergency_contact_relationship': 'Father',
+                'emergency_contact_address': '123 Redwood St, City, Country',
+                'emergency_contact_phone': '234-567-8900',
+                'emergency_enrolling_teacher': 'Mr. Rivera',
+                'emergency_referred_by': 'Mrs. Cruz',
+                'emergency_date': datetime.strptime('2024-11-27', '%Y-%m-%d').date()
+            },
+            {
+                'emergency_contact_name': 'Isabella Martinez',
+                'emergency_contact_relationship': 'Mother',
+                'emergency_contact_address': '567 Coral Blvd, City, Country',
+                'emergency_contact_phone': '345-678-9011',
+                'emergency_enrolling_teacher': 'Ms. Navarro',
+                'emergency_referred_by': 'Mr. Martinez',
+                'emergency_date': datetime.strptime('2024-11-27', '%Y-%m-%d').date()
             }
+            
         ]
 
         for i, student in enumerate(student_data):

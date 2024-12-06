@@ -19,36 +19,40 @@ class SessionYearModel(models.Model):
 # Overriding the Default Django Auth User and adding One More Field (user_type)
 class CustomUser(AbstractUser):
     user_type_data = ((1, "HOD"), (2, "Staff"), (3, "Student"))
+    failed_login_attempts = models.IntegerField(default=0)
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
 
 
-class AdminHOD(models.Model):
+class Employee(models.Model):
     id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-
-class Staffs(models.Model):
-    id = models.AutoField(primary_key=True)
-    admin = models.OneToOneField(CustomUser, on_delete = models.CASCADE)
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     middle_name = models.CharField(max_length=255, blank=True, null=True)
     suffix = models.CharField(max_length=20, blank=True, null=True)
-    dob = models.DateField(blank=True, null=True)  # Assuming Date of Birth is a date
+    dob = models.DateField(blank=True, null=True)
     age = models.CharField(max_length=15, blank=True, null=True)
     pob = models.CharField(max_length=255)
     sex = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
     civil_status = models.CharField(max_length=20, choices=[('single', 'Single'), ('married', 'Married'), ('other', 'Other')])
     citizenship = models.CharField(max_length=20, default='Filipino', blank=True, null=True)
-    dual_country = models.CharField(max_length=255, blank=True, null=True)  # For specifying the country if dual citizenship
+    dual_country = models.CharField(max_length=255, blank=True, null=True)
     max_load = models.IntegerField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
+
+    class Meta:
+        abstract = True  # This makes the class abstract
+
+class AdminHOD(Employee):
+    # You can add fields specific to AdminHOD here
+    pass
+
+class Staffs(Employee):
+    # You can add fields specific to Staffs here
+    pass
 
 class staff_contact_info(models.Model):
-    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE, blank=True, null=True)
+    adminhod_id = models.ForeignKey(AdminHOD, on_delete=models.CASCADE, blank=True, null=True)
     region = models.CharField(max_length=255, blank=True, null=True)
     province = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
@@ -56,7 +60,8 @@ class staff_contact_info(models.Model):
     street = models.CharField(max_length=255, blank=True, null=True)
     telephone_no = models.CharField(max_length=20, blank=True, null=True)
     cellphone_no = models.CharField(max_length=20, blank=True, null=True)
-    emergency_contact = models.CharField(max_length=20, blank=True, null=True)
+    emergency_contact_name = models.CharField(max_length=20, blank=True, null=True)
+    emergency_contact_no = models.CharField(max_length=255, blank=True, null=True)
     emergency_relationship = models.CharField(max_length=255, blank=True, null=True)
     medical_condition = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,7 +69,8 @@ class staff_contact_info(models.Model):
     objects = models.Manager()
 
 class staff_employment_info(models.Model):
-    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE, blank=True, null=True)
+    adminhod_id = models.ForeignKey(AdminHOD, on_delete=models.CASCADE, blank=True, null=True)
     employee_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
     employee_type = models.CharField(max_length=255, blank=True, null=True)
     position = models.CharField(max_length=255, blank=True, null=True)
@@ -74,7 +80,8 @@ class staff_employment_info(models.Model):
     objects = models.Manager()
 
 class staff_physical_info(models.Model):
-    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE, blank=True, null=True)
+    adminhod_id = models.ForeignKey(AdminHOD, on_delete=models.CASCADE, blank=True, null=True)
     blood_type = models.CharField(max_length=10, blank=True, null=True)
     height = models.CharField(max_length=10, blank=True, null=True)  # For height in meters
     weight = models.CharField(max_length=10, blank=True, null=True)  # For weight in kilograms
@@ -85,7 +92,8 @@ class staff_physical_info(models.Model):
     objects = models.Manager()
 
 class staff_government_ID_info(models.Model):
-    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE, blank=True, null=True)
+    adminhod_id = models.ForeignKey(AdminHOD, on_delete=models.CASCADE, blank=True, null=True)
     gsis_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     pagibig_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
     philhealth_id = models.CharField(max_length=50, blank=True, null=True, default='N/A')
@@ -96,7 +104,8 @@ class staff_government_ID_info(models.Model):
     objects = models.Manager()
 
 class Staffs_Educ_Background(models.Model):
-    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE)
+    staffs_id = models.ForeignKey(Staffs, on_delete=models.CASCADE, blank=True, null=True)
+    adminhod_id = models.ForeignKey(AdminHOD, on_delete=models.CASCADE, blank=True, null=True)
     HEA = models.CharField(max_length=255, blank=True, null=True) # Highest Educational Attainment
     Cert_License = models.CharField(max_length=255, blank=True, null=True)
     teaching_exp = models.CharField(max_length=255, blank=True, null=True)
@@ -114,6 +123,14 @@ class School_info(models.Model):
     school_district = models.CharField(max_length=255, blank=True, null=True)
     school_division = models.CharField(max_length=255, blank=True, null=True)
     school_region = models.CharField(max_length=255, blank=True, null=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    province = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    barangay = models.CharField(max_length=255, blank=True, null=True)
+    street = models.CharField(max_length=255, blank=True, null=True)
+    school_email = models.CharField(max_length=255, blank=True, null=True)
+    school_cellphone = models.CharField(max_length=20, blank=True, null=True)
+    school_telephone = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -285,6 +302,23 @@ class Schedule(models.Model):
     def __str__(self):
         return f"{self.load_id.subject_id.subject_name} - {self.load_id.GradeLevel_id.GradeLevel_name} - {self.day_of_week} ({self.start_time} to {self.end_time})"
     
+class StudentResult(models.Model):
+    id = models.AutoField(primary_key=True)
+    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    load_id = models.ForeignKey(Load, on_delete=models.CASCADE)
+    
+    subject_first_quarter = models.FloatField(default=0)
+    subject_second_quarter = models.FloatField(default=0)
+    subject_third_quarter = models.FloatField(default=0)
+    subject_fourth_quarter = models.FloatField(default=0)
+    subject_final_grade = models.FloatField(default=0)
+    general_average = models.FloatField(default=0)
+    remarks = models.CharField(max_length=50, blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class ParentGuardian(models.Model):
     students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
     father_name = models.CharField(max_length=100, blank=True, null=True)
@@ -394,24 +428,7 @@ class NotificationStaffs(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class StudentResult(models.Model):
-    id = models.AutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    load_id = models.ForeignKey(Load, on_delete=models.CASCADE)
-    
-    subject_first_quarter = models.FloatField(default=0)
-    subject_second_quarter = models.FloatField(default=0)
-    subject_third_quarter = models.FloatField(default=0)
-    subject_fourth_quarter = models.FloatField(default=0)
-    subject_final_grade = models.FloatField(default=0)
-    general_average = models.FloatField(default=0)
 
-    subject_exam_marks = models.FloatField(default=0)
-    subject_assignment_marks = models.FloatField(default=0)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
 
 
 class GradingConfiguration(models.Model):

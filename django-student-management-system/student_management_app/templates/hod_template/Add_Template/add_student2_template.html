@@ -8,12 +8,14 @@
 
 {% load static %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
-                <div class="card card-primary">
+                <div class="card card-success">
                     <div class="card-header">
                         <h3 class="card-title" style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;">REGISTRATION AND ASSESSMENT FORM</h3>
                     </div>
@@ -54,11 +56,11 @@
                                     <div class="col-md-4">
                                         <!-- Dynamic Session Selection -->
                                         <div class="form-group">
-                                            <label for="session">Session <span style="color: red;">*</span></label>
+                                            <label for="session">Academic Year <span style="color: red;">*</span></label>
                                             <select class="form-control" name="session_year_id" id="session_year_id" required>
                                                 <option value="">Select a Session</option> <!-- Optional placeholder -->
                                                 {% for session in sessions %}
-                                                    <option value="{{ session.id }}">{{ session.session_start_year }} - {{ session.session_end_year }}</option>
+                                                    <option value="{{ session.id }}">{{ session.session_start_year.year }} - {{ session.session_end_year.year }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -95,12 +97,14 @@
                                         <div class="form-group">
                                             <label for="username">Username <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="username" id="username" placeholder="Enter Username" required>
+                                            <span class="username_error"></span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="email">Email <span style="color: red;">*</span></label>
                                             <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" required>
+                                            <span class="email_error"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -424,7 +428,7 @@
                             <!-- Save Button -->
                             <div class="form-group row">
                                 <div class="col-sm-12 text-center">
-                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button type="submit" class="btn btn-success">Save</button>
                                     <a href="{% url 'add_student' %}" class="btn btn-secondary">Cancel</a>
                                 </div>
                             </div>
@@ -447,6 +451,65 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+<script>
+$(document).ready(function() {
+            // Check email availability
+            $("#email").on("keyup", function() {
+                var email = $(this).val();
+
+                if (email !== "") {
+                    $.ajax({
+                        url: '{% url "check_email_exist" %}',
+                        type: 'POST',
+                        data: { email: email },
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }, // CSRF token for security
+                    })
+                    .done(function(response) {
+                        $(".email_error").remove(); // Remove previous messages
+                        if (response.trim() === "True") {
+                            $("<span class='email_error' style='color: red; padding: 5px; font-weight: bold;'> Email Not Available. </span>").insertAfter("#email");
+                        } else {
+                            $("<span class='email_error' style='color: green; padding: 5px; font-weight: bold;'> Email Available. </span>").insertAfter("#email");
+                        }
+                    })
+                    .fail(function() {
+                        console.error("Failed to check email availability.");
+                    });
+                } else {
+                    $(".email_error").remove(); // Remove message if input is empty
+                }
+            });
+
+            // Check username availability
+            $("#username").on("keyup", function() {
+                var username = $(this).val();
+
+                if (username !== "") {
+                    $.ajax({
+                        url: '{% url "check_username_exist" %}',
+                        type: 'POST',
+                        data: { username: username },
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }, // CSRF token for security
+                    })
+                    .done(function(response) {
+                        $(".username_error").remove(); // Remove previous messages
+                        if (response.trim() === "True") {
+                            $("<span class='username_error' style='color: red; padding: 5px; font-weight: bold;'> Username Not Available. </span>").insertAfter("#username");
+                        } else {
+                            $("<span class='username_error' style='color: green; padding: 5px; font-weight: bold;'> Username Available. </span>").insertAfter("#username");
+                        }
+                    })
+                    .fail(function() {
+                        console.error("Failed to check username availability.");
+                    });
+                } else {
+                    $(".username_error").remove(); // Remove message if input is empty
+                }
+            });
+        });
+
+</script>
 
 <script>
 
@@ -474,75 +537,6 @@
         document.getElementById('city-text').addEventListener('input', concatenateAddress);
         document.getElementById('barangay-text').addEventListener('input', concatenateAddress);
         document.getElementById('street-text').addEventListener('input', concatenateAddress);
-
-
-    $(document).ready(function(){
-        
-        // keyup event will be triggered when user leaves keyboard
-        $("#id_email").keyup(function(){
-            var email = $(this).val();
-
-            if(email!=""){
-                $.ajax({
-                    url : '{% url "check_email_exist" %}',
-                    type : 'POST',
-                    data : {email:email}
-                })
-                .done(function(response){
-                    //console.log(response);
-
-                    if(response == "True"){
-                        $(".email_error").remove();
-                        $("<span class='email_error' style='color: red; padding: 5px; font-weight: bold;'> Email Not Available. </span>").insertAfter("#id_email")
-                    }
-                    else{
-                        $(".email_error").remove();
-                        $("<span class='email_error' style='color: green; padding: 5px; font-weight: bold;'> Email Available. </span>").insertAfter("#id_email")
-                    }
-                })
-
-                .fail(function(){
-                    console.log("Failed");
-                })
-            }
-            else{
-                $(".email_error").remove();
-            }
-            
-        })
-
-        $("#id_username").keyup(function(){
-            var username = $(this).val();
-            
-            if(username!=""){
-                $.ajax({
-                    url : '{% url "check_username_exist" %}',
-                    type : 'POST',
-                    data : {username:username}
-                })
-                .done(function(response){
-                    //console.log(response);
-
-                    if(response == "True"){
-                        $(".username_error").remove();
-                        $("<span class='username_error' style='color: red; padding: 5px; font-weight: bold;'> Username Not Available. </span>").insertAfter("#id_username")
-                    }
-                    else{
-                        $(".username_error").remove();
-                        $("<span class='username_error' style='color: green; padding: 5px; font-weight: bold;'> Username Available. </span>").insertAfter("#id_username")
-                    }
-                })
-
-                .fail(function(){
-                    console.log("Failed");
-                })
-            }
-            else{
-                $(".username_error").remove();
-            }
-            
-        })
-    });
 
     function calculateAge() {
         const dobInput = document.getElementById('dob').value;

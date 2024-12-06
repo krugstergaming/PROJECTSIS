@@ -8,14 +8,15 @@
 
 {% load static %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <!-- general form elements -->
-                <div class="card card-primary">
+                <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">Add School Information</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
@@ -48,37 +49,108 @@
                         {% endif %}
 
                         <div class="card-body">
-                            <div class="form-group">
-                                <label>School Name</label>
-                                <input type="text" class="form-control" name="school_name" id="school_name" placeholder="Enter School Name" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>School Name <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_name" id="school_name" placeholder="Enter School Name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>School ID <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_ID_number" id="school_ID_number" placeholder="Enter School ID" required>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label>School ID</label>
-                                <input type="text" class="form-control" name="school_ID_number" id="school_ID_number" placeholder="Enter School ID" required>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School District <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_district" id="school_district" placeholder="Enter School District" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Division <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_division" id="school_division" placeholder="Enter School Division" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Region <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_region" id="school_region" placeholder="Enter School Region" required>
+                                    </div> 
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label>School District</label>
-                                <input type="text" class="form-control" name="school_district" id="school_district" placeholder="Enter School District" required>
+                            <div class="form-header">Address:</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="region">Region <span style="color: red;">*</span></label>
+                                        <select name="region" class="form-control form-control-md" id="region"></select>
+                                        <input type="hidden" class="form-control form-control-md" name="region-text" id="region-text">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="province">Province <span style="color: red;">*</span></label>
+                                        <select name="province" class="form-control form-control-md" id="province"></select>
+                                        <input type="hidden" class="form-control form-control-md" name="province-text" id="province-text">
+                                    </div>
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="city">City <span style="color: red;">*</span></label>
+                                        <select name="city" class="form-control form-control-md" id="city"></select>
+                                        <input type="hidden" class="form-control form-control-md" name="city-text" id="city-text">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="barangay">Barangay <span style="color: red;">*</span></label>
+                                        <select name="barangay" class="form-control form-control-md" id="barangay"></select>
+                                        <input type="hidden" class="form-control form-control-md" name="barangay-text" id="barangay-text">
+                                    </div>
+                                </div>
 
-                            <div class="form-group">
-                                <label>School Division</label>
-                                <input type="text" class="form-control" name="school_division" id="school_division" placeholder="Enter School Division" required>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="street">Street <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control form-control-md" id="street" name="street" placeholder="Enter your Street">
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="form-group">
-                                <label>School Region</label>
-                                <input type="text" class="form-control" name="school_region" id="school_region" placeholder="Enter School Region" required>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Email <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_email" id="school_email" placeholder="Enter School Email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Cellphone No. <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_cellphone" id="school_cellphone" placeholder="Enter School Cellphone No." required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Telephone No.</label>
+                                        <input type="text" class="form-control" name="school_telephone" id="school_telephone" placeholder="Enter School Tellphone No.">
+                                    </div> 
+                                </div>
                             </div>
-
-                            
                         </div>
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                            <button type="button" class="btn btn-primary" onclick="showModal()">Add School</button>
+                            <button type="button" class="btn btn-success" onclick="showModal()">Save</button>
+                            <a class="btn btn-secondary" href="{% url 'manage_school' %}" role="button">Back</a>
                         </div>
                     </form>
                 </div>
@@ -108,6 +180,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    function updateAddressFields() {
+        // Get the selected options and their text content
+        var regionSelect = document.getElementById('region');
+        var provinceSelect = document.getElementById('province');
+        var citySelect = document.getElementById('city');
+        var barangaySelect = document.getElementById('barangay');
+
+        // Ensure there's a valid selection and update hidden inputs with the option text
+        if (regionSelect.selectedIndex > 0) {
+            document.getElementById('region-text').value = regionSelect.options[regionSelect.selectedIndex].text;
+        }
+        if (provinceSelect.selectedIndex > 0) {
+            document.getElementById('province-text').value = provinceSelect.options[provinceSelect.selectedIndex].text;
+        }
+        if (citySelect.selectedIndex > 0) {
+            document.getElementById('city-text').value = citySelect.options[citySelect.selectedIndex].text;
+        }
+        if (barangaySelect.selectedIndex > 0) {
+            document.getElementById('barangay-text').value = barangaySelect.options[barangaySelect.selectedIndex].text;
+        }
+    }
+
+    // Event listeners to update the hidden fields whenever a selection is made
+    document.getElementById('region').addEventListener('change', updateAddressFields);
+    document.getElementById('province').addEventListener('change', updateAddressFields);
+    document.getElementById('city').addEventListener('change', updateAddressFields);
+    document.getElementById('barangay').addEventListener('change', updateAddressFields);
+
+    // Initial call to populate hidden fields when page loads (if pre-populated values exist)
+    updateAddressFields();
+</script>
 
 <script>
     // Function to show the confirmation dialog
@@ -184,6 +289,8 @@
     }
 
 </script>
+
+
 
 <style>
     /* Modal background */

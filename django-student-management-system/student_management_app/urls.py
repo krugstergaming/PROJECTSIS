@@ -14,6 +14,9 @@ urlpatterns = [
     path('admin_home/', HodViews.admin_home, name="admin_home"),
     path('add_staff/', HodViews.add_staff, name="add_staff"),
     path('add_staff_save/', HodViews.add_staff_save, name="add_staff_save"),
+    
+    path('add_admin/', HodViews.add_admin, name="add_admin"),
+    path('add_admin_save/', HodViews.add_admin_save, name="add_admin_save"),
 
     path('manage_staff/', HodViews.manage_staff, name="manage_staff"),
     path('toggle_grading_state/', HodViews.toggle_grading_state, name='toggle_grading_state'),
@@ -22,11 +25,15 @@ urlpatterns = [
     path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
 
+    path('toggle_user_activation/<int:user_id>/', HodViews.toggle_user_activation, name='toggle_user_activation'),
+
     # path('edit_max_load/<int:staff_id>/', views.edit_max_load, name='edit_max_load'),
 
     path('add_school/', HodViews.add_school, name="add_school"),
     path('add_school_save/', HodViews.add_school_save, name="add_school_save"),
     path('manage_school/', HodViews.manage_school, name="manage_school"),
+    path('edit_school/<int:school_info_id>/', HodViews.edit_school, name="edit_school"),
+    path('edit_school_save/', HodViews.edit_school_save, name="edit_school_save"),
 
 
     path('add_curriculum/', HodViews.add_curriculum, name="add_curriculum"),
@@ -66,6 +73,7 @@ urlpatterns = [
     path('edit_student/<student_id>', HodViews.edit_student, name="edit_student"),
     path('edit_student_save/', HodViews.edit_student_save, name="edit_student_save"),
     path('manage_student/', HodViews.manage_student, name="manage_student"),
+    path('toggle_student_activation/<int:user_id>/', HodViews.toggle_student_activation, name='toggle_student_activation'),
 
 
     # enrollment urls
@@ -77,12 +85,20 @@ urlpatterns = [
     path('edit_enrollment/<enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
     path('edit_enrollment_save/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
 
-    path('update-student-status/', HodViews.update_student_status, name='update-student-status'),
-    path('update-batch-student-status/', HodViews.update_batch_student_status, name='update_batch_student_status'),
+    path('update_student_status/', HodViews.update_student_status, name='update_student_status'),
+
+    path('add_promotion/', HodViews.add_promotion, name="add_promotion"),
+    path('promote_sections_and_students/', HodViews.promote_sections_and_students, name="promote_sections_and_students"),
+    path('add_promotion_save/', HodViews.add_promotion_save, name="add_promotion_save"),
 
 
-    path('add_load/', HodViews.add_load, name="add_load"),
+
+    path('add_load/', HodViews.add_load, name="add_load"), 
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
+
+    path('get_subject_data/', HodViews.get_subject_data, name='get_subject_data'),
+    path('save_load_data/', HodViews.save_load_data, name='save_load_data'),
+
     # path('edit_load/<load_id>', HodViews.edit_load, name="edit_load"),
     # path('edit_load_save/', HodViews.edit_load_save, name="edit_load_save"),
     # path('manage_load/', HodViews.manage_load, name="manage_load"),
@@ -102,8 +118,6 @@ urlpatterns = [
     path('manage_assign_section/', HodViews.manage_assign_section, name="manage_assign_section"),
     path('manage_load_scheduling/', HodViews.manage_load_scheduling, name="manage_load_scheduling"),
 
-    path('filter_schedules/', HodViews.filter_schedules, name='filter_schedules'),
-    path('fetch_schedules/', HodViews.fetch_schedules, name='fetch_schedules'), 
     path('fetch_load_data/', HodViews.fetch_load_data, name='fetch_load_data'),
     path('save_schedule/', HodViews.save_schedule, name='save_schedule'),
     path('search_schedule/', HodViews.search_schedule, name='search_schedule'),
@@ -129,6 +143,7 @@ urlpatterns = [
 
     path('check_email_exist/', HodViews.check_email_exist, name="check_email_exist"),
     path('check_username_exist/', HodViews.check_username_exist, name="check_username_exist"),
+
     path('student_feedback_message/', HodViews.student_feedback_message, name="student_feedback_message"),
     path('student_feedback_message_reply/', HodViews.student_feedback_message_reply, name="student_feedback_message_reply"),
     path('staff_feedback_message/', HodViews.staff_feedback_message, name="staff_feedback_message"),

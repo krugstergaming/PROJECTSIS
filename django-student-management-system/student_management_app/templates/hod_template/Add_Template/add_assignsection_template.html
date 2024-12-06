@@ -6,13 +6,14 @@
 
 {% block main_content %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-primary">
+                <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">Add Assign Section</h3>
                     </div>
                     <form role="form" method="POST" action="{% url 'add_assignsection_save' %}">
                         {% csrf_token %}
@@ -49,41 +50,50 @@
                         {% endif %}
 
                         <div class="card-body">
-                            <div class="form-group">
-                                <label for="gradelevel">Grade level</label>
-                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
-                                    <option value="">Select a Grade level</option>
-                                    {% for gradelevel in gradelevels %}
-                                        <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Section</label>
-                                <select class="form-control" name="section_id" id="section_id" required disabled>
-                                    <option value="" disabled selected>Select a Section</option>
-                                </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="gradelevel">Grade level</label>
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                            <option value="">Select a Grade level</option>
+                                            {% for gradelevel in gradelevels %}
+                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Section</label>
+                                        <select class="form-control" name="section_id" id="section_id" required disabled>
+                                            <option value="" disabled selected>Select a Section</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                            
+
+                            
 
                             <div class="form-group">
                                 <label>Students</label>
-                                <table class="table table-bordered" id="student_table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="student_table_body">
-                                        <!-- Student rows will be populated here -->
-                                    </tbody>
-                                </table>
+                                    <table class="table table-bordered" id="student_table">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="5" style="text-align: center;">Names</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="student_table_body">
+                                            <td class="text-center">Select a grade level load data.</td>
+                                        </tbody>
+                                    </table>
                             </div>
                         </div>
 
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Add Assign Section</button>
-                            <a href="{% url 'manage_class_scheduling' %}" class="btn btn-secondary">Back</a>
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_assign_section' %}" class="btn btn-secondary">Back</a>
                         </div>
                         
 
@@ -129,17 +139,21 @@
                         sectionSelect.appendChild(option);  
                     });
 
-                    // Populate student table
+                    // Populate student table in 3 columns
                     studentTableBody.innerHTML = ''; // Clear previous rows
-                    data.students.forEach(function(student) {
-                        var row = document.createElement('tr');
-                        // Automatically select the checkbox for the student
-                        row.innerHTML = `
-                            <td>
-                                <input type="checkbox" name="student_ids" value="${student.id}" checked>
-                                ${student.name}
-                            </td>`;
-                        studentTableBody.appendChild(row);
+                    let row;
+                    data.students.forEach(function(student, index) {
+                        if (index % 5 === 0) {
+                            // Create a new row every 3 students
+                            row = document.createElement('tr');
+                            studentTableBody.appendChild(row);
+                        }
+                        // Create a new cell for the student
+                        const cell = document.createElement('td');
+                        cell.innerHTML = `
+                            <input type="checkbox" name="student_ids" value="${student.id}" checked>
+                            ${student.name}`;
+                        row.appendChild(cell);
                     });
                 });
         });
