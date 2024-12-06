@@ -23,11 +23,14 @@ class Command(BaseCommand):
         if not CustomUser.objects.filter(username='admin').exists():
             admin = CustomUser.objects.create_superuser(
                 username='admin',
-                first_name='Levi',
-                last_name='Matudan',
+                first_name='Franco',
+                last_name='Rosel',
                 email='admin@gmail.com',
-                password='ad',
-                user_type=1 
+                password='admin',
+                user_type=1,
+                is_superuser=True,
+                is_staff=True,
+                is_active=True
             )
             self.stdout.write(self.style.SUCCESS(f'Admin user "{admin.username}" created successfully.'))
         else:

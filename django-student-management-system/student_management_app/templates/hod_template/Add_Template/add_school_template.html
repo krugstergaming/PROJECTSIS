@@ -1,0 +1,284 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Add School Information
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- general form elements -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add School Information</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" action="{% url 'add_school_save' %}" id="schoolForm" onsubmit="return validateForm()">
+                        {% csrf_token %}
+
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>School Name</label>
+                                <input type="text" class="form-control" name="school_name" id="school_name" placeholder="Enter School Name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School ID</label>
+                                <input type="text" class="form-control" name="school_ID_number" id="school_ID_number" placeholder="Enter School ID" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School District</label>
+                                <input type="text" class="form-control" name="school_district" id="school_district" placeholder="Enter School District" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School Division</label>
+                                <input type="text" class="form-control" name="school_division" id="school_division" placeholder="Enter School Division" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>School Region</label>
+                                <input type="text" class="form-control" name="school_region" id="school_region" placeholder="Enter School Region" required>
+                            </div>
+
+                            
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary" onclick="showModal()">Add School</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Alert Modal -->
+<div id="alertModal" class="modal">
+    <div class="modal-content">
+        <h3 id="alertMessage">Please fill in all the required fields.</h3>
+        <div class="modal-footer">
+            <button class="btn btn-ok" onclick="closeAlertModal()">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure you want to add this School Information?</h3>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+            <button class="btn btn-success" onclick="submitForm()">Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to show the confirmation dialog
+    function showModal() {
+        const form = document.getElementById("schoolForm");
+        const missingFields = [];
+
+        if (document.getElementById("school_name").value.trim() === "") {
+            missingFields.push("School Name");
+        }
+        if (document.getElementById("school_ID_number").value.trim() === "") {
+            missingFields.push("School ID");
+        }
+        if (document.getElementById("school_district").value === "") {
+            missingFields.push("School District");
+        }
+        if (document.getElementById("school_division").value === "") {
+            missingFields.push("School Division");
+        }
+        if (document.getElementById("school_region").value === "") {
+            missingFields.push("School Region");
+        }
+        // If any required fields are missing, show the alert modal
+        if (missingFields.length > 0) {
+            showAlertModal(missingFields);
+            return; // Prevent the form submission
+        }
+
+        // If all required fields are filled, proceed to confirmation modal
+        const modal = document.getElementById("confirmationModal");
+        modal.style.display = "block";
+        modal.classList.add("zoomIn");
+    }
+
+    // Function to show the alert modal with the specific missing fields
+    function showAlertModal(missingFields) {
+        const alertModal = document.getElementById("alertModal");
+        const alertMessage = document.getElementById("alertMessage");
+        
+        alertMessage.innerHTML = "Please fill in the following required fields:<br><br>" + missingFields.join("<br><br>");
+        
+        alertModal.style.display = "block";
+        alertModal.classList.add("zoomIn");
+    }
+
+    // Function to close the alert modal
+    function closeAlertModal() {
+        const alertModal = document.getElementById("alertModal");
+        alertModal.classList.remove("zoomIn");
+        alertModal.classList.add("zoomOut");
+
+        setTimeout(() => {
+            alertModal.style.display = "none";
+            alertModal.classList.remove("zoomOut");
+        }, 500); // Match the duration of the zoomOut effect
+    }
+
+    // Function to close the confirmation modal
+    function closeConfirmationModal() {
+        const confirmationModal = document.getElementById("confirmationModal");
+        confirmationModal.classList.remove("zoomIn");
+        confirmationModal.classList.add("zoomOut");
+
+        setTimeout(() => {
+            confirmationModal.style.display = "none";
+            confirmationModal.classList.remove("zoomOut");
+        }, 500); // Match the duration of the zoomOut effect
+    }
+
+    // Function to submit the form after confirmation
+    function submitForm() {
+        const form = document.getElementById("schoolForm");
+        form.submit(); // Submit the form
+    }
+
+</script>
+
+<style>
+    /* Modal background */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgba(0,0,0,0.4); /* Black with opacity */
+        padding-top: 60px;
+        opacity: 0; /* Initial opacity for fade effect */
+        transition: opacity 0.5s ease; /* Smooth fade transition */
+    }
+
+    /* Modal content box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%; /* Adjust the width as per your requirement */
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.3); /* Shadow for better visibility */
+        text-align: center; /* Center the text */
+        transform: scale(0.8); /* Start scaled down */
+        transition: transform 0.5s ease; /* Smooth zoom transition */
+    }
+
+    /* Modal zoom-in effect */
+    .modal.zoomIn {
+        opacity: 1; /* Full opacity */
+        transform: scale(1); /* Zoom to normal size */
+    }
+
+    /* Modal zoom-out effect */
+    .modal.zoomOut {
+        opacity: 0;
+        transform: scale(0.8); /* Scale down to create zoom-out effect */
+    }
+
+    /* Modal buttons container */
+    .modal-footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center; /* Center the buttons */
+        gap: 10px; /* Space between buttons */
+    }
+
+    /* Modal buttons */
+    .btn-ok {
+    padding: 15px 25px;
+    font-size: 24px;
+    width: 100px; /* Set fixed width for buttons */
+    background-color: #808080; /* Gray background color */
+    color: white; /* White text color */
+    border: none; /* Optional: Removes border */
+    cursor: pointer; /* Optional: Changes cursor to pointer when hovered */
+    }
+
+    .btn-ok:hover {
+        background-color: #696969; /* Darker gray on hover */
+    }
+
+    /* Larger button styles for the confirmation modal */
+    .modal-footer button {
+        padding: 15px 30px; /* Increase padding to make the button bigger */
+        font-size: 18px; /* Increase font size for bigger text */
+        width: 150px; /* Optional: set a fixed width for consistency */
+    }
+
+    /* Specific styles for the 'Cancel' and 'Submit' buttons */
+    .modal-footer .btn-secondary {
+        background-color: #6c757d; /* Gray color for Cancel button */
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    .modal-footer .btn-success {
+        background-color: #28a745; /* Green color for Submit button */
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Hover effects for both buttons */
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .modal-footer .btn-success:hover {
+        background-color: #218838;
+    }
+</style>
+
+{% endblock main_content %}
