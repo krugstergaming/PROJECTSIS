@@ -776,16 +776,6 @@ def delete_session(request, session_id):
     except:
         messages.error(request, "Failed to Delete Session.")
         return redirect('manage_session')
-    
-# def manage_classroom(request):
-#     classrooms = Classroom.objects.all()
-
-#     # Define context with headers, data, and statistics
-#     context = {
-#         "classrooms": classrooms
-#     }
-
-#     return render(request, "hod_template/Manage_Template/manage_classroom_template.html", context)
 
 def add_student(request):
     gradelevels = GradeLevel.objects.all()

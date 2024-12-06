@@ -83,7 +83,10 @@
                                     <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
                                     <td>{{ schedule.load_id.subject_id.subject_name }}</td>
                                     <td>{{ schedule.load_id.staff_id.first_name }} {{ schedule.load_id.staff_id.last_name }}</td>
+                                    <td>{{ schedule.load_id.staff_id.first_name }} {{ schedule.load_id.staff_id.last_name }}</td>
                                     <td>{{ schedule.day_of_week }}</td>
+                                    <td>{{ schedule.start_time|time:"h:i a" }}</td>
+                                    <td>{{ schedule.end_time|time:"h:i a" }}</td>
                                     <td>{{ schedule.start_time|time:"h:i a" }}</td>
                                     <td>{{ schedule.end_time|time:"h:i a" }}</td>
                                     <td>
@@ -101,7 +104,7 @@
 
             </div>
         </div>
-        
+
     </div><!-- /.container-fluid -->
 </section>
 
