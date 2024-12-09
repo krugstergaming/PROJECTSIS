@@ -1552,7 +1552,7 @@ def manage_classroom(request):
     return render(request, 'hod_template/Manage_Template/manage_classroom_template.html', context)
 
 def fetch_classroom(request):
-    api_url = "https://inventoryapp1-o2l3.onrender.com/classroom/"
+    api_url = "http://127.0.0.1:8001/classroom/"
 
     try:
         response = requests.get(api_url)

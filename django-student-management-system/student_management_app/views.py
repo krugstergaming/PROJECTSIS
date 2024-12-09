@@ -152,6 +152,7 @@ def update_session_key(sender, user, request, **kwargs):
             pass
 
     user.last_login_session_key = current_session_key
+    user.session_expiry = request.session.get_expiry_date()  # Store session expiry
     user.save()
 
 
@@ -160,4 +161,5 @@ def clear_session_key(sender, request, user, **kwargs):
     """Clear session key on logout."""
     if user:
         user.last_login_session_key = None
+        user.session_expiry = None
         user.save()

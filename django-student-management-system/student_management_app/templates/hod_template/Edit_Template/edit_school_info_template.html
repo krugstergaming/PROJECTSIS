@@ -1,0 +1,202 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Edit School Information
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        
+                    </div>
+
+                    <form role="form" method="POST" action="{% url 'edit_school_save' %}">
+                        {% csrf_token %}
+
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <input type="hidden" name="school_id" value="{{ school.id }}">
+
+                            <!-- Basic Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>School Name <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_name" value="{{ school.school_name }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>School ID <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_ID_number" value="{{ school.school_ID_number }}" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School District <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_district" id="school_district" 
+                                        value="{{ school.school_district }}" placeholder="Enter School District" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Division <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_division" id="school_division" 
+                                        value="{{ school.school_division }}" placeholder="Enter School Division" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Region <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_region" id="school_region" 
+                                        value="{{ school.school_region }}" placeholder="Enter School Region" required>
+                                    </div> 
+                                </div>
+                            </div>
+
+                            <!-- Address Section -->
+                            <div class="form-header">Address:</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="region">Region <span style="color: red;">*</span></label>
+                                        <select name="region" class="form-control form-control-md" id="region">
+                                            <option value="{{ school.region }}" selected>{{ school.region }}</option>
+                                            <!-- Add dynamic region options here -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="province">Province <span style="color: red;">*</span></label>
+                                        <select name="province" class="form-control form-control-md" id="province">
+                                            <option value="{{ school.province }}" selected>{{ school.province }}</option>
+                                            <!-- Add dynamic province options here -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="city">City <span style="color: red;">*</span></label>
+                                        <select name="city" class="form-control form-control-md" id="city">
+                                            <option value="{{ school.city }}" selected>{{ school.city }}</option>
+                                            <!-- Add dynamic city options here -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="barangay">Barangay <span style="color: red;">*</span></label>
+                                        <select name="barangay" class="form-control form-control-md" id="barangay">
+                                            <option value="{{ school.barangay }}" selected>{{ school.barangay }}</option>
+                                            <!-- Add dynamic barangay options here -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="street">Street <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="street" 
+                                        value="{{ school.street }}" placeholder="Enter Street">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Email <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_email" id="school_email" 
+                                        value="{{ school.school_email }}" placeholder="Enter School Email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Cellphone No. <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control" name="school_cellphone" id="school_cellphone" 
+                                        value="{{ school.school_cellphone }}" placeholder="Enter School Cellphone No." required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>School Telephone No.</label>
+                                        <input type="text" class="form-control" name="school_telephone" id="school_telephone" 
+                                        value="{{ school.school_telephone }}" placeholder="Enter School Tellphone No.">
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Update School Information</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function updateAddressFields() {
+        // Get the selected options and their text content
+        var regionSelect = document.getElementById('region');
+        var provinceSelect = document.getElementById('province');
+        var citySelect = document.getElementById('city');
+        var barangaySelect = document.getElementById('barangay');
+
+        // Ensure there's a valid selection and update hidden inputs with the option text
+        if (regionSelect.selectedIndex > 0) {
+            document.getElementById('region-text').value = regionSelect.options[regionSelect.selectedIndex].text;
+        }
+        if (provinceSelect.selectedIndex > 0) {
+            document.getElementById('province-text').value = provinceSelect.options[provinceSelect.selectedIndex].text;
+        }
+        if (citySelect.selectedIndex > 0) {
+            document.getElementById('city-text').value = citySelect.options[citySelect.selectedIndex].text;
+        }
+        if (barangaySelect.selectedIndex > 0) {
+            document.getElementById('barangay-text').value = barangaySelect.options[barangaySelect.selectedIndex].text;
+        }
+    }
+
+    // Event listeners to update the hidden fields whenever a selection is made
+    document.getElementById('region').addEventListener('change', updateAddressFields);
+    document.getElementById('province').addEventListener('change', updateAddressFields);
+    document.getElementById('city').addEventListener('change', updateAddressFields);
+    document.getElementById('barangay').addEventListener('change', updateAddressFields);
+
+    // Initial call to populate hidden fields when page loads (if pre-populated values exist)
+    updateAddressFields();
+</script>
+
+  {% endblock main_content %}

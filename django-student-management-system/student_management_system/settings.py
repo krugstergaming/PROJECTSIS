@@ -50,8 +50,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'student_management_app.LoginCheckMiddleWare.LoginCheckMiddleWare',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'student_management_app.ClearStaleSessionMiddleware.ClearStaleSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'student_management_system.urls'
@@ -169,4 +170,5 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 2592000
+SESSION_COOKIE_AGE = 3600
+

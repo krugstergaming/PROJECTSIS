@@ -21,6 +21,8 @@ class CustomUser(AbstractUser):
     user_type_data = ((1, "HOD"), (2, "Staff"), (3, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
     last_login_session_key = models.CharField(max_length=40, blank=True, null=True)
+    session_expiry = models.DateTimeField(blank=True, null=True)  # New field to track expiry
+
 
 
 class AdminHOD(models.Model):
@@ -167,7 +169,7 @@ class Students(models.Model):
     age = models.IntegerField(blank=True, null=True)
     pob = models.CharField(max_length=100, blank=True, null=True)
     sex = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
-    address = models.TextField()
+    address = models.TextField(blank=True, null=True)
     nationality = models.CharField(max_length=50, blank=True, null=True)
     religion = models.CharField(max_length=50, blank=True, null=True)
     rank_in_family = models.IntegerField(blank=True, null=True)
@@ -422,7 +424,6 @@ class StudentResult(models.Model):
     subject_third_quarter = models.FloatField(default=0)
     subject_fourth_quarter = models.FloatField(default=0)
     subject_final_grade = models.FloatField(default=0)
-    general_average = models.FloatField(default=0)
 
     subject_exam_marks = models.FloatField(default=0)
     subject_assignment_marks = models.FloatField(default=0)
