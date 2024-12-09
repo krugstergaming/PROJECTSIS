@@ -1,26 +1,64 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Manage Faculty
+    Manage Employee
 {% endblock page_title %}
 
 {% block main_content %}
 
 {% load static %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .user-details {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Create 6 equal columns */
+        gap: 20px;
+    }
+
+    .grid-item {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    h4 {
+        margin-top: 20px;
+        font-size: 1.1em;
+    }
+
+    .custom-modal-width {
+        max-width: 1400px; /* Adjust the value as needed */
+    }
+</style>
+
 <section class="content">
     <div class="container-fluid">
         <!-- Add Staff Button -->
         <div class="row">
-            <!-- Add Staff Button -->
             <div class="col-12 mb-3">
-                <a class="btn btn-success" href="{% url 'add_staff' %}" role="button">+ Add Faculty</a>
+                <!-- Button trigger dropdown -->
+                <button class="btn btn-success dropdown-toggle" type="button" id="addEmployeeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    + Add Employee
+                </button>
+        
+                <!-- Dropdown menu -->
+                <ul class="dropdown-menu" aria-labelledby="addEmployeeDropdown">
+                    <li><a class="dropdown-item" href="{% url 'add_staff' %}">Add Faculty</a></li>
+                    <li><a class="dropdown-item" href="{% url 'add_admin' %}">Add Admin</a></li>
+                </ul>
             </div>
         </div>
 
         <!-- Activate/Deactivate Grading Button -->
         <div class="row">
-            <!-- Activate/Deactivate Grading Button -->
             <div class="col-12 mb-3">
                 <a class="btn btn-secondary" href="{% url 'toggle_grading_state' %}" role="button">
                     {% if grading_config.is_grading_active %}
@@ -58,10 +96,9 @@
 
         <div class="row">
             <div class="col-md-12">
-                <!-- General form elements -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Faculty Details</h3>
+                        <h3 class="card-title">Employee Details</h3>
 
                         <div class="card-tools">
                             <div class="input-group input-group-sm" style="width: 150px;">
@@ -72,51 +109,163 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /.card-header -->
+
                     <div class="card-body table-responsive p-0">
                         <table class="table table-hover text-nowrap">
                             <thead>
                                 <tr>
-                                    <!-- <th>ID</th> -->
-                                     <th>No. </th>
+                                    <th>No.</th>
                                     <th>First Name</th>
                                     <th>Last Name</th>
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Last Login</th>
                                     <th>Date Joined</th>
+                                    <th>Role</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for staff in staffs %}
-                                <tr>
-                                    <!-- <td>{{ staff.admin.id }}</td> -->
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ staff.admin.first_name }}</td>
-                                    <td>{{ staff.admin.last_name }}</td>
-                                    <td>{{ staff.admin.username }}</td>
-                                    <td>{{ staff.admin.email }}</td>
-                                    <td>{{ staff.admin.last_login }}</td>
-                                    <td>{{ staff.admin.date_joined }}</td>
-                                    <td>
-                                        <a href="" class="btn btn-info">Details</a>
-                                        <a href="{% url 'edit_staff' staff.admin.id %}" class="btn btn-warning">Edit</a> 
-                                        <!-- <a href="{% url 'delete_staff' staff.admin.id %}" class="btn btn-danger">Delete</a> -->
-                                        <a href="" class="btn btn-danger">Deactivate</a>
-                                        <a href="" class="btn btn-secondary">Archive</a>
-                                    </td>
-                                </tr>
+                                {% for user in all_users %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.last_login }}</td>
+                                        <td>{{ user.date_joined }}</td>
+                                        <td>
+                                            {% if user.user_type == "1" %}
+                                                Admin
+                                            {% elif user.user_type == "2" %}
+                                                Faculty
+                                            {% else %}
+                                                None
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
+                                            <a href="" class="btn btn-warning">Edit</a>
+                                            <a href="{% url 'toggle_user_activation' user.user_id %}" class="btn 
+                                                {% if user.user.is_active %}
+                                                    btn-danger
+                                                {% else %}
+                                                    btn-success
+                                                {% endif %}">
+                                                {% if user.user.is_active %}
+                                                    Deactivate
+                                                {% else %}
+                                                    Activate
+                                                {% endif %}
+                                            </a>
+                                            <a href="" class="btn btn-secondary">Archive</a>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="userModal-{{ user.user_id }}" tabindex="-1" aria-labelledby="userModalLabel-{{ user.user_id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg custom-modal-width">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="userModalLabel-{{ user.user_id }}">{{ user.first_name }} {{ user.last_name }} - Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="user-details">
+                                                        <div class="grid-container">
+                                                            <!-- Personal Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b> Personal Information: </b></h3>
+                                                                <p>First Name: <b>{{ user.first_name }}</b></p>
+                                                                <p>Last Name: <b>{{ user.last_name }}</b></p>
+                                                                <p>Middle Name: <b>{{ user.middle_name }}</b></p>
+                                                                <p>Suffix: <b>{{ user.suffix }}</b></p>
+                                                                <p>Date of Birth: <b>{{ user.dob }}</b></p>
+                                                                <p>Age: <b>{{ user.age }}</b></p>
+                                                                <p>Place of Birth: <b>{{ user.pob }}</b></p>
+                                                                <p>Sex: <b>{{ user.sex }}</b></p>
+                                                                <p>Civil Status: <b>{{ user.civil_status }}</b></p>
+                                                                <p>Citizenship: <b>{{ user.citizenship }}</b></p>
+                                                                <p>Dual Country: <b>{{ user.dual_country }}</b></p>
+
+                                                            </div>
+
+                                                            <!-- Contact Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Contact Information: </b></h3>
+                                                                <p>Region: <b>{{ user.contact_info.region }}</b></p>
+                                                                <p>Province: <b>{{ user.contact_info.province }}</b></p>
+                                                                <p>City: <b>{{ user.contact_info.city }}</b></p>
+                                                                <p>Barangay: <b>{{ user.contact_info.barangay }}</b></p>
+                                                                <p>Street: <b>{{ user.contact_info.street }}</b></p>
+                                                                <p>Telephone No. : <b>+ {{ user.contact_info.telephone_no }}</b></p>
+                                                                <p>Cellphone No.: <b>+ {{ user.contact_info.cellphone_no }}</b></p>
+                                                                <p>Emergency Contact: <b>{{ user.contact_info.emergency_contact_name }}</b></p>
+                                                                <p>Emergency Contact No.: <b>+{{ user.contact_info.emergency_contact_no }}</b></p>
+                                                                <p>Emergency Contact Relationship: <b>{{ user.contact_info.emergency_relationship }}</b></p>
+                                                                <p>Medical Condition: <b>{{ user.contact_info.medical_condition }}</b></p>
+                                                            </div>
+                                                            <!-- Employment Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Employment Information:</b></h3> <br>
+                                                                <p>Employee Number: <b>{{ user.employment_info.employee_number }}</b></p>
+                                                                <p>Position: <b>{{ user.employment_info.position }}</b></p>
+                                                                <p>Max Load: <b>{{ user.max_load }}</b></p>
+                                                                <p>Employment Type: <b>{{ user.employment_info.employee_type }}</b></p>
+                                                                <p>Employment Status: <b>{{ user.employment_info.employment_status }}</b></p>
+                                                            </div>
+                                                    
+                                                            <!-- Physical Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Physical Information:</b></h3> <br>
+                                                                <p>Blood Type: <b>{{ user.physical_info.blood_type }}</b></p>
+                                                                <p>Height: <b>{{ user.physical_info.height }}ft</b></p>
+                                                                <p>Weight: <b>{{ user.physical_info.weight }}kg</b></p>
+                                                                <p>Eye Color: <b>{{ user.physical_info.eye_color }}</b></p>
+                                                                <p>Hair Color: <b>{{ user.physical_info.hair_color }}</b></p>
+                                                            </div>
+
+                                                            <!-- Government ID Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Government ID Information:</b></h3> <br>
+                                                                <p>GSIS ID: <b>{{ user.gov_id_info.gsis_id }}</b></p>
+                                                                <p>PAGIBIG ID: <b>{{ user.gov_id_info.pagibig_id }}</b></p>
+                                                                <p>PhilHealth ID: <b>{{ user.gov_id_info.philhealth_id }}</b></p>
+                                                                <p>SSS ID: <b>{{ user.gov_id_info.sss_id }}</b></p>
+                                                                <p>TIN ID: <b>{{ user.gov_id_info.tin_id }}</b></p>
+                                                            </div>
+
+                                                            <!-- Educational Background -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Educational Background:</b></h3> <br>
+                                                                <p>Highest Educational Attainment: <b>{{ user.education_info.HEA }}</b></p>
+                                                                <p>Certifications/Licenses: <b>{{ user.education_info.Cert_License }}</b></p>
+                                                                <p>Teaching Experience: <b>{{ user.education_info.teaching_exp }}</b></p>
+                                                                <p>Skills/Competencies: <b>{{ user.education_info.skills_competencies }}</b></p>
+                                                                <p>Languages Spoken: <b>{{ user.education_info.language_spoken }}</b></p>
+                                                                <p>Preferred Subject: <b>{{ user.education_info.preferred_subject }}</b></p>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
             </div>
         </div>
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock main_content %}

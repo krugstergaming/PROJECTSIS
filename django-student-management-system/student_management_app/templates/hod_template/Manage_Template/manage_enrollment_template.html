@@ -9,6 +9,59 @@
 {% load static %}
 {% load humanize %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    /* Modal background */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgba(0,0,0,0.4); /* Black with opacity */
+        padding-top: 60px;
+    }
+    
+    /* Modal content box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%; /* Adjust the width as per your requirement */
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.3); /* Shadow for better visibility */
+        text-align: center; /* Center the text */
+    }
+    
+    /* Modal buttons container */
+    .modal-footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center; /* Center the buttons */
+        gap: 10px; /* Space between buttons */
+    }
+    
+    /* Modal buttons */
+    .btn-yes, .btn-no {
+        padding: 10px 20px;
+        font-size: 16px;
+        width: 100px; /* Set fixed width for buttons */
+    }
+    
+    .btn-yes {
+        background-color: green;
+        color: white;
+    }
+    
+    .btn-no {
+        background-color: red;
+        color: white;
+    }
+    </style>
+
 <section class="content">
     <div class="container-fluid">
         {% if messages %}
@@ -72,7 +125,9 @@
                                         <td>{{ student.created_at|date:"M d, Y" }}</td>
                                         <td>{{ student.updated_at|date:"M d, Y" }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#detailsModal{{ student.id }}">Details</button>
+                                            <button type="button" class="btn btn-info" onclick="printReceipt({{ student.id }})">Print</button>
+                                            <input type="hidden" name="student_id" value="{{ student.id }}">
+                                            <button type="button" class="btn btn-warning" onclick="showModal({{ student.id }})">Update Status</button>
                                         </td>
                                     </tr>
                                 {% empty %}
@@ -99,7 +154,17 @@
                                         <div class="modal-body">
                                             <!-- Receipt for Cashier -->
                                                 <div id="cashierReceiptContent{{ student.id }}" class="receipt-content" style="font-family: Arial, sans-serif; padding: 10px; width: 470px; border: 2px solid #000; border-radius: 5px;">
-                                                    <h3 style="text-align: center; margin-bottom: 10px;">Payment Receipt (Cashier Copy)</h3>
+                                                    <div style="text-align: center;">
+                                                        <p style="line-height: 2; font-size: 16px; text-transform: uppercase;"> <b>{{ school.school_name }} school</b></p>
+                                                        <p style="line-height: 1;">
+                                                            Address: {{ school.street }}, {{ school.barangay }}, {{ school.city }}
+                                                        </p>
+                                                        <p style="line-height: 1;">Email: {{ school.school_email }}</p>
+                                                        <p style="line-height: 1;">Contact: 
+                                                            #{{ school.school_cellphone }} | #{{ school.school_telephone }}
+                                                        </p>
+                                                    </div>
+                                                    <p style="font-size: 14px; text-align: center; margin-top: 10px;"> <b>Payment Receipt (Cashier Copy)</b></p>
                                                     <hr style="border-top: 1px dashed #ccc;">
                                                 <p>
                                                     <strong>Name:</strong>
@@ -118,30 +183,25 @@
                                                 <hr style="border-top: 1px dashed #ccc;">
                                                 
                                                 {% if student.voucher %}
-                                                    <p><strong>Fees Breakdown:</strong></p>
-                                                    <ul style="list-style: none; padding: 0;">
-                                                        <li style="margin-left: 25px;"><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></li>
-                                                        <li style="margin-left: 25px;"><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span> </li>
-                                                        <li style="margin-left: 25px;"><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </li>
-                                                        <br>
-                                                        <li><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></li>
-                                                    </ul>
+                                                    <p><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></p>
+                                                    <p><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span></p>
+                                                    <p><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </p>
+                                                    <p><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></p>    
                                                 {% else %}
                                                     <p><strong>Fees:</strong> No data available for this grade level.</p>
                                                 {% endif %}
                                                 
-                                                <hr style="border-top: 1px dashed #ccc;">
-                                                <p><strong>Less:</strong></p>
-                                                <p style="margin-left: 25px;"><strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
-                                                <p style="margin-left: 25px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                
+                                                <p><strong>Less:</strong> <strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 35px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
                                                 <p><strong>Balance:</strong> <span style="float: right;"> - _____________________ </span></p>
-                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
                                                 
                                                 <p><strong>Installment Details:</strong></p>
                                                 <p style="margin-left: 25px;"><strong>Monthly/Quarterly:</strong> <span style="float: right;"> - _____________________ </span></p>
                                                 <p style="margin-left: 25px;"><strong>Installment Payment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                
                                                 <hr style="border-top: 1px dashed #ccc;">
-
                                                 <p><strong>Assessment Information:</strong></p>
                                                 <p>
                                                     <strong>Assessed By:</strong>
@@ -156,16 +216,27 @@
                                                     <strong>Payment Date:</strong>
                                                     <span style="display: inline-block; width: 80px;">____________</span>
                                                 </p>
-                                                <hr style="border-top: 1px dashed #ccc;">
-                                                
-                                                <p><strong>Remarks:</strong></p>
-                                                <p>______________________________________________________</p>
-                                                <p>______________________________________________________</p>
+                                                <p><strong>Remarks:_____________________________________________</strong></p>
+                                                <p><strong>Attachments:</strong> 
+                                                    2X2 Picture: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;"> 
+                                                    PSA: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;">
+                                                    Form 138: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;">
+                                                </p>
                                             </div>
 
                                             <!-- Receipt Styling -->
                                             <div id="studentReceiptContent{{ student.id }}" class="receipt-content" style="font-family: Arial, sans-serif; padding: 10px; width: 470px; border: 2px solid #000; border-radius: 5px; margin-bottom: 20px;">
-                                                <h3 style="text-align: center; margin-bottom: 10px;">Payment Receipt (Student Copy)</h3>
+                                                <div style="text-align: center;">
+                                                    <p style="line-height: 2; font-size: 16px; text-transform: uppercase;"> <b>{{ school.school_name }} school</b></p>
+                                                    <p style="line-height: 1;">
+                                                        Address: {{ school.street }}, {{ school.barangay }}, {{ school.city }}
+                                                    </p>
+                                                    <p style="line-height: 1;">Email: {{ school.school_email }}</p>
+                                                    <p style="line-height: 1;">Contact: 
+                                                        #{{ school.school_cellphone }} | #{{ school.school_telephone }}
+                                                    </p>
+                                                </div>
+                                                <p style="font-size: 14px; text-align: center; margin-top: 10px"> <b>Payment Receipt (Student Copy)</b></p>
                                                 <hr style="border-top: 1px dashed #ccc;">
                                                 <p>
                                                     <strong>Name:</strong>
@@ -184,30 +255,25 @@
                                                 <hr style="border-top: 1px dashed #ccc;">
                                                 
                                                 {% if student.voucher %}
-                                                    <p><strong>Fees Breakdown:</strong></p>
-                                                    <ul style="list-style: none; padding: 0;">
-                                                        <li style="margin-left: 25px;"><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></li>
-                                                        <li style="margin-left: 25px;"><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span> </li>
-                                                        <li style="margin-left: 25px;"><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </li>
-                                                        <br>
-                                                        <li><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></li>
-                                                    </ul>
+                                                    <p><strong>Registration Fee:</strong> <span style="float: right;"> {{ student.voucher.registration_fee|intcomma }}</span></p>
+                                                    <p><strong>Miscellaneous Fee:</strong> <span style="float: right;"> {{ student.voucher.misc_fee|intcomma }} </span></p>
+                                                    <p><strong>Tuition Fee:</strong> <span style="float: right;"> {{ student.voucher.tuition_fee|intcomma }} </span> </p>
+                                                    <p><strong>Total Fee:</strong> <span style="float: right;"> {{ student.voucher.total_fee|intcomma }} </span></p>    
                                                 {% else %}
                                                     <p><strong>Fees:</strong> No data available for this grade level.</p>
                                                 {% endif %}
                                                 
-                                                <hr style="border-top: 1px dashed #ccc;">
-                                                <p><strong>Less:</strong></p>
-                                                <p style="margin-left: 25px;"><strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
-                                                <p style="margin-left: 25px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                               
+                                                <p><strong>Less:</strong> <strong>Downpayment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                <p style="margin-left: 35px;"><strong>Applicable Discount/s:</strong> <span style="float: right;"> - _____________________ </span></p>
                                                 <p><strong>Balance:</strong> <span style="float: right;"> - _____________________ </span></p>
-                                                <hr style="border-top: 1px dashed #ccc;">
+                                                
                                                 
                                                 <p><strong>Installment Details:</strong></p>
                                                 <p style="margin-left: 25px;"><strong>Monthly/Quarterly:</strong> <span style="float: right;"> - _____________________ </span></p>
                                                 <p style="margin-left: 25px;"><strong>Installment Payment:</strong> <span style="float: right;"> - _____________________ </span></p>
+                                                
                                                 <hr style="border-top: 1px dashed #ccc;">
-
                                                 <p><strong>Assessment Information:</strong></p>
                                                 <p>
                                                     <strong>Assessed By:</strong>
@@ -218,15 +284,16 @@
                                                 <p><strong>Payment Received By:</strong> ____________________</p>
                                                 <p>
                                                     <strong>Payment Amount:</strong>
-                                                    <span style="display: inline-block; width: 80px;">______________</span>
+                                                    <span style="display: inline-block; width: 80px;">____________</span>
                                                     <strong>Payment Date:</strong>
                                                     <span style="display: inline-block; width: 80px;">____________</span>
                                                 </p>
-                                                <hr style="border-top: 1px dashed #ccc;">
-                                                
-                                                <p><strong>Remarks:</strong></p>
-                                                <p>________________________________________________________</p>
-                                                <p>________________________________________________________</p>
+                                                <p><strong>Remarks:_____________________________________________</strong></p>
+                                                <p><strong>Attachments:</strong> 
+                                                    2X2 Picture: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;"> 
+                                                    PSA: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;">
+                                                    Form 138: <input type="text" style="border: 1px solid #000; width: 25px; height: 20px;">
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -257,6 +324,38 @@
 
 <script>
     document.cookie = "csrftoken={{ csrf_token }}";
+</script>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure?</h3>
+        <p>Do you want to Update the status of this Student?</p>
+        <div class="modal-footer">
+            <!-- Link to trigger the update URL with student_id -->
+            <a id="confirmLink" class="btn btn-yes" href="#">Yes</a>
+            <button class="btn btn-no" onclick="closeModal()">No</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Function to show the confirmation dialog and set the URL for the "Yes" action
+function showModal(studentId) {
+    // Build the URL with the student_id (you can add more query params as needed)
+    const url = "{% url 'update_student_status' %}?student_id=" + studentId;
+    
+    // Set the href of the confirmation link
+    document.getElementById('confirmLink').href = url;
+
+    // Show the modal
+    document.getElementById("confirmationModal").style.display = "block";
+}
+
+// Function to close the confirmation dialog
+function closeModal() {
+    document.getElementById("confirmationModal").style.display = "none";
+}
 </script>
 
 <script>
@@ -294,7 +393,7 @@
         printWindow.document.write('@media print {');
         printWindow.document.write('body { font-family: Arial, sans-serif; font-size: 12px; margin: 0; padding: 0; width: 100%; height: 100%; }');
         printWindow.document.write('.receipt-item { width: 388px; display: inline-block; vertical-align: top; margin: 10px; padding: 5px; border: 1px solid #000; box-sizing: border-box; }');
-        printWindow.document.write('h3 { font-size: 14px; margin: 10px 0; text-align: center; }');
+        printWindow.document.write('h5 { font-size: 14px; margin: 10px 0; text-align: center; }');
         printWindow.document.write('hr { border-top: 1px dashed #ccc; margin: 5px 0; }');
         printWindow.document.write('p { margin: 5px 0; }');
         printWindow.document.write('strong { font-weight: bold; }');
@@ -304,37 +403,9 @@
         printWindow.document.write(receiptContent);
         printWindow.document.write('</body></html>');
 
-        // Print the content
         printWindow.document.close();
         printWindow.print();
-
-        // Update the student status via AJAX
-        var csrfToken = getCSRFToken();
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/update-student-status/", true); // Ensure the endpoint matches your Django URLconf
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.setRequestHeader("X-CSRFToken", csrfToken); // Include the CSRF token in the headers
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    alert('Student status updated successfully.');
-                    // Redirect to the manage enrollment page
-                    // window.location.href = "{% url 'manage_enrollment' %}"; // Django URL reverse tag
-                    // // Close the print window after printing
-                    // printWindow.close();
-                } else {
-                    alert('Failed to update status: ' + response.message);
-                }
-            }
-        };
-
-        // Send student ID and new status to the server
-        xhr.send("student_id=" + studentId + "&status=Paying"); // Adjust the status value as needed
     }
-
-    // Function to show confirmation before printing
     function confirmPrintBatchReceipts() {
         var confirmAction = confirm("Are you sure you want to print all receipts?");
         if (confirmAction) {
@@ -343,8 +414,6 @@
             alert("Print action canceled.");
         }
     }
-
-    // Function to batch print all receipts and update status
     function printBatchReceipts() {
         var allReceiptContents = '';
         var studentIds = [];  // Array to store student IDs for batch update
@@ -373,7 +442,7 @@
         printWindow.document.write('.receipt-item { width: 388px; display: inline-block; vertical-align: top; margin: 10px; padding: 5px; border: 1px solid #000; box-sizing: border-box; }');
         printWindow.document.write('h3 { font-size: 14px; margin: 10px 0; text-align: center; }');
         printWindow.document.write('hr { border-top: 1px dashed #ccc; margin: 5px 0; }');
-        printWindow.document.write('p { margin: 5px 0; }');
+        printWindow.document.write('p { margin: 5px 0; font-size: 12px }');
         printWindow.document.write('strong { font-weight: bold; }');
         printWindow.document.write('.page-break { page-break-after: always; }');
         printWindow.document.write('}');
@@ -382,36 +451,12 @@
         printWindow.document.write(allReceiptContents); // Add all receipts
         printWindow.document.write('</body></html>');
         
-        // Print the content
         printWindow.document.close();
         printWindow.print();
-
-        // Now send the batch update request to update statuses
-        var csrfToken = getCSRFToken();
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/update-batch-student-status/", true);  // Ensure the endpoint matches your Django URLconf
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.setRequestHeader("X-CSRFToken", csrfToken);  // Include the CSRF token in the headers
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    alert('Batch student status updated successfully.');
-                    // Redirect to the manage enrollment page
-                    // window.location.href = "{% url 'manage_enrollment' %}";  // Django URL reverse tag
-                    // // Close the print window after printing
-                    // printWindow.close();
-                } else {
-                    alert('Failed to update status: ' + response.message);
-                }
-            }
-        };
-
-        // Send the list of student IDs to update their status
-        xhr.send("student_ids[]=" + studentIds.join("&student_ids[]="));  // Send all student IDs
     }
 </script>
+
+
 
 
 {% endblock %}

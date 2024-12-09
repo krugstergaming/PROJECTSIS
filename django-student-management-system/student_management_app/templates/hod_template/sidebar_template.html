@@ -1,6 +1,6 @@
 {% load static %}
 
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-dark-success elevation-4">
       <!-- Brand Logo -->
       <a href="{% url 'admin_home' %}" class="brand-link">
         <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
@@ -46,7 +46,7 @@
               {% if request.path == edit_staff %} active {% endif %}">
                 <i class="nav-icon fas fa-chalkboard-teacher"></i>
                 <p>
-                  Faculty Management 
+                  Employee Management 
                 </p>
               </a>
             </li>
@@ -86,23 +86,6 @@
               <i class="nav-icon fas fa-file-alt"></i>
                 <p>
                   Classroom API
-                </p>
-              </a>
-            </li>
-
-            <!-- Class Scheduling Management -->
-            <li class="nav-item has-treeview 
-              {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 
-                  menu-open 
-              {% endif %}">
-              <a href="#" class="nav-link 
-                {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 
-                    active 
-                {% endif %}">
-                <i class="nav-icon fas fa-folder-open"></i>
-                <p>
-                  Class Management
-                  <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
               <ul class="nav nav-treeview">
@@ -148,6 +131,17 @@
                     </a>
                 </li>
               </ul>
+            </li>
+
+            <li class="nav-item">
+              {% url 'add_promotion' as add_promotion %}
+              <a href="{{ add_promotion }}" class="nav-link 
+                {% if request.path == add_promotion or request.path == add_promotion %} 
+                  active 
+                {% endif %}">
+                <i class="nav-icon fas fa-list"></i>
+                <p>Student Promotion</p>
+              </a>
             </li>
 
 

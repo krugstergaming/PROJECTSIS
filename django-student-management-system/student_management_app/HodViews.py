@@ -31,6 +31,7 @@ from rest_framework.permissions import IsAuthenticated
 from student_management_app.EmailBackEnd import EmailBackEnd
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
 
 from student_management_app.models import CustomUser, School_info, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
 from student_management_app.models import Staffs, staff_contact_info, staff_employment_info, staff_physical_info, staff_government_ID_info, Staffs_Educ_Background, StudentPromotionHistory
@@ -98,6 +99,9 @@ def admin_home(request):
 def add_staff(request):
     return render(request, "hod_template/Add_Template/add_staff_template.html")
 
+def add_admin(request):
+    return render(request, "hod_template/Add_Template/add_admin_template.html")
+
 def add_staff_save(request):
     if request.method != "POST":
         messages.error(request, "Invalid Method ")
@@ -108,7 +112,6 @@ def add_staff_save(request):
             last_name = request.POST.get('last_name')
             username = request.POST.get('username')
             email = request.POST.get('email')
-            max_laod = request.POST.get('max_load')
             middle_name = request.POST.get('middle_name')
             dob = request.POST.get('dob')
             age = request.POST.get('age')
@@ -117,6 +120,7 @@ def add_staff_save(request):
             civil_status = request.POST.get('civil_status')
             citizenship = request.POST.get('citizenship')
             dual_country = request.POST.get('dual_country')
+            max_load = request.POST.get('max_load')
 
             # Generate a predefined password based on staff details
             current_year = now().year
@@ -125,13 +129,12 @@ def add_staff_save(request):
             # Create Staff User
             user = CustomUser.objects.create_user(
                 username=username,
-                password=make_password(predefined_password),  # Use hashed password
+                password=predefined_password,  # Use hashed password
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
                 user_type=2
             )
-            user.staffs.max_laod = max_laod
             user.staffs.middle_name = middle_name
             user.staffs.dob = dob
             user.staffs.age = age
@@ -140,6 +143,7 @@ def add_staff_save(request):
             user.staffs.civil_status = civil_status
             user.staffs.citizenship = citizenship
             user.staffs.dual_country = dual_country
+            user.staffs.max_load = max_load
             user.save()
 
             # save staff contact information
@@ -201,6 +205,124 @@ def add_staff_save(request):
         except Exception as e:
             messages.error(request, f"Failed to Add Staff: {str(e)}")
             return redirect('add_staff')
+ 
+def add_admin_save(request):
+    if request.method != "POST":
+        messages.error(request, "Invalid Method ")
+        return redirect('add_admin')
+    else:
+        try:
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            middle_name = request.POST.get('middle_name')
+            dob = request.POST.get('dob')
+            age = request.POST.get('age')
+            pob = request.POST.get('pob')
+            sex = request.POST.get('sex')
+            civil_status = request.POST.get('civil_status')
+            citizenship = request.POST.get('citizenship')
+            dual_country = request.POST.get('dual_country')
+            max_load = request.POST.get('max_load')
+
+            # Generate a predefined password based on staff details
+            current_year = now().year
+            predefined_password = f"{first_name.lower()}{last_name.lower()}{current_year}"
+
+            # Create Staff User
+            user = CustomUser.objects.create_user(
+                username=username,
+                password=predefined_password,  # Use hashed password
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                user_type=1
+            )
+            user.adminhod.middle_name = middle_name
+            user.adminhod.dob = dob
+            user.adminhod.age = age
+            user.adminhod.pob = pob
+            user.adminhod.sex = sex
+            user.adminhod.civil_status = civil_status
+            user.adminhod.citizenship = citizenship
+            user.adminhod.dual_country = dual_country
+            user.adminhod.max_load = max_load
+            user.save()
+
+            # save staff contact information
+            staff_contact_info.objects.create(
+                 adminhod_id = user.adminhod,
+                 region = request.POST.get('region-text'),
+                 province = request.POST.get('province-text'),
+                 city = request.POST.get('city-text'),
+                 barangay = request.POST.get('barangay-text'),
+                 street = request.POST.get('street'),
+                 telephone_no = request.POST.get('telephone_no'),
+                 cellphone_no = request.POST.get('cellphone_no'),
+                 emergency_contact = request.POST.get('emergency_contact'),
+                 emergency_relationship = request.POST.get('emergency_relationship'),
+                 medical_condition = request.POST.get('medical_condition'),
+            )
+            # save staff employment information
+            staff_employment_info.objects.create(
+                 adminhod_id = user.adminhod,
+                 employee_number = request.POST.get('employee_number'),
+                 employee_type = request.POST.get('employee_type'),
+                 position = request.POST.get('position'),
+                 employment_status = request.POST.get('employment_status'),
+            )
+            # save staff physical information
+            staff_physical_info.objects.create(
+                 adminhod_id = user.adminhod,
+                 blood_type = request.POST.get('blood_type'),
+                 height = request.POST.get('height'),
+                 weight = request.POST.get('weight'),
+                 eye_color = request.POST.get('eye_color'),
+                 hair_color = request.POST.get('hair_color'),
+            )
+            # save staff govenrment ID information
+            staff_government_ID_info.objects.create(
+                 adminhod_id = user.adminhod,
+                 gsis_id = request.POST.get('gsis_id'),
+                 philhealth_id = request.POST.get('philhealth_id'),
+                 pagibig_id = request.POST.get('pagibig_id'),
+                 sss_id = request.POST.get('sss_id'),
+                 tin_id = request.POST.get('tin_id'),
+            )
+            # save staff educational background information
+            Staffs_Educ_Background.objects.create(
+                 adminhod_id = user.adminhod,
+                 HEA = request.POST.get('HEA'),
+                 preferred_subject = request.POST.get('preferred_subject'),
+                 Cert_License = request.POST.get('Cert_License'),
+                 teaching_exp = request.POST.get('teaching_exp'),
+                 skills_competencies = request.POST.get('skills_competencies'),
+                 language_spoken = request.POST.get('language_spoken'),
+            )
+            messages.success(request, "Admin Added Successfully! Password: " + predefined_password)
+            return redirect('add_admin')
+        
+        except IntegrityError as e:
+            messages.error(request, f"Failed to Add Admin: Database error - {str(e)}")
+            return redirect('add_admin')
+        except Exception as e:
+            messages.error(request, f"Failed to Add Admin: {str(e)}")
+            return redirect('add_admin')
+
+def toggle_user_activation(request, user_id):
+    user = get_user_model().objects.get(id=user_id)
+
+    if user.is_active:
+        user.is_active = False
+        messages.success(request, f"User {user.username} has been deactivated.")
+    else:
+        user.is_active = True
+        messages.success(request, f"User {user.username} has been reactivated.")
+    
+    user.save()
+
+    return redirect('manage_staff')
 
 def toggle_grading_state(request):
     grading_config, created = GradingConfiguration.objects.get_or_create(id=1)
@@ -212,14 +334,86 @@ def toggle_grading_state(request):
     return redirect('manage_staff')
 
 def manage_staff(request):
+    # Retrieve all AdminHOD and Staff instances
+    admins = AdminHOD.objects.all()
     staffs = Staffs.objects.all()
-    grading_config, created = GradingConfiguration.objects.get_or_create(id=1)
-    context = {
-        "staffs": staffs,
-        "grading_config": grading_config,  # Pass the grading configuration to the template
-    }
-    return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
+    
+    # Initialize an empty list to hold combined user details
+    all_users = []
 
+    # Retrieve and structure data for AdminHODs
+    for admin in admins:
+        # Retrieve associated user data
+        admin_data = {
+            'user': admin.admin,
+            'user_id': admin.admin.id,
+            'first_name': admin.admin.first_name,  
+            'last_name': admin.admin.last_name,    
+            'username': admin.admin.username,      
+            'email': admin.admin.email,            
+            'last_login': admin.admin.last_login,  
+            'date_joined': admin.admin.date_joined, 
+            'user_type': admin.admin.user_type,   
+            'middle_name': admin.middle_name,
+            'suffix': admin.suffix,
+            'dob': admin.dob,
+            'age': admin.age,
+            'pob': admin.pob,
+            'sex': admin.sex,
+            'civil_status': admin.civil_status,
+            'citizenship': admin.citizenship,
+            'dual_country': admin.dual_country,
+            'max_load': admin.max_load,
+            'contact_info': staff_contact_info.objects.filter(adminhod_id=admin).first(),
+            'employment_info': staff_employment_info.objects.filter(adminhod_id=admin).first(),
+            'physical_info': staff_physical_info.objects.filter(adminhod_id=admin).first(),
+            'gov_id_info': staff_government_ID_info.objects.filter(adminhod_id=admin).first(),
+            'education_info': Staffs_Educ_Background.objects.filter(adminhod_id=admin).first()
+        }
+        all_users.append(admin_data)
+
+    # Retrieve and structure data for Staffs
+    for staff in staffs:
+        # Retrieve associated user data
+        staff_data = {
+            'user': staff.admin,
+            'user_id': staff.admin.id,
+            'first_name': staff.admin.first_name,  # Access first_name from CustomUser
+            'last_name': staff.admin.last_name,    # Access last_name from CustomUser
+            'username': staff.admin.username,      # Access username from CustomUser
+            'email': staff.admin.email,            # Access email from CustomUser
+            'last_login': staff.admin.last_login,  # Access last_login from CustomUser
+            'date_joined': staff.admin.date_joined, # Access date_joined from CustomUser
+            'user_type': staff.admin.user_type,    # Access user_type from CustomUser
+            'middle_name': staff.middle_name,
+            'suffix': staff.suffix,
+            'dob': staff.dob,
+            'age': staff.age,
+            'pob': staff.pob,
+            'sex': staff.sex,
+            'civil_status': staff.civil_status,
+            'citizenship': staff.citizenship,
+            'dual_country': staff.dual_country,
+            'max_load': staff.max_load,
+            'contact_info': staff_contact_info.objects.filter(staffs_id=staff).first(),
+            'employment_info': staff_employment_info.objects.filter(staffs_id=staff).first(),
+            'physical_info': staff_physical_info.objects.filter(staffs_id=staff).first(),
+            'gov_id_info': staff_government_ID_info.objects.filter(staffs_id=staff).first(),
+            'education_info': Staffs_Educ_Background.objects.filter(staffs_id=staff).first()
+        }
+        all_users.append(staff_data)
+
+    # Grading configuration (as before)
+    grading_config, created = GradingConfiguration.objects.get_or_create(id=1)
+
+    # Context to pass to the template
+    context = {
+        'all_users': all_users,
+        'grading_config': grading_config
+    }
+
+    # Render the template with the context
+    return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
 
 def edit_staff(request, staff_id):
     staff = Staffs.objects.get(admin=staff_id)
@@ -229,7 +423,6 @@ def edit_staff(request, staff_id):
         "id": staff_id
     }
     return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
-
 
 def edit_staff_save(request):
     if request.method != "POST":
@@ -282,8 +475,6 @@ def deactivate_staff(request, staff_id):
         messages.error(request, f"Failed to deactivate staff: {str(e)}")
         return redirect('manage_staff')
 
-
-
 def add_school(request):
     return render(request, "hod_template/Add_Template/add_school_template.html")
 
@@ -297,13 +488,29 @@ def add_school_save(request):
         school_district = request.POST.get('school_district')
         school_division = request.POST.get('school_division')
         school_region = request.POST.get('school_region')
+        region = request.POST.get('region-text')
+        province = request.POST.get('province-text')
+        city = request.POST.get('city-text')
+        barangay = request.POST.get('barangay-text')
+        street = request.POST.get('street')
+        school_email = request.POST.get('school_email')
+        school_cellphone = request.POST.get('school_cellphone')
+        school_telephone = request.POST.get('school_telephone')
         try:
             school = School_info(
                 school_name=school_name,
                 school_ID_number=school_ID_number,
                 school_district=school_district,
                 school_division=school_division,
-                school_region=school_region
+                school_region=school_region,
+                region=region,
+                province=province,
+                city=city,
+                barangay=barangay,
+                street=street,
+                school_email=school_email,
+                school_cellphone=school_cellphone,
+                school_telephone=school_telephone
                 )
             school.save()
             messages.success(request, "School Added Successfully!")
@@ -318,6 +525,43 @@ def manage_school(request):
         "schools": schools
     }
     return render(request, 'hod_template/Manage_Template/manage_school_template.html', context)
+
+def edit_school(request, school_info_id):
+    school = School_info.objects.get(id=school_info_id)
+    context = {
+        "school": school
+    }
+    return render(request, 'hod_template/Edit_Template/edit_school_info_template.html', context)
+
+def edit_school_save(request):
+    if request.method == "POST":
+        school_id = request.POST.get('school_id')
+        school_name = request.POST.get('school_name')
+        school_ID_number = request.POST.get('school_ID_number')
+        region = request.POST.get('region')
+        province = request.POST.get('province')
+        city = request.POST.get('city')
+        barangay = request.POST.get('barangay')
+        street = request.POST.get('street')
+
+        try:
+            school = School_info.objects.get(id=school_id)
+            school.school_name = school_name
+            school.school_ID_number = school_ID_number
+            school.region = region
+            school.province = province
+            school.city = city
+            school.barangay = barangay
+            school.street = street
+            school.save()
+
+            messages.success(request, "School Information Updated Successfully.")
+            return redirect('/manage_school/')
+        except Exception as e:
+            messages.error(request, f"Failed to Update School Information. Error: {e}")
+            return redirect('/manage_school/')
+    else:
+        return HttpResponse("Invalid Method")
 
 def add_curriculum(request):
     return render(request, "hod_template/Add_Template/add_curriculum_template.html")
@@ -898,7 +1142,7 @@ def add_student_save(request):
         # Create Student User
         user = CustomUser.objects.create_user(
             username=username, 
-            password=make_password(predefined_password),  # Use hashed password
+            password=(predefined_password),  # Use hashed password
             email=email,
             first_name=first_name, 
             last_name=last_name, 
@@ -929,6 +1173,7 @@ def add_student_save(request):
         user.students.mobile_phone_nos = mobile_phone_nos
         user.students.is_covid_vaccinated = is_covid_vaccinated
         user.students.date_of_vaccination = date_of_vaccination
+        user.students.student_status = "Pending"
         user.save()
 
         # Save Parent/Guardian Information
@@ -970,6 +1215,27 @@ def add_student_save(request):
     except Exception as e:
         messages.error(request, f"Failed to Add Student! Error: {str(e)}")
         return redirect('add_student')
+
+def manage_student(request):
+    students = Students.objects.all()
+    context = {
+        "students": students
+    }
+    return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
+
+def toggle_student_activation(request, user_id):
+    user = get_user_model().objects.get(id=user_id)
+
+    if user.is_active:
+        user.is_active = False
+        messages.success(request, f"User {user.username} has been deactivated.")
+    else:
+        user.is_active = True
+        messages.success(request, f"User {user.username} has been reactivated.")
+    
+    user.save()
+
+    return redirect('manage_student')
 
 def add_enrollment(request):
     # Get all grade levels that are not already associated with an Enrollment_voucher
@@ -1028,37 +1294,58 @@ def manage_enrollment(request):
     for student in students:
         student.voucher = enrollment_vouchers.get(student.GradeLevel_id.id)
 
+    school = School_info.objects.first()
     context = {
         "students": students,
+        "school": school,
         'now': timezone.now(),
     }
     return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', context)
 
 def update_student_status(request):
+    # Handle GET request: Show confirmation or handle any required logic
+    if request.method == 'GET':
+        student_id = request.GET.get('student_id')
+        
+        if student_id:
+            try:
+                # Find the student by ID
+                student = Students.objects.get(id=student_id)
+                
+                # Update the student status
+                student.student_status = 'Enrolled'  # You can set your desired status
+                student.save()
+
+                # Add a success message to be shown after redirection
+                messages.success(request, 'Status updated successfully.')
+
+                # Redirect to a page, like managing the enrollment
+                return redirect('manage_enrollment')
+            
+            except Students.DoesNotExist:
+                # If the student doesn't exist, add an error message
+                messages.error(request, 'Student not found.')
+                return redirect('manage_enrollment')
+        
+        # If no student_id is passed, return an error
+        messages.error(request, 'Invalid student ID.')
+        return redirect('manage_enrollment')
+
+    # If the method is POST, handle it as your original code
     if request.method == 'POST':
         student_id = request.POST.get('student_id')
         try:
             student = Students.objects.get(id=student_id)
-            student.student_status = "Paying"
+            student.student_status = "Enrolled"
             student.save()
-            return JsonResponse({'success': True, 'message': 'Status updated successfully.'})
+            messages.success(request, 'Status updated successfully.')
         except Students.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Student not found.'})
+            messages.error(request, 'Student not found.')
 
-    return JsonResponse({'success': False, 'message': 'Invalid request.'})
+        return redirect('manage_enrollment')
 
-# Update batch of students' statuses
-def update_batch_student_status(request):
-    if request.method == 'POST':
-        student_ids = request.POST.getlist('student_ids[]')  # A list of student IDs
-        try:
-            students = Students.objects.filter(id__in=student_ids)
-            students.update(student_status="Paying")
-            return JsonResponse({'success': True, 'message': 'Batch status updated successfully.'})
-        except Students.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Students not found.'})
-
-    return JsonResponse({'success': False, 'message': 'Invalid request.'})
+    # For any other method (if any), return a response
+    return HttpResponse("Invalid request method.", status=405)
 
 def manage_enrollment_voucher(request):
     enrollment_vouchers = Enrollment_voucher.objects.all()
@@ -1218,48 +1505,42 @@ def update_balance(request, enrollment_id=None):
         'enrollment': enrollment,
         'enrollments': Enrollment.objects.all(),
     })  
- 
-# def promote_students(request):
-#     if request.method == "POST":
-#         current_grade_id = request.POST.get('current_grade')
-#         next_grade_id = request.POST.get('next_grade')
+
+def promote_students(request):
+    if request.method == "POST":
+        current_grade_id = request.POST.get('current_grade')
+        next_grade_id = request.POST.get('next_grade')
         
-#         try:
-#             current_grade = GradeLevel.objects.get(id=current_grade_id)
-#             next_grade = GradeLevel.objects.get(id=next_grade_id)
+        try:
+            current_grade = GradeLevel.objects.get(id=current_grade_id)
+            next_grade = GradeLevel.objects.get(id=next_grade_id)
             
-#             # Get all students in the current grade
-#             students_to_promote = Students.objects.filter(GradeLevel_id=current_grade)
+            # Get all students in the current grade
+            students_to_promote = Students.objects.filter(GradeLevel_id=current_grade)
             
-#             # Create a promotion history for each student
-#             for student in students_to_promote:
-#                 StudentPromotionHistory.objects.create(
-#                     student=student,
-#                     previous_grade=current_grade,
-#                     new_grade=next_grade,
-#                     promotion_date=timezone.now()
-#                 )
+            # Create a promotion history for each student
+            for student in students_to_promote:
+                StudentPromotionHistory.objects.create(
+                    student=student,
+                    previous_grade=current_grade,
+                    new_grade=next_grade,
+                    promotion_date=timezone.now()
+                )
 
-#             # Promote students to the next grade
-#             students_to_promote.update(GradeLevel_id=next_grade)
+            # Promote students to the next grade
+            students_to_promote.update(GradeLevel_id=next_grade)
             
-#             messages.success(request, f"All students have been promoted from {current_grade.name} to {next_grade.name}.")
-#         except Exception as e:
-#             messages.error(request, f"Failed to promote students. Error: {e}")
+            messages.success(request, f"All students have been promoted from {current_grade.name} to {next_grade.name}.")
+        except Exception as e:
+            messages.error(request, f"Failed to promote students. Error: {e}")
         
-#     return redirect('students_list')
+    return redirect('students_list')
 
-# def view_promotion_history(request, student_id):
-#     promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
-#     return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
+def view_promotion_history(request, student_id):
+    promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
+    return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
 
 
-def manage_student(request):
-    students = Students.objects.all()
-    context = {
-        "students": students
-    }
-    return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
 
 def edit_student(request, student_id):
     student = Students.objects.get(admin=student_id)
@@ -1684,7 +1965,139 @@ def delete_subject(request, subject_id):
     except:
         messages.error(request, "Failed to Delete Subject.")
         return redirect('manage_subject')
-    
+
+def add_promotion(request):
+    # Filter grade levels for students eligible for promotion
+    eligible_students = Students.objects.filter(
+        student_status="Enrolled",
+        id__in=StudentResult.objects.filter(general_average__gte=75).values_list('student_id', flat=True)
+    )
+
+    # Grade levels associated with eligible students
+    gradelevels = GradeLevel.objects.filter(
+        id__in=eligible_students.values_list('GradeLevel_id', flat=True)
+    )
+
+    # Fetch all grade levels for "Next Grade Level" dropdown
+    all_gradelevels = GradeLevel.objects.all()
+
+    context = {
+        "gradelevels": gradelevels,  # Filtered grade levels
+        "all_gradelevels": all_gradelevels,  # All grade levels
+    }
+    return render(request, 'hod_template/Add_Template/add_promotion_template.html', context)
+
+def promote_sections_and_students(request):
+    gradelevel_id = request.GET.get('gradelevel_id')
+    section_id = request.GET.get('section_id')  # Get section ID
+
+    # Fetch sections by GradeLevel
+    sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
+
+    # Get students in the GradeLevel eligible for promotion
+    eligible_student_ids = StudentResult.objects.filter(
+        general_average__gte=75,
+        load_id__AssignSection_id__GradeLevel_id=gradelevel_id  # Correct reference to GradeLevel_id
+    ).values_list('student_id', flat=True)
+
+    students = Students.objects.filter(
+        GradeLevel_id=gradelevel_id,
+        student_status="Enrolled",
+        id__in=eligible_student_ids
+    )
+
+    # If section_id is provided, filter students by AssignSection model
+    if section_id:
+        # Filter the students that are assigned to the selected section
+        students = students.filter(assignsection__section_id=section_id)
+
+    # Prepare data for response
+    section_list = [{"id": section.id, "name": section.section_name} for section in sections]
+    student_list = [
+        {"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"}
+        for student in students
+    ]
+
+    return JsonResponse({'sections': section_list, 'students': student_list})
+
+def create_new_student_results(student, next_gradelevel):
+    # Fetch the AssignSection records for the next grade level
+    assign_sections_for_next_grade = AssignSection.objects.filter(GradeLevel_id=next_gradelevel)
+
+    # Fetch loads for those AssignSections
+    loads_for_next_grade = Load.objects.filter(AssignSection_id__in=assign_sections_for_next_grade)
+
+    # Create new StudentResult records for the student
+    for load in loads_for_next_grade:
+        StudentResult.objects.create(
+            student_id=student,
+            load_id=load,
+            subject_first_quarter=0,
+            subject_second_quarter=0,
+            subject_third_quarter=0,
+            subject_fourth_quarter=0,
+            subject_final_grade=0,
+            general_average=0,
+            remarks=""
+        )
+
+def add_promotion_save(request):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('add_promotion')
+
+    try:
+        gradelevel_id = request.POST.get('gradelevel_id')
+        next_gradelevel_id = request.POST.get('next_gradelevel_id')
+
+        # Fetch the grade levels
+        gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+        next_gradelevel = GradeLevel.objects.get(id=next_gradelevel_id)
+
+        student_ids = request.POST.getlist('student_ids')  # Get multiple student IDs
+
+        # Check if student_ids is empty
+        if not student_ids:
+            messages.error(request, "No students selected! Please select students for promotion.")
+            return redirect('add_promotion')
+
+        # Fetch students eligible for promotion
+        students_to_promote = Students.objects.filter(id__in=student_ids, GradeLevel_id=gradelevel)
+
+        # Check if any students are found for the selected grade level
+        if not students_to_promote:
+            messages.error(request, f"No students found in {gradelevel} for promotion.")
+            return redirect('add_promotion')
+
+        # Save the promotion history and update grade level for each student
+        for student in students_to_promote:
+            # Save the promotion history
+            StudentPromotionHistory.objects.create(
+                student=student,
+                previous_grade=gradelevel,
+                new_grade=next_gradelevel,
+                promotion_date=timezone.now()
+            )
+
+            # Update the student's grade level
+            student.GradeLevel_id = next_gradelevel
+            student.save()
+
+            # Update the GradeLevel_id in the AssignSection model for the promoted student
+            AssignSection.objects.filter(Student_id=student, GradeLevel_id=gradelevel).update(GradeLevel_id=next_gradelevel)
+
+            # Call the function to create new StudentResult records for the next grade level
+            create_new_student_results(student, next_gradelevel)
+
+        success_message = f"{len(students_to_promote)} students promoted successfully from {gradelevel.GradeLevel_name} to {next_gradelevel.GradeLevel_name}."
+        messages.success(request, success_message)
+
+        return redirect('add_promotion')
+
+    except Exception as e:
+        messages.error(request, f"Failed to promote students! Error: {e}")
+        return redirect('add_promotion')
+
 def add_assignsection(request):
     # Filter grade levels for students with student_status="Enrolled"
     gradelevels = GradeLevel.objects.filter(
@@ -1696,19 +2109,6 @@ def add_assignsection(request):
         "gradelevels": gradelevels,
     }
     return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
-
-
-# def add_assignsection(request):
-#     # Filter grade levels only for students present in the Enrollment table
-#     gradelevels = GradeLevel.objects.filter(
-#         id__in=Students.objects.filter(
-#             id__in=Enrollment.objects.values_list('student_id', flat=True)
-#         ).values_list('GradeLevel_id', flat=True)
-#     )
-#     context = {
-#         "gradelevels": gradelevels,
-#     }
-#     return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
 
 def load_sections_and_students(request):
     gradelevel_id = request.GET.get('gradelevel_id')
@@ -1728,26 +2128,6 @@ def load_sections_and_students(request):
     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
     
     return JsonResponse({'sections': section_list, 'students': student_list})
-
-# def load_sections_and_students(request):
-#     gradelevel_id = request.GET.get('gradelevel_id')
-    
-#     # Fetch sections by GradeLevel
-#     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
-
-#     # Get all students in the GradeLevel who are NOT already assigned to a section
-#     assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
-#     students = Students.objects.filter(
-#         GradeLevel_id=gradelevel_id,
-#         id__in=Enrollment.objects.values_list('student_id', flat=True)  # Only include enrolled students
-#     ).exclude(id__in=assigned_students)
-
-#     # Prepare data for response
-#     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
-#     student_list = [{"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"} for student in students]
-    
-#     return JsonResponse({'sections': section_list, 'students': student_list})
-
 
 def add_assignsection_save(request):
     if request.method != "POST":
@@ -1827,6 +2207,73 @@ def add_load(request):
         "loads": loads,
     }
     return render(request, 'hod_template/Add_Template/add_load_template.html', context)
+
+
+def get_subject_data(request):
+    curriculum_id = request.GET.get('curriculum_id')
+    gradelevel_id = request.GET.get('gradelevel_id')
+
+    if curriculum_id and gradelevel_id:
+        # Fetch subjects based on curriculum and grade level
+        subjects = Subjects.objects.filter(curriculum_id=curriculum_id, GradeLevel_id=gradelevel_id)
+        
+        # Fetch all staff for the faculty dropdown
+        staffs = Staffs.objects.all()
+
+        # Prepare the subject data
+        subject_data = [
+            {"id": subject.id, "name": subject.subject_name} for subject in subjects
+        ]
+
+        # Prepare the staff data
+        staff_data = [
+            {"id": staff.id, "name": f"{staff.admin.first_name} {staff.admin.last_name}"} for staff in staffs
+        ]
+
+        return JsonResponse({"subjects": subject_data, "staffs": staff_data}, status=200)
+    
+    return JsonResponse({"subjects": [], "staffs": []}, status=400)
+    
+def save_load_data(request):
+    if request.method == 'POST':
+        try:
+            # Parse the JSON data from the request body
+            data = json.loads(request.body)
+            print("Received Data:", data)  # Log incoming data for debugging
+
+            # Extract 'loads' list from the data
+            loads = data.get('loads', [])
+            for load_data in loads:
+                # Fetch the related model instances based on the provided IDs
+                session_year = SessionYearModel.objects.get(id=load_data['session_year_id'])
+                curriculum = Curriculums.objects.get(id=load_data['curriculum_id'])
+                assign_section = AssignSection.objects.get(id=load_data['assign_section_id'])
+                subject = Subjects.objects.get(id=load_data['subject_id'])
+                staff = CustomUser.objects.get(id=load_data['staff_id'])
+
+                # Create the Load record
+                Load.objects.create(
+                    session_year_id=session_year,
+                    curriculum_id=curriculum,
+                    AssignSection_id=assign_section,
+                    subject_id=subject,
+                    staff_id=staff,
+                    is_advisory=load_data.get('is_advisory', False)  # Default to False if not provided
+                )
+
+            # Set a success message
+            messages.success(request, "Load data saved successfully!")
+
+            # Return a JSON response with success message and redirect URL
+            return JsonResponse({
+                "message": "Load data saved successfully!",
+                "redirect_url": "/add_load/"  # Update to your desired redirect path
+            })
+        except Exception as e:
+            print("Error:", e)  # Log any error for debugging
+            return JsonResponse({"message": str(e)}, status=400)
+
+    return JsonResponse({"message": "Invalid request method"}, status=405)
 
 def add_load_save(request):
     if request.method != "POST":
@@ -2025,60 +2472,6 @@ def manage_class_scheduling(request):
         "schedules": schedules,
     }
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
-
-def filter_schedules(request):
-    gradelevel_id = request.GET.get('gradelevel_id')
-    section_id = request.GET.get('section_id')
-
-    if gradelevel_id and section_id:
-        schedules = Schedule.objects.filter(
-            load_id__AssignSection_id__GradeLevel_id_id=gradelevel_id,
-            load_id__AssignSection_id__section_id_id=section_id
-        ).select_related('load_id', 'staff_id')
-
-        schedule_data = [
-            {
-                'id': schedule.id,
-                'grade_section': f"{schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name} - {schedule.load_id.AssignSection_id.section_id.section_name}",
-                'subject': schedule.load_id.subject_id.subject_name,
-                'staff': f"{schedule.staff_id.first_name} {schedule.staff_id.last_name}",
-                'day_of_week': schedule.day_of_week,
-                'start_time': schedule.start_time.strftime('%I:%M %p'),
-                'end_time': schedule.end_time.strftime('%I:%M %p')
-            }
-            for schedule in schedules
-        ]
-        return JsonResponse({'schedules': schedule_data})
-    return JsonResponse({'schedules': []})
-
-def fetch_schedules(request):
-    grade_level_id = request.GET.get('gradelevel_id')
-    section_id = request.GET.get('section_id')
-
-    if grade_level_id and section_id:
-        schedules = Schedule.objects.filter(
-            load_id__AssignSection_id__GradeLevel_id=grade_level_id,
-            load_id__AssignSection_id__section_id=section_id
-        ).select_related('load_id__AssignSection_id', 'load_id__subject_id', 'staff_id')
-        
-        schedule_data = [
-            {
-                'id': schedule.id,
-                'grade_level': schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name,
-                'section': schedule.load_id.AssignSection_id.section_id.section_name,
-                'subject': schedule.load_id.subject_id.subject_name,
-                'staff': f"{schedule.staff_id.first_name} {schedule.staff_id.last_name}",
-                'day_of_week': schedule.day_of_week,
-                'start_time': schedule.start_time.strftime("%I:%M %p"),
-                'end_time': schedule.end_time.strftime("%I:%M %p"),
-            }
-            for schedule in schedules
-        ]
-        
-        return JsonResponse({'schedules': schedule_data}, safe=False)
-
-    return JsonResponse({'schedules': []}, safe=False)
-
 
 def fetch_load_data(request):
     grade_level_id = request.GET.get('gradelevel_id')

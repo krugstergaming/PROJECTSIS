@@ -266,7 +266,7 @@
                                                         <td>{{ row.subject_third_quarter|floatformat:0 }}</td>
                                                         <td>{{ row.subject_fourth_quarter|floatformat:0 }}</td>
                                                         <td>{{ row.subject_final_grade|default:"N/A" }}</td>
-                                                        <td>{% if row.subject_final_grade >= 75 %} Pass {% else %} Fail {% endif %}</td>
+                                                        <td>{{ row.remarks|default:"N/A" }}</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>

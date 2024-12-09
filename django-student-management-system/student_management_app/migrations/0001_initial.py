@@ -62,6 +62,19 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='School_info',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('school_name', models.CharField(blank=True, max_length=255, null=True)),
+                ('school_ID_number', models.CharField(blank=True, max_length=255, null=True)),
+                ('school_district', models.CharField(blank=True, max_length=255, null=True)),
+                ('school_division', models.CharField(blank=True, max_length=255, null=True)),
+                ('school_region', models.CharField(blank=True, max_length=255, null=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+            ],
+        ),
+        migrations.CreateModel(
             name='SessionYearModel',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
@@ -105,10 +118,22 @@ class Migration(migrations.Migration):
             name='AdminHOD',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('middle_name', models.CharField(blank=True, max_length=255, null=True)),
+                ('suffix', models.CharField(blank=True, max_length=20, null=True)),
+                ('dob', models.DateField(blank=True, null=True)),
+                ('age', models.CharField(blank=True, max_length=15, null=True)),
+                ('pob', models.CharField(max_length=255)),
+                ('sex', models.CharField(choices=[('male', 'Male'), ('female', 'Female')], max_length=10)),
+                ('civil_status', models.CharField(choices=[('single', 'Single'), ('married', 'Married'), ('other', 'Other')], max_length=20)),
+                ('citizenship', models.CharField(blank=True, default='Filipino', max_length=20, null=True)),
+                ('dual_country', models.CharField(blank=True, max_length=255, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('admin', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'abstract': False,
+            },
         ),
         migrations.CreateModel(
             name='BalancePayment',
@@ -184,6 +209,18 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='Schedule',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('day_of_week', models.CharField(max_length=10)),
+                ('start_time', models.TimeField()),
+                ('end_time', models.TimeField()),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('load_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='student_management_app.load')),
+            ],
+        ),
+        migrations.CreateModel(
             name='Section',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
@@ -199,20 +236,6 @@ class Migration(migrations.Migration):
             model_name='assignsection',
             name='section_id',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='student_management_app.section'),
-        ),
-        migrations.CreateModel(
-            name='Schedule',
-            fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('day_of_week', models.CharField(max_length=10)),
-                ('start_time', models.TimeField()),
-                ('end_time', models.TimeField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('load_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='student_management_app.load')),
-                ('staff_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('session_year_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='student_management_app.sessionyearmodel')),
-            ],
         ),
         migrations.CreateModel(
             name='Attendance',
@@ -389,6 +412,7 @@ class Migration(migrations.Migration):
                 ('subject_third_quarter', models.FloatField(default=0)),
                 ('subject_fourth_quarter', models.FloatField(default=0)),
                 ('subject_final_grade', models.FloatField(default=0)),
+                ('general_average', models.FloatField(default=0)),
                 ('subject_exam_marks', models.FloatField(default=0)),
                 ('subject_assignment_marks', models.FloatField(default=0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),

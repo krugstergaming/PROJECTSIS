@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.urls import reverse
+from django.contrib.auth import get_user_model  # Add this import
 
 
 from rest_framework.views import APIView
@@ -40,46 +41,75 @@ class LoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user = EmailBackEnd.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = EmailBackEnd.authenticate(request, username=email, password=password)
+
         if user:
-            if user.is_active:
-                    if user.user_type in ["1", "2", "3"]:
-                        if user.last_login_session_key:
-                            try:
-                                active_session = Session.objects.get(session_key=user.last_login_session_key)
-                                if active_session.expire_date > timezone.now():
-                                    return Response({"error": "Account already logged in on another device"}, status=403)
-                            except Session.DoesNotExist:
-                                pass
-                    else:
-                        return Response({"error": "User type is invalid or missing."}, status=400)
+            if not user.is_active:
+                return Response(
+                    {"error": "Your account has been deactivated due to multiple failed login attempts. Please contact support."}, 
+                    status=403
+                )
+            
+            # Check user type and active session logic
+            if user.user_type in ["1", "2", "3"]:
+                if user.last_login_session_key:
+                    try:
+                        active_session = Session.objects.get(session_key=user.last_login_session_key)
+                        if active_session.expire_date > timezone.now():
+                            return Response({"error": "Account already logged in on another device"}, status=403)
+                    except Session.DoesNotExist:
+                        pass
             else:
-                return Response({"error": "Account is disabled. Please contact support."}, status=403)
-        else:
-            raise AuthenticationFailed("Invalid login credentials")
+                return Response({"error": "User type is invalid or missing."}, status=400)
 
-        login(request, user)
-        refresh = RefreshToken.for_user(user)
-        # Determine redirection URL based on user_type
-        if user.user_type == "1":
-            redirect_url = reverse('admin_home')
-        elif user.user_type == "2":
-            redirect_url = reverse('staff_home')
-        elif user.user_type == "3":
-            redirect_url = reverse('student_home')
-        else:
-            redirect_url = reverse('login')
+            # Reset failed login attempts on successful login
+            user.failed_login_attempts = 0
+            user.save()
 
-        response_data = {
-            "message": "Login successful",
-            "tokens": {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            },
-            "redirect_url": redirect_url,
-        }
+            # Log the user in
+            login(request, user)
+            refresh = RefreshToken.for_user(user)
 
-        return Response(response_data)
+            # Determine redirection URL based on user_type
+            if user.user_type == "1":
+                redirect_url = reverse('admin_home')
+            elif user.user_type == "2":
+                redirect_url = reverse('staff_home')
+            elif user.user_type == "3":
+                redirect_url = reverse('student_home')
+            else:
+                redirect_url = reverse('login')
+
+            response_data = {
+                "message": "Login successful",
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                "redirect_url": redirect_url,
+            }
+
+            return Response(response_data)
+
+        # Handle failed login attempts
+        user_model = get_user_model()
+        user = user_model.objects.filter(email=email).first()
+
+        if user:
+            user.failed_login_attempts += 1
+            if user.failed_login_attempts >= 3:
+                user.is_active = False  # Deactivate account after 3 failed attempts
+                user.save()
+                return Response(
+                    {"error": "Your account has been deactivated due to multiple failed login attempts. Please contact support."}, 
+                    status=403
+                )
+
+            user.save()
+
+        raise AuthenticationFailed("Invalid login credentials")
 
 
 class LogoutView(APIView):

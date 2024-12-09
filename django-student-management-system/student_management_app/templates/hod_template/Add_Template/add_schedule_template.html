@@ -15,114 +15,113 @@
     }
 </style>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <section class="content">
     <div class="container-fluid">
-
-        {% if messages %}
-        <div class="form-group">
-            <div class="col-12">
-                {% for message in messages %}
-                {% if message.tags == "error" %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% elif message.tags == "success" %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                
-                {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-
-        <!-- <a class="btn btn-success" href="{% url 'add_schedule' %}" role="button">+ Add Schedule</a> <br/>&nbsp; -->
-
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="gradelevel">Grade level</label>
-                    <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
-                        <option value="">Select a Grade level</option>
-                        {% for gradelevel in gradelevels %}
-                            <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                        {% endfor %}
-                    </select>            
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Section</label>
-                    <select class="form-control" name="section_id" id="section_id" required disabled>
-                        <option value="" disabled selected>Select a Section</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        
-
-        
-        <!-- <a class="btn btn-info" href="javascript:void(0);" role="button">Fetch</a><br/>&nbsp; -->
-
-        <div class="row">
-
+        <div class="row"> 
             <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Schedule Details</h3>
-
-                        <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                <div class="card card-success">
+                    <div class="card-header"></div> 
+                        {% if messages %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        {% if message.tags == "error" %}
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% elif message.tags == "success" %}
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                {{ message }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="gradelevel">Grade level</label>
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                            <option value="">Select a Grade level</option>
+                                            {% for gradelevel in gradelevels %}
+                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                            {% endfor %}
+                                        </select>            
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Section</label>
+                                        <select class="form-control" name="section_id" id="section_id" required disabled>
+                                            <option value="" disabled selected>Select a Section</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- general form elements -->
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Schedule Details</h3>
+                                            <div class="card-tools">
+                                                <div class="input-group input-group-sm" style="width: 150px;">
+                                                    <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.card-header -->
+                                        <div class="card-body table-responsive p-0">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>Academic Year</th>
+                                                        <th>Subject</th>
+                                                        <th>Staff</th>
+                                                        <th>Grade Level - Section</th>
+                                                        <th>Classroom</th>
+                                                        <th>Day of Week</th>
+                                                        <th>Start Time</th>
+                                                        <th>End Time</th>
+                                                        <th id="conflict-header" style="display: none; color: red; "> Time Conflict</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="schedule_table_body">
+                                                    <tr>
+                                                        <td colspan="9" class="text-center">Select a grade level and section to load data.</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- /.card-body -->
+                                    </div>
+                                    
+                                    <!-- /.card -->
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Academic Year</th>
-                                    <th>Subject</th>
-                                    <th>Staff</th>
-                                    <th>Grade Level - Section</th>
-                                    <th>Classroom</th>
-                                    <th>Day of Week</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th id="conflict-header" style="display: none; color: red; "> Time Conflict</th>
-                                </tr>
-                            </thead>
-                            <tbody id="schedule_table_body">
-                                <tr>
-                                    <td colspan="9" class="text-center">Select a grade level and section to load data.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <button type="button" id="save_schedule" class="btn btn-primary">Save Schedule</button>
-                <!-- /.card -->
-            </div>
-        </div>
-
+                        <div class="card-footer">
+                            <button type="button" id="save_schedule" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_class_scheduling' %}" class="btn btn-secondary">Back</a>
+                        </div>
+                    </div> <!-- card card-primary -->
+                </div> <!-- col-md-12 -->
+            </div> <!-- row -->
     </div><!-- /.container-fluid -->
 </section>
 
@@ -250,7 +249,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const gradeLevelSelect = document.getElementById('GradeLevel_id');
         const sectionSelect = document.getElementById('section_id');
-        const scheduleTableBody = document.querySelector('tbody');
+        const scheduleTableBody = document.querySelector('tbody'); 
 
         scheduleTableBody.addEventListener('input', function (event) {
             const target = event.target;
@@ -279,154 +278,154 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const gradeLevelSelect = document.getElementById('GradeLevel_id');
-    const sectionSelect = document.getElementById('section_id');
-    const scheduleTableBody = document.querySelector('tbody');
+        const gradeLevelSelect = document.getElementById('GradeLevel_id');
+        const sectionSelect = document.getElementById('section_id');
+        const scheduleTableBody = document.querySelector('tbody');
 
-    gradeLevelSelect.addEventListener('change', function () {
-        const gradeLevelId = gradeLevelSelect.value;
+        gradeLevelSelect.addEventListener('change', function () {
+            const gradeLevelId = gradeLevelSelect.value;
 
-        if (gradeLevelId) {
-            fetch(`/load_sections_and_students/?gradelevel_id=${gradeLevelId}`)
-                .then(response => response.json())
-                .then(data => {
-                    sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
-                    data.sections.forEach(section => {
-                        const option = document.createElement('option');
-                        option.value = section.id;
-                        option.textContent = section.name;
-                        sectionSelect.appendChild(option);
-                    });
-                    sectionSelect.disabled = false;
-                });
-        } else {
-            sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
-            sectionSelect.disabled = true;
-        }
-    });
-
-    sectionSelect.addEventListener('change', function () {
-        const gradeLevelId = gradeLevelSelect.value;
-        const sectionId = sectionSelect.value;
-
-        if (gradeLevelId && sectionId) 
-        {
-            fetch(`/fetch_load_data/?gradelevel_id=${gradeLevelId}&section_id=${sectionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    scheduleTableBody.innerHTML = ''; // Clear previous data
-                    if (data.loads.length) {
-                        data.loads.forEach((load, index) => {
-                            const row = document.createElement('tr');
-
-                            // Add load_id as a data attribute on the row
-                            row.dataset.loadId = load.id;  // Assuming `load.id` is the load's unique identifier
-
-                            row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${load.session_year}</td>
-                                <td>${load.subject}</td>
-                                <td>${load.staff}</td>
-                                <td>${load.grade_level} - ${load.section}</td>
-                                <td><select name="classroom" class="form-control">
-                                        <option value=""  selected>Select Classroom</option>
-                                        <option value="101">101</option>
-                                        <option value="102">102</option>
-                                        <option value="201">201</option>
-                                        <option value="202">202</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="day_of_week" class="form-control" required>
-                                        <option value="" disabled selected>Select Day</option>
-                                        <option value="Monday">Monday</option>
-                                        <option value="Tuesday">Tuesday</option>
-                                        <option value="Wednesday">Wednesday</option>
-                                        <option value="Thursday">Thursday</option>
-                                        <option value="Friday">Friday</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="time" name="start_time" class="form-control" id="start_time_${index}" required>
-                                </td>
-                                <td>
-                                    <input type="time" name="end_time" class="form-control" id="end_time_${index}" readonly>
-                                </td>
-                                <td class="conflict-column" style="display: none;"></td>
-                            `;
-                            scheduleTableBody.appendChild(row);
-
-                            // Attach event listener to each start_time input field
-                            document.getElementById(`start_time_${index}`).addEventListener('input', function () {
-                                const startTime = this.value;  // Get the start time value
-                                if (startTime) {
-                                    const startDate = new Date('1970-01-01T' + startTime + 'Z');  // Convert start time to a Date object
-                                    startDate.setMinutes(startDate.getMinutes() + 50);  // Add 50 minutes to the start time
-
-                                    // Format the end time back to 'HH:MM' format and update the end time input
-                                    const hours = startDate.getUTCHours().toString().padStart(2, '0');
-                                    const minutes = startDate.getUTCMinutes().toString().padStart(2, '0');
-                                    document.getElementById(`end_time_${index}`).value = hours + ':' + minutes;
-                                }
-                            });
+            if (gradeLevelId) {
+                fetch(`/load_sections_and_students/?gradelevel_id=${gradeLevelId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                        data.sections.forEach(section => {
+                            const option = document.createElement('option');
+                            option.value = section.id;
+                            option.textContent = section.name;
+                            sectionSelect.appendChild(option);
                         });
-                    } else {
-                        scheduleTableBody.innerHTML = `
-                            <tr>
-                                <td colspan="9" class="text-center" style="color: white; background-color: red; font-weight: bold;">No loads found for the selected Grade level and Section.</td>
-                            </tr>
-                        `;
-                    }
-                });
-        }
-    });
-});
-
-document.getElementById('save_schedule').addEventListener('click', function () {
-    const rows = document.querySelectorAll('#schedule_table_body tr');
-    const scheduleData = [];
-
-    rows.forEach(row => {
-        const load_id = row.dataset.loadId;  // Get the load_id from the row's data attribute
-        const dayOfWeek = row.querySelector('select[name="day_of_week"]').value;
-        const startTime = row.querySelector('input[name="start_time"]').value;
-        const endTime = row.querySelector('input[name="end_time"]').value;
-
-        if (dayOfWeek && startTime && endTime) {
-            scheduleData.push({
-                load_id: load_id,  // Add load_id to the request data
-                day_of_week: dayOfWeek,
-                start_time: startTime,
-                end_time: endTime
-            });
-        }
-    });
-
-    if (scheduleData.length) {
-        fetch('/save_schedule/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken // Ensure CSRF token is included
-            },
-            body: JSON.stringify({ schedules: scheduleData })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.redirect_url) {
-                // Redirect to the URL provided in the response
-                window.location.href = data.redirect_url;
+                        sectionSelect.disabled = false;
+                    });
             } else {
-                alert(data.message); // Show any message if no redirect URL is present
+                sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                sectionSelect.disabled = true;
             }
-        })
-        .catch(error => {
-            alert('Error: ' + error.message);  // Show any error that occurred during the process
         });
-    } else {
-        alert('Please fill out all fields before saving.');
-    }
-});
+
+        sectionSelect.addEventListener('change', function () {
+            const gradeLevelId = gradeLevelSelect.value;
+            const sectionId = sectionSelect.value;
+
+            if (gradeLevelId && sectionId) 
+            {
+                fetch(`/fetch_load_data/?gradelevel_id=${gradeLevelId}&section_id=${sectionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        scheduleTableBody.innerHTML = ''; // Clear previous data
+                        if (data.loads.length) {
+                            data.loads.forEach((load, index) => {
+                                const row = document.createElement('tr');
+
+                                // Add load_id as a data attribute on the row
+                                row.dataset.loadId = load.id;  // Assuming `load.id` is the load's unique identifier
+
+                                row.innerHTML = `
+                                    <td>${index + 1}</td>
+                                    <td>${load.session_year}</td>
+                                    <td>${load.subject}</td>
+                                    <td>${load.staff}</td>
+                                    <td>${load.grade_level} - ${load.section}</td>
+                                    <td><select name="classroom" class="form-control">
+                                            <option value=""  selected>Select Classroom</option>
+                                            <option value="101">101</option>
+                                            <option value="102">102</option>
+                                            <option value="201">201</option>
+                                            <option value="202">202</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="day_of_week" class="form-control" required>
+                                            <option value="" disabled selected>Select Day</option>
+                                            <option value="Monday">Monday</option>
+                                            <option value="Tuesday">Tuesday</option>
+                                            <option value="Wednesday">Wednesday</option>
+                                            <option value="Thursday">Thursday</option>
+                                            <option value="Friday">Friday</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="time" name="start_time" class="form-control" id="start_time_${index}" required>
+                                    </td>
+                                    <td>
+                                        <input type="time" name="end_time" class="form-control" id="end_time_${index}" readonly>
+                                    </td>
+                                    <td class="conflict-column" style="display: none;"></td>
+                                `;
+                                scheduleTableBody.appendChild(row);
+
+                                // Attach event listener to each start_time input field
+                                document.getElementById(`start_time_${index}`).addEventListener('input', function () {
+                                    const startTime = this.value;  // Get the start time value
+                                    if (startTime) {
+                                        const startDate = new Date('1970-01-01T' + startTime + 'Z');  // Convert start time to a Date object
+                                        startDate.setMinutes(startDate.getMinutes() + 50);  // Add 50 minutes to the start time
+
+                                        // Format the end time back to 'HH:MM' format and update the end time input
+                                        const hours = startDate.getUTCHours().toString().padStart(2, '0');
+                                        const minutes = startDate.getUTCMinutes().toString().padStart(2, '0');
+                                        document.getElementById(`end_time_${index}`).value = hours + ':' + minutes;
+                                    }
+                                });
+                            });
+                        } else {
+                            scheduleTableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="9" class="text-center" style="color: white; background-color: red; font-weight: bold;">No loads found for the selected Grade level and Section.</td>
+                                </tr>
+                            `;
+                        }
+                    });
+            }
+        });
+    });
+
+    document.getElementById('save_schedule').addEventListener('click', function () {
+        const rows = document.querySelectorAll('#schedule_table_body tr');
+        const scheduleData = [];
+
+        rows.forEach(row => {
+            const load_id = row.dataset.loadId;  // Get the load_id from the row's data attribute
+            const dayOfWeek = row.querySelector('select[name="day_of_week"]').value;
+            const startTime = row.querySelector('input[name="start_time"]').value;
+            const endTime = row.querySelector('input[name="end_time"]').value;
+
+            if (dayOfWeek && startTime && endTime) {
+                scheduleData.push({
+                    load_id: load_id,  // Add load_id to the request data
+                    day_of_week: dayOfWeek,
+                    start_time: startTime,
+                    end_time: endTime
+                });
+            }
+        });
+
+        if (scheduleData.length) {
+            fetch('/save_schedule/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // Ensure CSRF token is included
+                },
+                body: JSON.stringify({ schedules: scheduleData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    // Redirect to the URL provided in the response
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert(data.message); // Show any message if no redirect URL is present
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);  // Show any error that occurred during the process
+            });
+        } else {
+            alert('Please fill out all fields before saving.');
+        }
+    });
 </script>
 
 

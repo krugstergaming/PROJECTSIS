@@ -357,9 +357,10 @@ def get_students(request):
         if load_model.session_year_id.id != int(session_year_id):
             return JsonResponse({"error": "Session Year mismatch"}, status=400)
 
-        # Get AssignSection entries based on the section in the selected load
+        # Get AssignSection entries based on the section in the selected load and grade level
         assign_sections = AssignSection.objects.filter(
             section_id__id=load_model.AssignSection_id.section_id.id,
+            GradeLevel_id__id=load_model.AssignSection_id.GradeLevel_id.id  # Add grade level condition
         )
 
         # Now, filter students based on the AssignSection records
@@ -442,6 +443,9 @@ def staff_add_result_save(request):
 
             final_grade = (first_quarter + second_quarter + third_quarter + fourth_quarter) / 4
 
+            # Determine remarks based on final grade
+            remarks = "Passed" if final_grade >= 75 else "Failed"
+
             # Check if the result already exists
             check_exist = StudentResult.objects.filter(load_id=load_obj, student_id=student_obj).exists()
             if check_exist:
@@ -451,6 +455,7 @@ def staff_add_result_save(request):
                 result.subject_third_quarter = third_quarter
                 result.subject_fourth_quarter = fourth_quarter
                 result.subject_final_grade = final_grade
+                result.remarks = remarks 
                 result.save()
                 messages.success(request, "Result Updated Successfully!")
             else:
@@ -461,7 +466,8 @@ def staff_add_result_save(request):
                     subject_second_quarter=second_quarter,
                     subject_third_quarter=third_quarter,
                     subject_fourth_quarter=fourth_quarter,
-                    subject_final_grade=final_grade
+                    subject_final_grade=final_grade,
+                    remarks=remarks  
                 )
                 result.save()
                 messages.success(request, "Result Added Successfully!")
