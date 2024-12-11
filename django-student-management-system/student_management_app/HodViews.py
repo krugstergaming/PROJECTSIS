@@ -33,10 +33,10 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model
 
-from student_management_app.models import CustomUser, School_info, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
+from student_management_app.models import CustomUser, School_info, AdminHOD, Students, ParentGuardian, PreviousSchool, EmergencyContact, Attachment, BalancePayment, AssignSection, Load, Schedule, GradingConfiguration
 from student_management_app.models import Staffs, staff_contact_info, staff_employment_info, staff_physical_info, staff_government_ID_info, Staffs_Educ_Background, StudentPromotionHistory
 from student_management_app.models import Curriculums, GradeLevel, Enrollment, Enrollment_voucher, Subjects, Section, SessionYearModel
-from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Classroom
+from student_management_app.models import FeedBackStudent, FeedBackStaffs, LeaveReportStudent, LeaveReportStaff, Attendance, AttendanceReport, Classroom, StudentResult
 from .forms import EditStudentForm, AddScheduleForm, EditScheduleForm
 
 

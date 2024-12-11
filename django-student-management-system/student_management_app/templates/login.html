@@ -62,12 +62,10 @@ document.getElementById('login-form').addEventListener('submit', async function 
 
     if (response.ok) {
       const data = await response.json();
-      // localStorage.removeItem("access_token");
-      // localStorage.removeItem("refresh_token");
 
       // Save tokens to localStorage
-      localStorage.setItem("refresh_token", data.tokens.refresh); // Save refresh token
-      localStorage.setItem("access_token", data.tokens.access); // Save access token
+      localStorage.setItem("refresh_token", data.tokens.refresh);
+      localStorage.setItem("access_token", data.tokens.access);
 
       // Redirect to the dashboard URL
       if (data.redirect_url) {
@@ -77,14 +75,15 @@ document.getElementById('login-form').addEventListener('submit', async function 
       }
     } else {
       const errorData = await response.json();
-      alert(errorData.error || "An account have already logged in.");
+      // Display the error message from the server, or a generic fallback message
+      alert(errorData.error);
     }
   } catch (error) {
     console.error("Error during login:", error);
     alert("An error occurred. Please try again.");
   }
 });
-
 </script>
+
 
 {% endblock %}

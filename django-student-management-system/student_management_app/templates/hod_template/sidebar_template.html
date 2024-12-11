@@ -1,12 +1,15 @@
 {% load static %}
 
-<aside class="main-sidebar sidebar-dark-success elevation-4">
-      <!-- Brand Logo -->
-      <a href="{% url 'admin_home' %}" class="brand-link">
-        <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-            style="opacity: .8">
-        <span class="brand-text font-weight-light">Flor De Grace </span>
-      </a>
+<aside class="main-sidebar sidebar-dark-primary" style="background-color: #93C572; color: #000;">
+      
+  {% comment %} <!-- Brand Logo -->
+    <a href="{% url 'admin_home' %}" class="brand-link">
+      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+          style="opacity: .8">
+
+      <!-- SHOOL NAME -->
+      <span class="brand-text font-weight-light">Flor de Grace School</span>
+    </a> {% endcomment %}
 
       <!-- Sidebar -->
       <div class="sidebar">

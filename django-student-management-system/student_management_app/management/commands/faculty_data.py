@@ -48,13 +48,14 @@ class Command(BaseCommand):
         return f"{first_name.lower()}{last_name.lower()}{current_year}"
 
     def seed_staffs(self):
-        for i in range(10):  # Create 5 sample staff members
+        for i in range(10):  # Create 10 sample staff members
             first_name = fake.first_name()
             last_name = fake.last_name()
             username = fake.user_name()
             email = f'faculty{i}@gmail.com'
             password = 'fac'
 
+            # Create the user
             user = CustomUser.objects.create_user(
                 username=username,
                 password=password,
@@ -63,6 +64,8 @@ class Command(BaseCommand):
                 last_name=last_name,
                 user_type=2
             )
+            
+            # Get the associated staff instance
             staff = user.staffs
             staff.middle_name = fake.last_name()
             staff.dob = fake.date_of_birth()
@@ -72,18 +75,18 @@ class Command(BaseCommand):
             staff.civil_status = random.choice(["Single", "Married", "Widowed"])
             staff.citizenship = random.choice(["Philippines"])
             staff.dual_country = None if random.random() > 0.5 else fake.country()
-            staff.max_load=random.randint(5, 10)
+            staff.max_load = random.randint(5, 10)
             staff.save()
 
-            # Add related information
+            # Add related models for the specific staff
             staff_contact_info.objects.create(
-                staffs_id=staff,
+                staffs_id=staff,  # Pass the staff object (not the ID)
                 region=fake.state(),
                 province=fake.city(),
                 city=fake.city(),
                 barangay=fake.street_name(),
                 street=fake.street_address(),
-                telephone_no=generate_telephone_number(),  
+                telephone_no=generate_telephone_number(),
                 cellphone_no=generate_cellphone_number(),
                 emergency_contact_name=fake.name(),
                 emergency_contact_no=generate_cellphone_number(),
@@ -91,22 +94,22 @@ class Command(BaseCommand):
                 medical_condition=fake.word(),
             )
             staff_employment_info.objects.create(
-                staffs_id=staff,
+                staffs_id=staff,  # Pass the staff object (not the ID)
                 employee_number=f"EMP{i}",
                 employee_type=random.choice(["Full-Time", "Part-Time"]),
                 position=random.choice(["Faculty", "Registrar", "Custodian"]),
                 employment_status=random.choice(["Active", "Inactive"]),
             )
             staff_physical_info.objects.create(
-                staffs_id=staff,
+                staffs_id=staff,  # Pass the staff object (not the ID)
                 blood_type=random.choice(["A", "B", "AB", "O"]),
-                height=random.randint(5, 6),
-                weight=random.randint(50, 90),
+                height=random.randint(150, 200),  # Height in cm
+                weight=random.randint(50, 90),  # Weight in kg
                 eye_color=random.choice(["Brown", "Blue", "Green"]),
                 hair_color=random.choice(["Black", "Brown", "Blonde"]),
             )
             staff_government_ID_info.objects.create(
-                staffs_id=staff,
+                staffs_id=staff,  # Pass the staff object (not the ID)
                 gsis_id=generate_gsis_id(),
                 philhealth_id=generate_philhealth_id(),
                 pagibig_id=generate_pagibig_id(),
@@ -114,7 +117,7 @@ class Command(BaseCommand):
                 tin_id=generate_individual_tin(),
             )
             Staffs_Educ_Background.objects.create(
-                staffs_id=staff,
+                staffs_id=staff,  # Pass the staff object (not the ID)
                 HEA=fake.random_element([
                     "Elementary", 
                     "High School", 
@@ -123,7 +126,7 @@ class Command(BaseCommand):
                     "Bachelor's Degree", 
                     "Master's Degree", 
                     "Doctorate/PhD"
-                ]),  # Randomly select from the valid options
+                ]),
                 preferred_subject=fake.random_element([
                     "Reading", 
                     "Language", 
@@ -136,13 +139,14 @@ class Command(BaseCommand):
                     "Mapeh", 
                     "Hele / epp", 
                     "N/A"
-                ]),  
+                ]),
                 Cert_License=fake.word(),
                 teaching_exp=random.randint(1, 20),
                 skills_competencies=fake.text(max_nb_chars=50),
-                # Language spoken is now dynamically generated
-                language_spoken=", ".join([fake.random_element(languages) for _ in range(2)]),  # Select 2 random languages
+                language_spoken=", ".join([fake.random_element(languages) for _ in range(2)]),
             )
+
+
 
     def seed_admins(self):
         for i in range(2):  # Create 2 sample admins
@@ -152,6 +156,7 @@ class Command(BaseCommand):
             email = f'admin{i}@gmail.com'
             password = 'ad'
 
+            # Create the user
             user = CustomUser.objects.create_user(
                 username=username,
                 password=password,
@@ -160,6 +165,8 @@ class Command(BaseCommand):
                 last_name=last_name,
                 user_type=1
             )
+            
+            # Get the associated adminhod instance
             admin = user.adminhod
             admin.middle_name = fake.last_name()
             admin.dob = fake.date_of_birth()
@@ -169,10 +176,10 @@ class Command(BaseCommand):
             admin.civil_status = random.choice(["Single", "Married", "Widowed"])
             admin.citizenship = fake.country()
             admin.dual_country = None if random.random() > 0.5 else fake.country()
-            admin.max_load=0
+            admin.max_load = 0
             admin.save()
 
-            # Add related information (similar to staff's related models)
+            # Add related models for the specific admin
             staff_contact_info.objects.create(
                 adminhod_id=admin,
                 region=fake.state(),
@@ -180,7 +187,7 @@ class Command(BaseCommand):
                 city=fake.city(),
                 barangay=fake.street_name(),
                 street=fake.street_address(),
-                telephone_no=generate_telephone_number(),  
+                telephone_no=generate_telephone_number(),
                 cellphone_no=generate_cellphone_number(),
                 emergency_contact_name=fake.name(),
                 emergency_contact_no=generate_cellphone_number(),
@@ -197,8 +204,8 @@ class Command(BaseCommand):
             staff_physical_info.objects.create(
                 adminhod_id=admin,
                 blood_type=random.choice(["A", "B", "AB", "O"]),
-                height=random.randint(5, 6),
-                weight=random.randint(50, 90),
+                height=random.randint(150, 200),  # Height in cm
+                weight=random.randint(50, 90),  # Weight in kg
                 eye_color=random.choice(["Brown", "Blue", "Green"]),
                 hair_color=random.choice(["Black", "Brown", "Blonde"]),
             )
@@ -220,7 +227,7 @@ class Command(BaseCommand):
                     "Bachelor's Degree", 
                     "Master's Degree", 
                     "Doctorate/PhD"
-                ]),  # Randomly select from the valid options
+                ]),
                 preferred_subject=fake.random_element([
                     "Reading", 
                     "Language", 
@@ -237,6 +244,5 @@ class Command(BaseCommand):
                 Cert_License=fake.word(),
                 teaching_exp=random.randint(5, 30),
                 skills_competencies=fake.text(max_nb_chars=50),
-                # Language spoken is now dynamically generated
-                language_spoken=", ".join([fake.random_element(languages) for _ in range(2)]),  # Select 2 random languages
+                language_spoken=", ".join([fake.random_element(languages) for _ in range(2)]),
             )

@@ -64,9 +64,22 @@ class LoginAPIView(APIView):
             else:
                 return Response({"error": "User type is invalid or missing."}, status=400)
 
-            # Reset failed login attempts on successful login
-            user.failed_login_attempts = 0
-            user.save()
+            if user:
+                user.failed_login_attempts = 0
+                user.save()
+            else:
+                user_model = get_user_model()
+                user = user_model.objects.filter(email=email).first()
+                user.failed_login_attempts += 1
+                if user.failed_login_attempts >= 3:
+                    user.is_active = False  # Deactivate account after 3 failed attempts
+                    user.save()
+                    return Response(
+                        {"error": "Your account has been deactivated due to multiple failed login attempts. Please contact support."}, 
+                        status=403
+                    )
+
+                user.save()
 
             # Log the user in
             login(request, user)
@@ -90,26 +103,10 @@ class LoginAPIView(APIView):
                 },
                 "redirect_url": redirect_url,
             }
-
             return Response(response_data)
-
-        # Handle failed login attempts
-        user_model = get_user_model()
-        user = user_model.objects.filter(email=email).first()
-
-        if user:
-            user.failed_login_attempts += 1
-            if user.failed_login_attempts >= 3:
-                user.is_active = False  # Deactivate account after 3 failed attempts
-                user.save()
-                return Response(
-                    {"error": "Your account has been deactivated due to multiple failed login attempts. Please contact support."}, 
-                    status=403
-                )
-
-            user.save()
-
-        raise AuthenticationFailed("Invalid login credentials")
+        else:
+            return Response({"error": "Invalid login credentials"}, status=401)
+        
 
 
 class LogoutView(APIView):

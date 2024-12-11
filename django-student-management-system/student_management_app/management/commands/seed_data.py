@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, ParentGuardian, PreviousSchool, EmergencyContact, CustomUser, Enrollment_voucher
+from student_management_app.models import Curriculums, GradeLevel, Section, SessionYearModel, Subjects, Staffs, Students, ParentGuardian, PreviousSchool, EmergencyContact, CustomUser, Enrollment_voucher, School_info
 from datetime import datetime, date
 import random
 

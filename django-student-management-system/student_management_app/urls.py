@@ -117,14 +117,11 @@ urlpatterns = [
     path('save_schedule/', HodViews.save_schedule, name='save_schedule'),
     path('search_schedule/', HodViews.search_schedule, name='search_schedule'),
     path('check_schedule_conflict/', HodViews.check_schedule_conflict, name='check_schedule_conflict'),
-    
-    
-    path('delete_student/<student_id>/', HodViews.delete_student, name="delete_student"),
 
     path('add_subject/', HodViews.add_subject, name="add_subject"),
     path('add_subject_save/', HodViews.add_subject_save, name="add_subject_save"),
     path('manage_subject/', HodViews.manage_subject, name="manage_subject"),
-    # path('manage_subject/api', ManageSubjectsAPIView.as_view(), name="manage_subject_json"),
+    path('toggle_user_activation/<int:user_id>/', HodViews.toggle_user_activation, name='toggle_user_activation'),
     path('edit_subject/<subject_id>/', HodViews.edit_subject, name="edit_subject"),
     path('edit_subject_save/', HodViews.edit_subject_save, name="edit_subject_save"),
     path('delete_subject/<subject_id>/', HodViews.delete_subject, name="delete_subject"),
