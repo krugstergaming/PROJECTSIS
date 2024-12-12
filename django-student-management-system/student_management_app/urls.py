@@ -104,6 +104,7 @@ urlpatterns = [
     path('get_sections_by_grade/<int:grade_level_id>/', HodViews.get_sections_by_grade, name='get_sections_by_grade'),
     path('edit_assignsection/', HodViews.edit_assignsection, name='edit_assignsection'),
 
+
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),
     path('add_schedule_save/', HodViews.add_schedule_save, name="add_schedule_save"),
     path('edit_schedule/<schedule_id>', HodViews.edit_schedule, name="edit_schedule"),

@@ -156,7 +156,8 @@ def add_staff_save(request):
                  street = request.POST.get('street'),
                  telephone_no = request.POST.get('telephone_no'),
                  cellphone_no = request.POST.get('cellphone_no'),
-                 emergency_contact = request.POST.get('emergency_contact'),
+                 emergency_contact_name = request.POST.get('emergency_contact_name'),
+                 emergency_contact_no = request.POST.get('emergency_contact_no'),
                  emergency_relationship = request.POST.get('emergency_relationship'),
                  medical_condition = request.POST.get('medical_condition'),
             )
@@ -260,7 +261,8 @@ def add_admin_save(request):
                  street = request.POST.get('street'),
                  telephone_no = request.POST.get('telephone_no'),
                  cellphone_no = request.POST.get('cellphone_no'),
-                 emergency_contact_no = request.POST.get('emergency_contact'),
+                 emergency_contact_name = request.POST.get('emergency_contact_name'),
+                 emergency_contact_no = request.POST.get('emergency_contact_no'),
                  emergency_relationship = request.POST.get('emergency_relationship'),
                  medical_condition = request.POST.get('medical_condition'),
             )
@@ -2481,8 +2483,6 @@ def add_schedule_save(request):
     # Return the data as a JSON response
     return JsonResponse(load_data, safe=False)
 
-
-
 def manage_load_scheduling(request):
     loads = Load.objects.all()
     context = {
@@ -2585,33 +2585,30 @@ def save_schedule(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print("Received Data:", data)  # Log the incoming data
-
             schedules = data.get('schedules', [])
             for schedule in schedules:
-                # Retrieve the Load object using the provided load_id
-                load = Load.objects.get(id=schedule['load_id'])  # Get the load associated with this schedule
-                
-                # Create the schedule entry
-                Schedule.objects.create(
-                    load_id=load,  # Use load_id directly here
-                    day_of_week=schedule['day_of_week'],
-                    start_time=schedule['start_time'],
-                    end_time=schedule['end_time']
-                )
+                load = Load.objects.get(id=schedule['load_id'])
 
-            # Set a success message in the session (you can also include this in the response if needed)
-            messages.success(request, "Schedule/s saved successfully!")
+                # Iterate through each day in the list of selected days
+                for day in schedule['day_of_week']:
+                    # Create a schedule entry for each day
+                    Schedule.objects.create(
+                        load_id=load,
+                        day_of_week=day,  # Use each day of the week separately
+                        start_time=schedule['start_time'],
+                        end_time=schedule['end_time']
+                    )
 
-            # Return a JsonResponse with the redirect URL
+            messages.success(request, "Schedules saved successfully!")
             return JsonResponse({
                 "message": "Schedules saved successfully!",
-                "redirect_url": "/add_schedule/"  # Include the redirect URL in the response
+                "redirect_url": "/add_schedule/"
             })
+
         except Exception as e:
             print(e)
             return JsonResponse({"message": str(e)}, status=400)
-    
+
     return JsonResponse({"message": "Invalid request method"}, status=405)
 
 def search_schedule(request):
