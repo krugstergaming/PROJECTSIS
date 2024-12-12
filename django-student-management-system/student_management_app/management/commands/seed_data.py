@@ -461,7 +461,7 @@ class Command(BaseCommand):
                 'rank_in_family': '5',
                 'telephone_nos': '123-456-7890',
                 'mobile_phone_nos': '098-765-4321',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -484,7 +484,7 @@ class Command(BaseCommand):
                 'rank_in_family': '3',
                 'telephone_nos': '234-567-8901',
                 'mobile_phone_nos': '109-876-5432',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -507,7 +507,7 @@ class Command(BaseCommand):
                 'rank_in_family': '2',
                 'telephone_nos': '345-678-9012',
                 'mobile_phone_nos': '210-987-6543',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -530,7 +530,7 @@ class Command(BaseCommand):
                 'rank_in_family': '4',
                 'telephone_nos': '456-789-0123',
                 'mobile_phone_nos': '321-098-7654',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -553,7 +553,7 @@ class Command(BaseCommand):
                 'rank_in_family': '1',
                 'telephone_nos': '567-890-1234',
                 'mobile_phone_nos': '432-109-8765',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -576,7 +576,7 @@ class Command(BaseCommand):
                 'rank_in_family': '3',
                 'telephone_nos': '678-901-2345',
                 'mobile_phone_nos': '543-210-9876',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -599,7 +599,7 @@ class Command(BaseCommand):
                 'rank_in_family': '2',
                 'telephone_nos': '789-012-3456',
                 'mobile_phone_nos': '654-321-0987',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -622,7 +622,7 @@ class Command(BaseCommand):
                 'rank_in_family': '4',
                 'telephone_nos': '890-123-4567',
                 'mobile_phone_nos': '765-432-1098',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -645,7 +645,7 @@ class Command(BaseCommand):
                 'rank_in_family': '5',
                 'telephone_nos': '901-234-5678',
                 'mobile_phone_nos': '876-543-2109',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             },
@@ -668,7 +668,7 @@ class Command(BaseCommand):
                 'rank_in_family': '3',
                 'telephone_nos': '012-345-6789',
                 'mobile_phone_nos': '987-654-3210',
-                'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
+                'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
                 'student_status': 'Enrolled'
             }

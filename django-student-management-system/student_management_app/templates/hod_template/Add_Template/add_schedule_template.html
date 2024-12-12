@@ -94,7 +94,6 @@
                                                         <th>Subject</th>
                                                         <th>Staff</th>
                                                         <th>Grade Level - Section</th>
-                                                        <th>Classroom</th>
                                                         <th>Day of Week</th>
                                                         <th>Start Time</th>
                                                         <th>End Time</th>
@@ -103,7 +102,7 @@
                                                 </thead>
                                                 <tbody id="schedule_table_body">
                                                     <tr>
-                                                        <td colspan="9" class="text-center">Select a grade level and section to load data.</td>
+                                                        <td colspan="8" class="text-center">Select a grade level and section to load data.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -327,24 +326,13 @@
                                     <td>${load.subject}</td>
                                     <td>${load.staff}</td>
                                     <td>${load.grade_level} - ${load.section}</td>
-                                    <td><select name="classroom" class="form-control">
-                                            <option value=""  selected>Select Classroom</option>
-                                            <option value="101">101</option>
-                                            <option value="102">102</option>
-                                            <option value="201">201</option>
-                                            <option value="202">202</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="day_of_week" class="form-control" required>
-                                            <option value="" disabled selected>Select Day</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                        </select>
-                                    </td>
+                                    <select name="day_of_week" class="form-control multiselect" multiple>
+                                        <option value="Monday">Monday</option>
+                                        <option value="Tuesday">Tuesday</option>
+                                        <option value="Wednesday">Wednesday</option>
+                                        <option value="Thursday">Thursday</option>
+                                        <option value="Friday">Friday</option>
+                                    </select>
                                     <td>
                                         <input type="time" name="start_time" class="form-control" id="start_time_${index}" required>
                                     </td>
@@ -368,11 +356,12 @@
                                         document.getElementById(`end_time_${index}`).value = hours + ':' + minutes;
                                     }
                                 });
+                                
                             });
                         } else {
                             scheduleTableBody.innerHTML = `
                                 <tr>
-                                    <td colspan="9" class="text-center" style="color: white; background-color: red; font-weight: bold;">No loads found for the selected Grade level and Section.</td>
+                                    <td colspan="8" class="text-center" style="color: white; background-color: red; font-weight: bold;">No loads found for the selected Grade level and Section.</td>
                                 </tr>
                             `;
                         }
@@ -387,14 +376,15 @@
 
         rows.forEach(row => {
             const load_id = row.dataset.loadId;  // Get the load_id from the row's data attribute
-            const dayOfWeek = row.querySelector('select[name="day_of_week"]').value;
+            const dayOfWeekSelect = row.querySelector('select[name="day_of_week"]');
+            const dayOfWeek = Array.from(dayOfWeekSelect.selectedOptions).map(option => option.value);
             const startTime = row.querySelector('input[name="start_time"]').value;
             const endTime = row.querySelector('input[name="end_time"]').value;
 
-            if (dayOfWeek && startTime && endTime) {
+            if (dayOfWeek.length && startTime && endTime) {
                 scheduleData.push({
-                    load_id: load_id,  // Add load_id to the request data
-                    day_of_week: dayOfWeek,
+                    load_id: load_id,
+                    day_of_week: dayOfWeek,  // Send the array of selected days
                     start_time: startTime,
                     end_time: endTime
                 });
@@ -413,7 +403,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.redirect_url) {
-                    // Redirect to the URL provided in the response
                     window.location.href = data.redirect_url;
                 } else {
                     alert(data.message); // Show any message if no redirect URL is present
