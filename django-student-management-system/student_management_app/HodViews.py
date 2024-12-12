@@ -260,7 +260,7 @@ def add_admin_save(request):
                  street = request.POST.get('street'),
                  telephone_no = request.POST.get('telephone_no'),
                  cellphone_no = request.POST.get('cellphone_no'),
-                 emergency_contact = request.POST.get('emergency_contact'),
+                 emergency_contact_no = request.POST.get('emergency_contact'),
                  emergency_relationship = request.POST.get('emergency_relationship'),
                  medical_condition = request.POST.get('medical_condition'),
             )

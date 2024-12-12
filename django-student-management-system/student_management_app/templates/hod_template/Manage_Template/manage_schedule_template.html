@@ -90,6 +90,10 @@
                                         <a href="" class="btn btn-secondary">Archive</a>
                                     </td>
                                 </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="11" class="text-center">No records found.</td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>

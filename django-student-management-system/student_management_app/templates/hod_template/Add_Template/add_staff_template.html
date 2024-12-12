@@ -338,7 +338,7 @@
 
                             <!-- Hidden inputs for form submission -->
                             
-                            <div class="row">
+                            <!-- <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="emergency_contact">Emergency Contact Number <span style="color: red;">*</span></label>
@@ -357,7 +357,7 @@
                                         <input type="text" class="form-control" id="medical_condition" name="medical_condition" placeholder="Enter your Medical Contidion (optional)">
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="form-title">IV. PHYSICAL INFORMATION</div>
                                 <div class="row">
@@ -422,7 +422,7 @@
                                     </div>
                                 </div>
 
-                            <div class="form-title">V. GOVERNMENT ID INFORMATION</div>
+                            <!-- <div class="form-title">V. GOVERNMENT ID INFORMATION</div>
                     
                             <div class="row">
                                 <div class="col-md-3">
@@ -525,13 +525,13 @@
                                         <textarea class="form-control" id="skills_competencies" name="skills_competencies" placeholder="Enter here" rows="3"></textarea>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_staff' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-success">Save</button>
-                        <a href="{% url 'manage_staff' %}" class="btn btn-secondary">Back</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -540,7 +540,6 @@
 
 <!-- Include Bootstrap JS (if not already included in base_template.html) -->
 <script src="{% static 'bootstrap-4.0.0-dist\js\bootstrap.bundle.min.js' %}"></script> 
-<script src="{% static 'ph-json/ph-address-selector.js' %}"></script>
 
 <script>
     $(document).ready(function() {
