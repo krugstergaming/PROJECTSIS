@@ -37,6 +37,7 @@
     .custom-modal-width {
         max-width: 1400px; /* Adjust the value as needed */
     }
+    
 </style>
 
 <section class="content">
@@ -137,7 +138,7 @@
                                         <td>{{ user.date_joined }}</td>
                                         <td>
                                             {% if user.user_type == "1" %}
-                                                Admin
+                                                <b><u>Admin</u></b>
                                             {% elif user.user_type == "2" %}
                                                 Faculty
                                             {% else %}

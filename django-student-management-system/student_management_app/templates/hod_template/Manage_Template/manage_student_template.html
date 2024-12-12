@@ -10,34 +10,61 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<style>
+    .user-details {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Create 6 equal columns */
+        gap: 20px;
+    }
+
+    .grid-item {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    h4 {
+        margin-top: 20px;
+        font-size: 1.1em;
+    }
+
+    .custom-modal-width {
+        max-width: 1400px; /* Adjust the value as needed */
+    }
+</style>
+
 <section class="content">
         <div class="container-fluid">
-
             <a class="btn btn-success" href="{% url 'add_student' %}" role="button">+ Add Student</a> <br/>&nbsp; 
-            
             {% if messages %}
-                                <div class="form-group">
-                                <div class="col-12">
-                                    {% for message in messages %}
-                                    {% if message.tags == "error" %}
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% elif message.tags == "success" %}
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                                </div>
-                                {% endif %}
+                <div class="form-group">
+                    <div class="col-12">
+                        {% for message in messages %}
+                        {% if message.tags == "error" %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                        {% elif message.tags == "success" %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
             <div class="row">
 
@@ -68,7 +95,8 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <!-- <th>Profile Pic</th> -->
-                                <th>GradeLevel</th>
+                                <th>School Year</th>
+                                <th>Grade Level</th>
                                 <th>Student Status</th>
                                 <th>Last Login</th>
                                 <th>Date Joined</th>
@@ -76,37 +104,136 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for student in students %}
+                                {% for user in all_users %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ student.admin.first_name }}</td>
-                                        <td>{{ student.admin.last_name }}</td>
-                                        <td>{{ student.admin.username }}</td>
-                                        <td>{{ student.admin.email }}</td>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
                                         <!-- <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td> -->
-                                        <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ student.student_status}}</td>
-                                        <td>{{ student.admin.last_login }}</td>
-                                        <td>{{ student.admin.date_joined }}</td>
+                                        <td>{{ user.session_year }}</td>
+                                        <td>{{ user.grade_level }}</td>
+                                        <td style="background-color: 
+                                        {% if user.student_status == 'Enrolled' %}lightgreen
+                                            {% elif user.student_status == 'Pending' %}yellow
+                                            {% else %}transparent
+                                        {% endif %}; 
+                                                border-radius: 10px; 
+                                                padding: 5px; 
+                                                text-align: center;">
+                                            {{ user.student_status }}
+                                        </td>
+                                        <td>{{ user.last_login }}</td>
+                                        <td>{{ user.date_joined }}</td>
                                         <td>
-                                            <a href="" class="btn btn-info">Details</a>
-                                            <a href="{% url 'edit_student' student.admin.id %}" class="btn btn-warning">Edit</a>
-                                            <a href="{% url 'toggle_student_activation' student.admin.id %}" class="btn 
-                                                    {% if student.admin.is_active %}
+                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
+                                            <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning">Edit</a>
+                                            <a href="{% url 'toggle_student_activation' user.user_id %}" class="btn 
+                                                    {% if user.user.is_active %}
                                                         btn-danger
                                                     {% else %}
                                                         btn-success
                                                     {% endif %}">
-                                                {% if student.admin.is_active %}
+                                                {% if user.user.is_active %}
                                                     Deactivate
                                                 {% else %}
                                                     Activate
                                                 {% endif %}
                                             </a> 
-                                            <!-- <a href="{% url 'delete_student' student.admin.id %}" class="btn btn-danger">Delete</a> -->
+                                            <!-- <a href="{% url 'delete_student' user.user_id %}" class="btn btn-danger">Delete</a> -->
                                             <a href="" class="btn btn-secondary">Archive</a>
                                         </td>
                                     </tr>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="userModal-{{ user.user_id }}" tabindex="-1" aria-labelledby="userModalLabel-{{ user.user_id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg custom-modal-width">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="userModalLabel-{{ user.user_id }}">{{ user.first_name }} {{ user.last_name }} - Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="user-details">
+                                                        <div class="grid-container">
+                                                            <!-- Personal Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b> Personal Information: </b></h3>
+                                                                <p>Student Status: <b>{{ user.student_status }}</b></p>
+                                                                <p>Student Number: <b>{{ user.student_number }}</b></p>
+                                                                <p>First Name: <b>{{ user.first_name }}</b></p>
+                                                                <p>Last Name: <b>{{ user.last_name }}</b></p>
+                                                                <p>Middle Name: <b>{{ user.middle_name }}</b></p>
+                                                                <p>Suffix: <b>{{ user.suffix }}</b></p>
+                                                                <p>Nickname: <b>{{ user.nickname }}</b></p>
+                                                                <p>Grade Level: <b>{{ user.grade_level }}</b></p>
+                                                                <p>Academic Year: <b>{{ user.session_year }}</b></p>
+                                                                <p>Date of Birth: <b>{{ user.dob }}</b></p>
+                                                                <p>Age: <b>{{ user.age }}</b></p>
+                                                                <p>Place of Birth: <b>{{ user.pob }}</b></p>
+                                                                <p>Sex: <b>{{ user.sex }}</b></p>
+                                                                <p>Address: <b>{{ user.address }}</b></p>
+                                                                <p>Religion: <b>{{ user.religion }}</b></p>
+                                                                <p>Rank in the Family: 
+                                                                    <b>
+                                                                        {% if user.rank_in_family == 1 %}
+                                                                            1st in the family
+                                                                        {% elif user.rank_in_family == 2 %}
+                                                                            2nd in the family
+                                                                        {% elif user.rank_in_family == 3 %}
+                                                                            3rd in the family
+                                                                        {% else %}
+                                                                            {{ user.rank_in_family }}th in the family
+                                                                        {% endif %}
+                                                                    </b>
+                                                                </p>
+                                                                <p>Telephone No.: <b>{{ user.telephone_nos }}</b></p>
+                                                                <p>Mobile No.: <b>{{ user.mobile_phone_nos }}</b></p>
+                                                                <p>Is Covid Vaccinated: <b>{{ user.is_covid_vaccinated }}</b></p>
+                                                                <p>Data of Vaccination: <b>{{ user.date_of_vaccination }}</b></p>
+                                                            </div>
+
+                                                            <!-- Parent Guardian Information-->
+                                                            <div class="grid-item">
+                                                                <h3><b>Parent Guardian Information: </b></h3>
+                                                                <p>Father Name: <b>{{ user.parent_guardian.father_name }}</b></p>
+                                                                <p>Father Occupation: <b>{{ user.parent_guardian.father_occupation }}</b></p>
+                                                                <p>Mother Name: <b>{{ user.parent_guardian.mother_name }}</b></p>
+                                                                <p>Mother Occupation: <b>{{ user.parent_guardian.mother_occupation }}</b></p>
+                                                                <p>Guardian Name: <b>{{ user.parent_guardian.guardian_name }}</b></p>
+                                                                <p>Guardian Occupation : <b>{{ user.parent_guardian.guardian_occupation }}</b></p>
+                                                            </div>
+                                                            <!-- Previous School Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Previous School Information:</b></h3> <br>
+                                                                <p>School Name: <b>{{ user.previous_school.previous_school_name }}</b></p>
+                                                                <p>School Address: <b>{{ user.previous_school.previous_school_address }}</b></p>
+                                                                <p>Grade level: <b>{{ user.previous_school.previous_grade_level }}</b></p>
+                                                                <p>S.Y. Attended: <b>{{ user.previous_school.previous_school_year_attended }}</b></p>
+                                                                <p>Teacher Name: <b>{{ user.previous_school.previous_teacher_name }}</b></p>
+                                                            </div>
+                                                    
+                                                            <!-- Emergency Contact Information -->
+                                                            <div class="grid-item">
+                                                                <h3><b>Person to contact in case of emergency:</b></h3> <br>
+                                                                <p>Name: <b>{{ user.emergency_contact.emergency_contact_name }}</b></p>
+                                                                <p>Relation: <b>{{ user.emergency_contact.emergency_contact_relationship }}</b></p>
+                                                                <p>Address: <b>{{ user.emergency_contact.emergency_contact_address }}</b></p>
+                                                                <p>Tel. Nos.: <b>{{ user.emergency_contact.emergency_contact_phone }}</b></p>
+                                                                <p>Enrolling Teacher: <b>{{ user.emergency_contact.emergency_enrolling_teacher }}</b></p>
+                                                                <p>Date: <b>{{ user.emergency_contact.emergency_referred_by }}</b></p>
+                                                                <p>Referred By: <b>{{ user.emergency_contact.emergency_date }}</b></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     
                                 {% endfor %}
@@ -122,6 +249,8 @@
             </div>
 
         </div><!-- /.container-fluid -->
-      </section>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
   {% endblock main_content %}

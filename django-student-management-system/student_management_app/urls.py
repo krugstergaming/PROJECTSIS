@@ -70,8 +70,8 @@ urlpatterns = [
 
     path('add_student/', HodViews.add_student, name="add_student"),
     path('add_student_save/', HodViews.add_student_save, name="add_student_save"),
-    path('edit_student/<student_id>', HodViews.edit_student, name="edit_student"),
-    path('edit_student_save/', HodViews.edit_student_save, name="edit_student_save"),
+    path('edit_student/<student_id>/', HodViews.edit_student, name="edit_student"),
+    path('edit_student_save/<student_id>/', HodViews.edit_student_save, name="edit_student_save"),
     path('manage_student/', HodViews.manage_student, name="manage_student"),
     path('toggle_student_activation/<int:user_id>/', HodViews.toggle_student_activation, name='toggle_student_activation'),
 
@@ -82,8 +82,8 @@ urlpatterns = [
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
     path('manage_enrollment_voucher', HodViews.manage_enrollment_voucher, name="manage_enrollment_voucher"),
     path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
-    path('edit_enrollment/<enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
-    path('edit_enrollment_save/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
+    path('edit_enrollment/<int:enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
+    path('edit_enrollment_save/<int:enrollment_id>/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
 
     path('update_student_status/', HodViews.update_student_status, name='update_student_status'),
 

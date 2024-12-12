@@ -1,282 +1,87 @@
 {% extends 'hod_template/base_template.html' %}
 
 {% block page_title %}
-    Edit Enrollment
+    Add Enrollment
 {% endblock page_title %}
 
 {% block main_content %}
 
 {% load static %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <section class="content">
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-primary">
+                <div class="card card-warning">
                     <div class="card-header">
                         <h3 class="card-title">Edit Enrollment</h3>
                     </div>
-                    <!-- /.card-header -->
-                    <!-- form start -->
-                    <form role="form" method="POST" enctype="multipart/form-data" action="{% url 'edit_enrollment_save' %}">
+
+                    <form method="POST" action="{% url 'edit_enrollment_save' enrollment_id=enrollment.id %}">
                         {% csrf_token %}
 
-                        {% comment %} Display Messages {% endcomment %}
                         {% if messages %}
-                        <div class="form-group">
-                            <div class="col-12">
-                                {% for message in messages %}
-                                {% if message.tags == "error" %}
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div> 
-                                {% elif message.tags == "success" %}
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                {% endif %}
-                                {% endfor %}
+                            <div class="form-group">
+                                <div class="col-12">
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                            {{ message }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                        </div>
                         {% endif %}
 
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="student_id">Student</label>
-                                <input type="text" class="form-control" name="student_id" id="student_id" 
-                                       value="{{ student_name }}" readonly>
-                            </div>
-                        
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Registration Fee</label>
-                                        <input type="number" class="form-control" name="registration_fee" id="registration_fee" value="{{ registration_fee }}" placeholder="Enter Registration Fee" step="0.01" min="0" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Miscellaneous Fee</label>
-                                        <input type="number" class="form-control" name="misc_fee" id="misc_fee" value="{{ misc_fee }}" placeholder="Enter Miscellaneous Fee" step="0.01" min="0" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Tuition Fee</label>
-                                        <input type="number" class="form-control" name="tuition_fee" id="tuition_fee" value="{{ tuition_fee }}" placeholder="Enter Tuition Fee" step="0.01" min="0" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Discount (%)</label>
-                                        <input type="number" class="form-control" name="discount" id="discount" value="{{ discount }}" placeholder="Enter Discount (e.g., 20 for 20%)" step="0.01" min="0">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Discount Amount</label>
-                                        <input type="number" class="form-control" name="discount_amount" id="discount_amount" value="{{ discount_amount }}" placeholder="0" step="0.01" min="0" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Total Fee</label>
-                                        <input type="number" class="form-control" name="total_fee" id="total_fee" value="{{ total_fee }}" step="0.01" min="0" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="panel panel-default" style="background-color: #d3d3d3; border: 1px solid #b2ebf2; margin-top: 20px;">
-                                    <div class="panel-heading" style="margin-left: 20px; margin-top: 20px;">
-                                        <h4>Installment Payment Option:</h4>
-                                    </div>
-                                    <div class="panel-body" style="margin-left: 20px; margin-right: 20px;">
-                                        <div class="form-group">
-                                            <label>
-                                                <input type="checkbox" id="installment_checkbox" {% if installment_enabled %}checked{% endif %}> Enable Installment Payment
-                                            </label>
-                                        </div>
-                            
-                                        <div id="installment_fields" {% if not installment_enabled %}style="display:none;"{% endif %}>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label>Downpayment</label>
-                                                        <input type="number" class="form-control" name="downpayment" id="downpayment" value="{{ downpayment }}" placeholder="Enter Downpayment" step="0.01" min="0">
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label>Balance</label>
-                                                        <input type="number" class="form-control" name="balance" id="balance" value="{{ enrollment.balance }}" step="0.01" min="0" readonly>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label>Installment Option</label>
-                                                        <select class="form-control" name="installment_option" id="installment_option">
-                                                            <option value="n/a" {% if installment_option == "n/a" %}selected{% endif %}>n/a</option>
-                                                            <option value="Monthly" {% if installment_option == "Monthly" %}selected{% endif %}>Monthly</option>
-                                                            <option value="Quarterly" {% if installment_option == "Quarterly" %}selected{% endif %}>Quarterly</option>
-                                                            <option value="Annually" {% if installment_option == "Annually" %}selected{% endif %}>Annually</option>
-                                                        </select>
-                                                    </div>
-                                                </div>   
-                                                
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label>Installment Payment</label>
-                                                        <input type="number" class="form-control" name="installment_payment" id="installment_payment" value="{{ installment_payment }}" step="0.01" min="0" readonly>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row" style="margin-top: 20px;">
-                                
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Assessed By</label>
-                                        <input type="text" class="form-control" name="assessed_by" id="assessed_by" 
-                                                value="{{ assessed_by }}" readonly>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Assessed Date</label>
-                                        <input type="date" class="form-control" name="assessed_date" id="assessed_date"
-                                                value="{{ assessed_date }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Payment Received By</label>
-                                        <input type="text" class="form-control" name="payment_received_by" id="payment_received_by" 
-                                            value="{{ payment_received_by }}" readonly>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Payment Amount</label>
-                                        <input type="number" class="form-control" name="" id="" 
-                                               step="0.01" min="0" value="{{ payment_amount }}" readonly>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Payment Date</label>
-                                        <input type="date" class="form-control" name="payment_date" id="payment_date" 
-                                        value="{{ payment_date }}" readonly>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label>Enrollment Status</label>
-                                <select class="form-control" name="enrollment_status" id="enrollment_status">
-                                    <option value="Pending" {% if enrollment_status == "Pending" %}selected{% endif %}>Pending</option>
-                                    <option value="Completed" {% if enrollment_status == "Completed" %}selected{% endif %}>Completed</option>
-                                    <option value="Cancelled" {% if enrollment_status == "Cancelled" %}selected{% endif %}>Cancelled</option>
-                                    <option value="In Progress" {% if enrollment_status == "In Progress" %}selected{% endif %}>In Progress</option>
-                                    <option value="Deferred" {% if enrollment_status == "Deferred" %}selected{% endif %}>Deferred</option>
-                                    <option value="Withdrawn" {% if enrollment_status == "Withdrawn" %}selected{% endif %}>Withdrawn</option>
-                                    <option value="Not Enrolled" {% if enrollment_status == "Not Enrolled" %}selected{% endif %}>Not Enrolled</option>
-                                    <option value="Awaiting Payment" {% if enrollment_status == "Awaiting Payment" %}selected{% endif %}>Awaiting Payment</option>
+                                <label for="GradeLevel_id">Grade Level</label>
+                                <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" disabled>
+                                    {% for gradelevel in gradelevels %}
+                                        <option value="{{ gradelevel.id }}" {% if enrollment.GradeLevel_id.id == gradelevel.id %}selected{% endif %}>
+                                            {{ gradelevel.GradeLevel_name }}
+                                        </option>
+                                    {% endfor %}
                                 </select>
                             </div>
 
-                            <div class="form-group">
-                                <label>Remarks</label>
-                                <textarea class="form-control" name="remarks" id="remarks" rows="3" placeholder="Additional Remarks">{{ remarks }}</textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Attachments:</label>
-                                
-                                <div>
-                                    <input type="checkbox" name="include_id_picture" id="id_picture" 
-                                           {% if id_picture_file %}checked{% endif %}>
-                                    <label for="id_picture">2x2 ID Picture</label>
-                                    {% if id_picture_file %}
-                                        <p>Existing File: {{ id_picture_file }}</p>
-                                    {% else %}
-                                        <p>No file uploaded.</p>
-                                    {% endif %}
-                                    <input type="file" name="id_picture_file" accept="image/*">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>Registration Fee</label>
+                                    <input type="number" class="form-control" name="registration_fee" id="registration_fee" 
+                                           value="{{ enrollment.registration_fee }}" step="0.01" min="0" required>
                                 </div>
-                                
-                                <div>
-                                    <input type="checkbox" name="include_birth_certificate" id="birth_certificate" 
-                                           {% if birth_certificate_file %}checked{% endif %}>
-                                    <label for="birth_certificate">PSA Birth Certificate</label>
-                                    {% if birth_certificate_file %}
-                                        <p>Existing File: {{ birth_certificate_file }}</p>
-                                    {% else %}
-                                        <p>No file uploaded.</p>
-                                    {% endif %}
-                                    <input type="file" name="birth_certificate_file" accept="image/*">
+                                <div class="col-md-3">
+                                    <label>Miscellaneous Fee</label>
+                                    <input type="number" class="form-control" name="misc_fee" id="misc_fee" 
+                                           value="{{ enrollment.misc_fee }}" step="0.01" min="0" required>
                                 </div>
-                                
-                                <div>
-                                    <input type="checkbox" name="include_form_138" id="form_138" 
-                                           {% if form_138_file %}checked{% endif %}>
-                                    <label for="form_138">Form 138</label>
-                                    {% if form_138_file %}
-                                        <p>Existing File: {{ form_138_file }}</p>
-                                    {% else %}
-                                        <p>No file uploaded.</p>
-                                    {% endif %}
-                                    <input type="file" name="form_138_file" accept="image/*">
+                                <div class="col-md-3">
+                                    <label>Tuition Fee</label>
+                                    <input type="number" class="form-control" name="tuition_fee" id="tuition_fee" 
+                                           value="{{ enrollment.tuition_fee }}" step="0.01" min="0" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Total Fee</label>
+                                    <input type="number" class="form-control" name="total_fee" id="total_fee" 
+                                           value="{{ enrollment.total_fee }}" step="0.01" min="0" readonly>
                                 </div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label>Attachments Remark:</label>
-                                <textarea class="form-control" name="attachment_remarks" id="attachment_remarks" rows="3" placeholder="Additional Remarks">{{ attachment_remarks }}</textarea>
-                            </div>
-
                         </div>
-                        <!-- /.card-body -->
 
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-warning">Update Enrollment</button>
+                            <button type="submit" class="btn btn-warning">Update</button>
+                            <a href="{% url 'manage_enrollment_voucher' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
                 </div>
-                <!-- /.card -->
-
             </div>
         </div>
-
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <script>
@@ -296,12 +101,6 @@ function formatDecimalInputs() {
         'registration_fee',
         'misc_fee',
         'tuition_fee',
-        'discount',
-        'downpayment',
-        'balance',
-        'payment_amount',
-        'installment_payment',
-        'discount_amount',
         'total_fee'
     ];
 
@@ -338,80 +137,24 @@ function formatDecimalInputs() {
     });
 }
 
-    // Function to toggle display of installment fields based on checkbox state
-    function toggleInstallmentFields() {
-        const installmentFields = document.getElementById('installment_fields');
-        const checkbox = document.getElementById('installment_checkbox');
-        installmentFields.style.display = checkbox.checked ? 'block' : 'none';
-        setPaymentAmount(); // Update payment amount based on checkbox state
-    }
-
-    // Toggle display of installment fields when the checkbox is checked
-    document.getElementById('installment_checkbox').addEventListener('change', toggleInstallmentFields);
-
-    // Function to calculate total fees
-    function calculateTotalFees() {
+    // Function to calculate and update the total fee
+    function updateFees() {
         const registrationFee = parseFloat(document.getElementById('registration_fee').value) || 0;
         const miscFee = parseFloat(document.getElementById('misc_fee').value) || 0;
         const tuitionFee = parseFloat(document.getElementById('tuition_fee').value) || 0;
-        const discount = parseFloat(document.getElementById('discount').value) || 0;
-
-        const totalFees = registrationFee + miscFee + tuitionFee;
-        const discountAmount = tuitionFee * (discount / 100); // Calculate the discount amount only on tuition fee
-        const totalAfterDiscount = totalFees - discountAmount;
         
-        document.getElementById('total_fee').value = totalAfterDiscount.toFixed(2);
-        document.getElementById('discount_amount').value = discountAmount.toFixed(2); // Update discount amount field
-        setPaymentAmount(); // Update payment amount whenever total fees are calculated
+        // Calculate Total Fee
+        const totalFee = registrationFee + miscFee + tuitionFee;
+        document.getElementById('total_fee').value = totalFee.toFixed(2);
     }
 
-    // Calculate total fees on input change
-    document.querySelectorAll('#registration_fee, #misc_fee, #tuition_fee, #discount').forEach(function(input) {
-        input.addEventListener('input', calculateTotalFees);
+    // Event listeners for real-time updates
+    document.querySelectorAll('#registration_fee, #misc_fee, #tuition_fee').forEach(function(input) {
+        input.addEventListener('input', updateFees);
     });
 
-    // Function to set payment amount based on installment checkbox
-    function setPaymentAmount() {
-        const totalFee = parseFloat(document.getElementById('total_fee').value) || 0;
-        const downpayment = parseFloat(document.getElementById('downpayment').value) || 0;
-
-        let balance = 0;
-        if (downpayment > 0) { // Only compute balance if downpayment has a value
-            balance = totalFee - downpayment;
-        }
-
-        document.getElementById('balance').value = balance.toFixed(2);
-        
-        const checkbox = document.getElementById('installment_checkbox');
-        const paymentAmount = checkbox.checked ? downpayment : totalFee;
-
-        document.getElementById('payment_amount').value = paymentAmount.toFixed(2);
-        
-        // Calculate installment payment if installment option is selected
-        const installmentOption = document.getElementById('installment_option').value;
-        const installmentPayment = calculateInstallmentPayment(installmentOption, balance);
-        document.getElementById('installment_payment').value = installmentPayment.toFixed(2);
-    }
-
-    // Calculate installment payment based on option selected
-    function calculateInstallmentPayment(option, balance) {
-        switch (option) {
-            case 'Monthly':
-                return balance / 12; // Assuming 12 months
-            case 'Quarterly':
-                return balance / 4; // Assuming 4 quarters
-            case 'Annually':
-                return balance; // Full balance as a single payment
-            default:
-                return 0; // No installment
-        }
-    }
-
-    // Update balance and payment amount when downpayment is changed
-    document.getElementById('downpayment').addEventListener('input', setPaymentAmount);
-    
-    // Update payment amount when installment option changes
-    document.getElementById('installment_option').addEventListener('change', setPaymentAmount);
+    // Initialize input formatting on page load
+    document.addEventListener('DOMContentLoaded', formatDecimalInputs);
 </script>
 
 {% endblock main_content %}

@@ -422,10 +422,20 @@ def manage_staff(request):
 
 def edit_staff(request, staff_id):
     staff = Staffs.objects.get(admin=staff_id)
+    staffContactInfo = staff_contact_info.objects.filter(staff_id=staff).first()
+    staffEmploymentInfo = staff_employment_info.objects.filter(staff_id=staff).first()
+    staffPhysicalInfo = staff_physical_info.objects.filter(staff_id=staff).first()
+    staffGovernmentId = staff_government_ID_info.objects.filter(staff_id=staff).first()
+    staffEducBackground = Staffs_Educ_Background.objects.filter(staff_id=staff).first()
 
     context = {
         "staff": staff,
-        "id": staff_id
+        "id": staff_id,
+        "staffContactInfo": staffContactInfo,
+        "staffEmploymentInfo": staffEmploymentInfo,
+        "staffPhysicalInfo": staffPhysicalInfo,
+        "staffGovernmentId": staffGovernmentId,
+        "staffEducBackground": staffEducBackground,
     }
     return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
 
@@ -1002,8 +1012,48 @@ def add_student_save(request):
 
 def manage_student(request):
     students = Students.objects.all()
+
+    all_users = []
+
+    # Retrieve and structure data for Staffs
+    for student in students:
+        # Retrieve associated user data
+        student_data = {
+            'user': student.admin,
+            'user_id': student.admin.id,
+            'first_name': student.admin.first_name,  # Access first_name from CustomUser
+            'last_name': student.admin.last_name,    # Access last_name from CustomUser
+            'username': student.admin.username,      # Access username from CustomUser
+            'email': student.admin.email,            # Access email from CustomUser
+            'last_login': student.admin.last_login,  # Access last_login from CustomUser
+            'date_joined': student.admin.date_joined, # Access date_joined from CustomUser
+            'user_type': student.admin.user_type,    # Access user_type from CustomUser
+            'grade_level': student.GradeLevel_id.GradeLevel_name,  # Assuming 'GradeLevel_name' is a field in the GradeLevel model
+            'session_year': f"{student.session_year_id.session_start_year.year}-{student.session_year_id.session_end_year.year}",  # Example of combining the start and end year
+            'student_number': student.student_number,
+            'middle_name': student.middle_name,
+            'suffix': student.suffix,
+            'nickname': student.nickname,
+            'dob': student.dob,
+            'age': student.age,
+            'pob': student.pob,
+            'sex': student.sex,
+            'address': student.address,
+            'religion': student.religion,
+            'rank_in_family': student.rank_in_family,
+            'telephone_nos': student.telephone_nos,
+            'mobile_phone_nos': student.mobile_phone_nos,
+            'is_covid_vaccinated': student.is_covid_vaccinated,
+            'date_of_vaccination': student.date_of_vaccination,
+            'student_status': student.student_status,
+            'parent_guardian': ParentGuardian.objects.filter(students_id=student).first(),
+            'previous_school': PreviousSchool.objects.filter(students_id=student).first(),
+            'emergency_contact': EmergencyContact.objects.filter(students_id=student).first(),
+        }
+        all_users.append(student_data)
+
     context = {
-        "students": students
+        'all_users': all_users
     }
     return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
 
@@ -1139,112 +1189,45 @@ def manage_enrollment_voucher(request):
     return render(request, 'hod_template/Manage_Template/manage_enrollment_voucher_template.html', context)
 
 def edit_enrollment(request, enrollment_id):
-    # Retrieve the enrollment instance
-    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    
-    # Prepare context with existing data from the enrollment instance
+    enrollment = Enrollment_voucher.objects.get(id=enrollment_id)
+    gradelevels = GradeLevel.objects.all()
+
     context = {
-        "enrollment_id": enrollment.id,
-        "student_id": enrollment.student_id.id,
-        "student_name": f"{enrollment.student_id.admin.first_name} {enrollment.student_id.admin.last_name}",
-        "registration_fee": enrollment.registration_fee,
-        "misc_fee": enrollment.misc_fee,
-        "tuition_fee": enrollment.tuition_fee,
-        "total_fee": enrollment.total_fee,
-        "downpayment": enrollment.downpayment,
-        "discount": enrollment.discount,
-        "discount_amount": enrollment.discount_amount,
-        "balance": enrollment.balance,
-        "installment_payment": enrollment.installment_payment,
-        "installment_option": enrollment.installment_option,
-        "assessed_by": enrollment.assessed_by,
-        "assessed_date": enrollment.assessed_date,
-        "payment_received_by": enrollment.payment_received_by,
-        "payment_amount": enrollment.payment_amount,
-        "payment_date": enrollment.payment_date,
-        "enrollment_status": enrollment.enrollment_status,
-        "remarks": enrollment.remarks,
+        "enrollment": enrollment,
+        "gradelevels": gradelevels,
     }
 
-    # Check for attachments and add them to the context if they exist
-    attachment = getattr(enrollment, 'attachment', None)
-    if attachment is not None:
-        context.update({
-            "id_picture_file": attachment.id_picture_file or '',  # Provide default if None
-            "birth_certificate_file": attachment.psa_file or '',  # Provide default if None
-            "form_138_file": attachment.form_138_file or '',  # Provide default if None
-            "attachment_remarks": attachment.attachment_remarks or '',  # Provide default if None
-        })
-    else:
-        # If no attachment exists, you might want to set default values for the context
-        context.update({
-            "id_picture_file": '',
-            "birth_certificate_file": '',
-            "form_138_file": '',
-            "attachment_remarks": '',
-        })
-
-    # Render the edit template with populated data
-    return render(request, "hod_template/Edit_Template/edit_enrollment_template.html", context)
+    return render(request, 'hod_template/Edit_Template/edit_enrollment_template.html', context)
 
 def edit_enrollment_save(request, enrollment_id):
     if request.method != "POST":
-        messages.error(request, "Invalid Method!")
-        return redirect('edit_enrollment', enrollment_id=enrollment_id)
+        return HttpResponse("Invalid Method.")
+    else:
+        # Retrieve other POST data
+        registration_fee = request.POST.get('registration_fee')
+        misc_fee = request.POST.get('misc_fee')
+        tuition_fee = request.POST.get('tuition_fee')
+        total_fee = request.POST.get('total_fee')
 
-    # Retrieve the existing enrollment instance
-    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-    student_instance = enrollment.student_id
-
-    # Retrieve and convert values from the form
-    def safe_decimal(value, field_name):
-        """Helper function to safely convert to Decimal with error logging."""
         try:
-            return Decimal(value.strip() or '0.00')
-        except InvalidOperation:
-            messages.error(request, f"Invalid input for {field_name}. Please check your values.")
-            raise
+            enrollment = Enrollment_voucher.objects.get(id=enrollment_id)
+            enrollment.registration_fee = registration_fee
+            enrollment.misc_fee = misc_fee
+            enrollment.tuition_fee = tuition_fee
+            enrollment.total_fee = total_fee
 
-    try:
-        # Convert and log values
-        enrollment.registration_fee = safe_decimal(request.POST.get('registration_fee', '0.00'), 'registration fee')
-        enrollment.misc_fee = safe_decimal(request.POST.get('misc_fee', '0.00'), 'misc fee')
-        enrollment.tuition_fee = safe_decimal(request.POST.get('tuition_fee', '0.00'), 'tuition fee')
-        enrollment.total_fee = safe_decimal(request.POST.get('total_fee', '0.00'), 'total fee')
-        enrollment.downpayment = safe_decimal(request.POST.get('downpayment', '0.00'), 'downpayment')
-        enrollment.discount = safe_decimal(request.POST.get('discount', '0.00'), 'discount')
-        enrollment.discount_amount = safe_decimal(request.POST.get('discount_amount', '0.00'), 'discount amount')
-        enrollment.balance = safe_decimal(request.POST.get('balance', '0.00'), 'balance')
-        enrollment.installment_payment = safe_decimal(request.POST.get('installment_payment', '0.00'), 'installment payment')
-        enrollment.payment_amount = safe_decimal(request.POST.get('payment_amount', '0.00'), 'payment amount')
+            enrollment.save()
 
-        enrollment.installment_option = request.POST.get('installment_option', 'Monthly')
-        enrollment.assessed_by = request.POST.get('assessed_by', '')
-        enrollment.assessed_date = request.POST.get('assessed_date', None)
-        enrollment.payment_received_by = request.POST.get('payment_received_by', '')
-        enrollment.payment_date = request.POST.get('payment_date', None)
-        enrollment.enrollment_status = request.POST.get('enrollment_status', 'Pending')
-        enrollment.remarks = request.POST.get('remarks', '')
-
-        # Save the updated enrollment instance
-        enrollment.save()
-
-        # Handle file uploads from the request
-        if request.POST.get('include_id_picture'):
-            enrollment.attachment.id_picture_file = request.FILES.get('id_picture_file')
-        if request.POST.get('include_birth_certificate'):
-            enrollment.attachment.psa_file = request.FILES.get('birth_certificate_file')
-        if request.POST.get('include_form_138'):
-            enrollment.attachment.form_138_file = request.FILES.get('form_138_file')
-
-        enrollment.attachment.attachment_remarks = request.POST.get('attachment_remarks', '')
-        enrollment.attachment.save()
-
-        messages.success(request, "Enrollment Updated Successfully!")
-    except Exception as e:
-        messages.error(request, f"Failed to Update Enrollment! Error: {str(e)}")
-
-    return redirect('edit_enrollment', enrollment_id=enrollment_id)
+            messages.success(request, "Enrollment Voucher Updated Successfully.")
+            # Redirect to the manage_enrollment_voucher page after success
+            return HttpResponseRedirect(reverse("manage_enrollment_voucher"))
+        except Enrollment_voucher.DoesNotExist:
+            messages.error(request, "Enrollment record not found.")
+        except Exception as e:
+            messages.error(request, f"Failed to Update Enrollment: {e}")
+        
+        # If there was an error, redirect back to the edit enrollment page
+        return HttpResponseRedirect(reverse("edit_enrollment", kwargs={"enrollment_id": enrollment_id}))
 
 def update_balance(request, enrollment_id=None):
     # Fetch enrollment based on enrollment_id
@@ -1325,7 +1308,7 @@ def view_promotion_history(request, student_id):
     return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
 
 def edit_student(request, student_id):
-    student = Students.objects.get(admin=student_id)
+    student = get_object_or_404(Students, id=student_id)
     sessions = SessionYearModel.objects.all()
     gradelevels = GradeLevel.objects.all()
     parentguardian = ParentGuardian.objects.filter(students_id=student).first()
@@ -1352,21 +1335,19 @@ def edit_student_save(request, student_id):
     try:
         # Fetch the student based on the provided student_id
         student = Students.objects.get(id=student_id)
-        user = student.user  # The associated CustomUser instance
+        user = student.admin  # The associated CustomUser instance (admin)
 
         # Extract data from request.POST
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         username = request.POST.get('username')
         middlename = request.POST.get('middle_name')
-
         suffix = request.POST.get("suffix")
         nickname = request.POST.get("nickname")
-
         email = request.POST.get('email')
         address = request.POST.get('address')
         session_year_id = request.POST.get('session_year_id')
-        GradeLevel_id = request.POST.get('GradeLevel_id')
+        grade_level_id = request.POST.get('GradeLevel_id')
         sex = request.POST.get('sex')
         age = request.POST.get('age')
         dob = request.POST.get('dob')
@@ -1376,7 +1357,7 @@ def edit_student_save(request, student_id):
         rank_in_family = request.POST.get('rank_in_family')
         telephone_nos = request.POST.get('telephone_nos')
         mobile_phone_nos = request.POST.get('mobile_phone_nos')
-        is_covid_vaccinated = request.POST.get('is_covid_vaccinated')
+        is_covid_vaccinated = request.POST.get('is_covid_vaccinated') == 'on'
         date_of_vaccination = request.POST.get('date_of_vaccination')
 
         # Handle file upload for profile picture
@@ -1387,12 +1368,12 @@ def edit_student_save(request, student_id):
             filename = fs.save(profile_pic.name, profile_pic)
             profile_pic_url = fs.url(filename)
 
-        # Update the user details
+        # Update user details
         user.username = username
         user.email = email
         user.first_name = first_name
         user.last_name = last_name
-        user.save()
+        user.save()  # Save the CustomUser instance
 
         # Update student details
         student.middle_name = middlename
@@ -1415,16 +1396,16 @@ def edit_student_save(request, student_id):
             student.profile_pic = profile_pic_url
         
         # Assign GradeLevel and Session Year
-        gradelevel_obj = GradeLevel.objects.get(id=GradeLevel_id)
+        gradelevel_obj = GradeLevel.objects.get(id=grade_level_id)
         session_year_obj = SessionYearModel.objects.get(id=session_year_id)
         student.GradeLevel_id = gradelevel_obj
         student.session_year_id = session_year_obj
 
-        # Save updated student record
+        # Save the updated student record
         student.save()
 
-        # Update Parent/Guardian Information (if needed)
-        parent_guardian = ParentGuardian.objects.get_or_create(students_id=student)
+        # Update Parent/Guardian Information (if it already exists, fetch and update it)
+        parent_guardian, created = ParentGuardian.objects.get_or_create(students_id=student)
         parent_guardian.father_name = request.POST.get('father_name')
         parent_guardian.father_occupation = request.POST.get('father_occupation')
         parent_guardian.mother_name = request.POST.get('mother_name')
@@ -1433,8 +1414,8 @@ def edit_student_save(request, student_id):
         parent_guardian.guardian_occupation = request.POST.get('guardian_occupation')
         parent_guardian.save()
 
-        # Update Previous School Information (if needed)
-        previous_school = PreviousSchool.objects.get_or_create(students_id=student)
+        # Update Previous School Information (fetch and update if it exists)
+        previous_school, created = PreviousSchool.objects.get_or_create(students_id=student)
         previous_school.previous_school_name = request.POST.get('previous_school_name')
         previous_school.previous_school_address = request.POST.get('previous_school_address')
         previous_school.previous_grade_level = request.POST.get('previous_grade_level')
@@ -1442,8 +1423,8 @@ def edit_student_save(request, student_id):
         previous_school.previous_teacher_name = request.POST.get('previous_teacher_name')
         previous_school.save()
 
-        # Update Emergency Contact Information (if needed)
-        emergency_contact = EmergencyContact.objects.get_or_create(students_id=student)
+        # Update Emergency Contact Information (fetch and update if it exists)
+        emergency_contact, created = EmergencyContact.objects.get_or_create(students_id=student)
         emergency_contact.emergency_contact_name = request.POST.get('emergency_contact_name')
         emergency_contact.emergency_contact_relationship = request.POST.get('emergency_contact_relationship')
         emergency_contact.emergency_contact_address = request.POST.get('emergency_contact_address')
@@ -1453,6 +1434,7 @@ def edit_student_save(request, student_id):
         emergency_contact.emergency_referred_by = request.POST.get('emergency_referred_by')
         emergency_contact.save()
 
+        # Success message
         messages.success(request, "Student Information Updated Successfully!")
         return redirect('edit_student', student_id=student_id)
 
@@ -1550,12 +1532,11 @@ def edit_section_save(request):
             section.save()
 
             messages.success(request, "Section Updated Successfully.")
-            # return redirect('/edit_subject/'+subject_id)
             return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
         except:
             messages.error(request, "Failed to Update Section.")
             return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
-            # return redirect('/edit_subject/'+subject_id)
+            
 
 def add_subject(request):
     curriculums = Curriculums.objects.all()
@@ -1607,10 +1588,12 @@ def manage_subject(request):
 def edit_subject(request, subject_id):
     subject = Subjects.objects.get(id=subject_id)
     gradelevels = GradeLevel.objects.all()
+    curriculums = Curriculums.objects.all()
     
     context = {
         "subject": subject,
         "gradelevels": gradelevels,
+        "curriculums": curriculums,
         "id": subject_id
     }
     return render(request, 'hod_template/Edit_Template/edit_subject_template.html', context)
