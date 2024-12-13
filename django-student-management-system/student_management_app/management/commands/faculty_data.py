@@ -149,7 +149,7 @@ class Command(BaseCommand):
 
 
     def seed_admins(self):
-        for i in range(2):  # Create 2 sample admins
+        for i in range(5):  # Create 2 sample admins
             first_name = fake.first_name()
             last_name = fake.last_name()
             username = fake.user_name()

@@ -1814,7 +1814,7 @@ def manage_classroom(request):
     return render(request, 'hod_template/Manage_Template/manage_classroom_template.html', context)
 
 def fetch_classroom(request):
-    api_url = "http://127.0.0.1:8001/classroom/"
+    api_url = "https://inventoryapp1-o2l3.onrender.com/classroom/"
 
     try:
         response = requests.get(api_url)
@@ -1832,7 +1832,7 @@ def fetch_classroom(request):
                 id=classroom["id"],
                 defaults={
                     "classroom_name": classroom["classroom_name"],
-                    "status": classroom["status"],  # Handle new 'status' field
+                    "capacity": classroom["capacity"],  # Handle new 'status' field
                 },
             )
 
@@ -2484,7 +2484,8 @@ def manage_class_scheduling(request):
     }
     return render(request, 'hod_template/Manage_Template/manage_schedule_template.html', context)
 
-def fetch_load_data(request):
+# FETCH LOAD DATA
+def fetch_load_data(request):                                   
     grade_level_id = request.GET.get('gradelevel_id')
     section_id = request.GET.get('section_id')
 

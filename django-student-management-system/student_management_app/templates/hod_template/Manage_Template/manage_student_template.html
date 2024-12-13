@@ -92,14 +92,14 @@
                                 <th>No.</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
-                                <th>Username</th>
+                                <!-- <th>Username</th> -->
                                 <th>Email</th>
                                 <!-- <th>Profile Pic</th> -->
                                 <th>School Year</th>
                                 <th>Grade Level</th>
                                 <th>Student Status</th>
-                                <th>Last Login</th>
-                                <th>Date Joined</th>
+                                <!-- <th>Last Login</th>
+                                <th>Date Joined</th> -->
                                 <th>Action</th>
                                 </tr>
                             </thead>
@@ -107,25 +107,15 @@
                                 {% for user in all_users %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ user.first_name }}</td>
-                                        <td>{{ user.last_name }}</td>
-                                        <td>{{ user.username }}</td>
-                                        <td>{{ user.email }}</td>
+                                        <td>{{ student.admin.first_name }}</td>
+                                        <td>{{ student.admin.last_name }}</td>
+                                        <!-- <td>{{ student.admin.username }}</td> -->
+                                        <td>{{ student.admin.email }}</td>
                                         <!-- <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td> -->
-                                        <td>{{ user.session_year }}</td>
-                                        <td>{{ user.grade_level }}</td>
-                                        <td style="background-color: 
-                                        {% if user.student_status == 'Enrolled' %}lightgreen
-                                            {% elif user.student_status == 'Pending' %}yellow
-                                            {% else %}transparent
-                                        {% endif %}; 
-                                                border-radius: 10px; 
-                                                padding: 5px; 
-                                                text-align: center;">
-                                            {{ user.student_status }}
-                                        </td>
-                                        <td>{{ user.last_login }}</td>
-                                        <td>{{ user.date_joined }}</td>
+                                        <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
+                                        <td>{{ student.student_status}}</td>
+                                        <!-- <td>{{ student.admin.last_login }}</td>
+                                        <td>{{ student.admin.date_joined }}</td> -->
                                         <td>
                                             <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
                                             <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning">Edit</a>
@@ -141,7 +131,7 @@
                                                     Activate
                                                 {% endif %}
                                             </a> 
-                                            <a href="" class="btn btn-secondary">Archive</a>
+                                            <!-- <a href="" class="btn btn-secondary">Archive</a> -->
                                         </td>
                                     </tr>
 

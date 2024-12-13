@@ -151,16 +151,7 @@ class Curriculums(models.Model):
 class Classroom(models.Model):
     id = models.AutoField(primary_key=True)
     classroom_name = models.CharField(max_length=255)
-    STATUS_CHOICES = [
-        ('Available', 'Available'),
-        ('Taken', 'Taken'),
-    ]
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        null=True,  # Allow null values
-        blank=True  # Optional field in forms
-    )
+    capacity = models.IntegerField(blank=True, null= True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -333,7 +324,7 @@ class Load(models.Model):
     curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
     AssignSection_id = models.ForeignKey(AssignSection, on_delete=models.CASCADE)
     subject_id = models.ForeignKey(Subjects, on_delete=models.CASCADE)
-    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    staff_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)                              # 
     is_advisory = models.BooleanField(default=False)  # BooleanField with True/False for Yes/No
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
