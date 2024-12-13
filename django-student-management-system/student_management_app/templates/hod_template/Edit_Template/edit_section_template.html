@@ -10,16 +10,11 @@
 
 <section class="content">
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-primary">
+                <div class="card card-warning">
                     <div class="card-header">
-                        <h3 class="card-title">Edit Section</h3>
                     </div>
-                    <!-- /.card-header -->
-                    <!-- form start -->
                     <form role="form" method="POST" action="{% url 'edit_section_save' %}">
                         {% csrf_token %}
                         {% comment %} Display Messages {% endcomment %}
@@ -78,7 +73,8 @@
                         <!-- /.card-body -->
 
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Update Section</button>
+                            <button type="submit" class="btn btn-warning">Update</button>
+                            <a href="{% url 'manage_section' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
                 </div>

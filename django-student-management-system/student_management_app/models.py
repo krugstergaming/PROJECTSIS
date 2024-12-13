@@ -200,6 +200,36 @@ class Students(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class ParentGuardian(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    father_name = models.CharField(max_length=100, blank=True, null=True)
+    father_occupation = models.CharField(max_length=100, blank=True, null=True)
+    mother_name = models.CharField(max_length=100, blank=True, null=True)
+    mother_occupation = models.CharField(max_length=100, blank=True, null=True)
+    guardian_name = models.CharField(max_length=100, blank=True, null=True)
+    guardian_occupation = models.CharField(max_length=100, blank=True, null=True)
+    objects = models.Manager()
+
+class PreviousSchool(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    previous_school_name = models.CharField(max_length=100, blank=True, null=True)
+    previous_school_address = models.CharField(max_length=255, blank=True, null=True)
+    previous_grade_level = models.CharField(max_length=20, blank=True, null=True)
+    previous_school_year_attended = models.CharField(max_length=255, blank=True, null=True)
+    previous_teacher_name = models.CharField(max_length=100, blank=True, null=True)
+    objects = models.Manager()
+
+class EmergencyContact(models.Model):
+    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True)
+    emergency_contact_address = models.CharField(max_length=255, blank=True, null=True)
+    emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
+    emergency_enrolling_teacher = models.CharField(max_length=100, blank=True, null=True)
+    emergency_referred_by = models.CharField(max_length=100, blank=True, null=True)
+    emergency_date = models.DateField(blank=True, null=True)
+    objects = models.Manager()
+
 class Enrollment_voucher(models.Model):
     id = models.AutoField(primary_key=True)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
@@ -339,35 +369,7 @@ class StudentResult(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class ParentGuardian(models.Model):
-    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    father_name = models.CharField(max_length=100, blank=True, null=True)
-    father_occupation = models.CharField(max_length=100, blank=True, null=True)
-    mother_name = models.CharField(max_length=100, blank=True, null=True)
-    mother_occupation = models.CharField(max_length=100, blank=True, null=True)
-    guardian_name = models.CharField(max_length=100, blank=True, null=True)
-    guardian_occupation = models.CharField(max_length=100, blank=True, null=True)
-    objects = models.Manager()
 
-class PreviousSchool(models.Model):
-    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    previous_school_name = models.CharField(max_length=100, blank=True, null=True)
-    previous_school_address = models.CharField(max_length=255, blank=True, null=True)
-    previous_grade_level = models.CharField(max_length=20, blank=True, null=True)
-    previous_school_year_attended = models.CharField(max_length=255, blank=True, null=True)
-    previous_teacher_name = models.CharField(max_length=100, blank=True, null=True)
-    objects = models.Manager()
-
-class EmergencyContact(models.Model):
-    students_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
-    emergency_contact_relationship = models.CharField(max_length=50, blank=True, null=True)
-    emergency_contact_address = models.CharField(max_length=255, blank=True, null=True)
-    emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
-    emergency_enrolling_teacher = models.CharField(max_length=100, blank=True, null=True)
-    emergency_referred_by = models.CharField(max_length=100, blank=True, null=True)
-    emergency_date = models.DateField(blank=True, null=True)
-    objects = models.Manager()
 
 class Attendance(models.Model):
     # Subject Attendance

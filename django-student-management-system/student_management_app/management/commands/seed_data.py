@@ -233,6 +233,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '098-765-4321',
                 'GradeLevel_id': grade_levels[0], # kinder
                 'session_year_id': session_year,  # current school year
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Pending'
             },
             {
@@ -256,6 +258,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '987-654-3210',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 2
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Pending'
             },
             {
@@ -279,6 +283,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '876-543-2109',
                 'GradeLevel_id': grade_levels[3],  # Assign to Grade 3
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Pending'
             },
             {
@@ -302,6 +308,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '765-432-1098',
                 'GradeLevel_id': grade_levels[4],  # Assign to Grade 4
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Pending'
             },
             {
@@ -325,6 +333,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '654-321-0987',
                 'GradeLevel_id': grade_levels[5],  # Assign to Grade 5
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Pending'
             },
             {
@@ -348,6 +358,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '543-210-9876',
                 'GradeLevel_id': grade_levels[0],  #5 Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -371,6 +383,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '654-321-0987',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -394,6 +408,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '765-432-1098',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -417,6 +433,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '876-543-2109',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -440,6 +458,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '987-654-3210',
                 'GradeLevel_id': grade_levels[0],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -463,6 +483,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '098-765-4321',
                 'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -486,6 +508,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '109-876-5432',
                 'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -509,6 +533,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '210-987-6543',
                 'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -532,6 +558,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '321-098-7654',
                 'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -555,6 +583,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '432-109-8765',
                 'GradeLevel_id': grade_levels[1],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -578,6 +608,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '543-210-9876',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -601,6 +633,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '654-321-0987',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -624,6 +658,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '765-432-1098',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -647,6 +683,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '876-543-2109',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             },
             {
@@ -670,6 +708,8 @@ class Command(BaseCommand):
                 'mobile_phone_nos': '987-654-3210',
                 'GradeLevel_id': grade_levels[2],  # Assign to Grade 6
                 'session_year_id': session_year,
+                'is_covid_vaccinated': True,
+                'date_of_vaccination': datetime.strptime('2020-10-10', '%Y-%m-%d').date(),
                 'student_status': 'Enrolled'
             }
             
@@ -1195,7 +1235,10 @@ class Command(BaseCommand):
                 student_instance.address = student['address']
                 student_instance.telephone_nos = student['telephone_nos']
                 student_instance.mobile_phone_nos = student['mobile_phone_nos']
+                student_instance.is_covid_vaccinated = student['is_covid_vaccinated']
+                student_instance.date_of_vaccination = student['date_of_vaccination']
                 student_instance.student_status = student['student_status']
+                
                 student_instance.save()
 
                 # Add ParentGuardian data

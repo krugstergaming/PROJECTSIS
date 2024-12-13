@@ -274,6 +274,7 @@
                                         <div class="form-group">
                                             <label for="is_covid_vaccinated">Is he/she COVID Vaccinated?</label>
                                             <select class="form-control" name="is_covid_vaccinated" id="is_covid_vaccinated">
+                                                <option value="">Select a Yes or NO</option>
                                                 <option value="True">Yes</option>
                                                 <option value="False">No</option>
                                             </select>
@@ -447,6 +448,28 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+<script>
+    // Get references to the fields
+    const vaccinationSelect = document.getElementById('is_covid_vaccinated');
+    const vaccinationDateInput = document.getElementById('date_of_vaccination');
+
+    // Function to toggle the disabled state based on selection
+    function toggleVaccinationDate() {
+        if (vaccinationSelect.value === 'False') {
+            vaccinationDateInput.disabled = true;
+            vaccinationDateInput.value = ''; // Clear the date if disabled
+        } else {
+            vaccinationDateInput.disabled = false;
+        }
+    }
+
+    // Initialize the state on page load
+    toggleVaccinationDate();
+
+    // Listen for changes in the dropdown
+    vaccinationSelect.addEventListener('change', toggleVaccinationDate);
+</script>
 
 <script>
 $(document).ready(function() {
