@@ -93,9 +93,6 @@ def admin_home(request):
 
     return render(request, "hod_template/home_content.html", context)
 
-
-
-
 def add_staff(request):
     return render(request, "hod_template/Add_Template/add_staff_template.html")
 
@@ -380,13 +377,13 @@ def manage_staff(request):
         staff_data = {
             'user': staff.admin,
             'user_id': staff.admin.id,
-            'first_name': staff.admin.first_name,  # Access first_name from CustomUser
-            'last_name': staff.admin.last_name,    # Access last_name from CustomUser
-            'username': staff.admin.username,      # Access username from CustomUser
-            'email': staff.admin.email,            # Access email from CustomUser
-            'last_login': staff.admin.last_login,  # Access last_login from CustomUser
-            'date_joined': staff.admin.date_joined, # Access date_joined from CustomUser
-            'user_type': staff.admin.user_type,    # Access user_type from CustomUser
+            'first_name': staff.admin.first_name,  
+            'last_name': staff.admin.last_name,    
+            'username': staff.admin.username,      
+            'email': staff.admin.email,            
+            'last_login': staff.admin.last_login,  
+            'date_joined': staff.admin.date_joined, 
+            'user_type': staff.admin.user_type,   
             'middle_name': staff.middle_name,
             'suffix': staff.suffix,
             'dob': staff.dob,
@@ -418,56 +415,139 @@ def manage_staff(request):
     return render(request, "hod_template/Manage_Template/manage_staff_template.html", context)
 
 def edit_staff(request, staff_id):
-    staff = Staffs.objects.get(admin=staff_id)
-    staffContactInfo = staff_contact_info.objects.filter(staff_id=staff).first()
-    staffEmploymentInfo = staff_employment_info.objects.filter(staff_id=staff).first()
-    staffPhysicalInfo = staff_physical_info.objects.filter(staff_id=staff).first()
-    staffGovernmentId = staff_government_ID_info.objects.filter(staff_id=staff).first()
-    staffEducBackground = Staffs_Educ_Background.objects.filter(staff_id=staff).first()
+    # Retrieve the staff object using the staff_id directly
+    staff = get_object_or_404(Staffs, id=staff_id)  # Use id, not admin
+    # Retrieve associated information
+    staffContactInfo = staff_contact_info.objects.filter(staffs_id=staff).first()
+    staffEmploymentInfo = staff_employment_info.objects.filter(staffs_id=staff).first()
+    staffPhysicalInfo = staff_physical_info.objects.filter(staffs_id=staff).first()
+    staffGovernmentId = staff_government_ID_info.objects.filter(staffs_id=staff).first()
+    staffEducBackground = Staffs_Educ_Background.objects.filter(staffs_id=staff).first()
 
+    # Pass data to the template
     context = {
         "staff": staff,
+        'first_name': staff.admin.first_name,  
+        'last_name': staff.admin.last_name,    
+        'username': staff.admin.username,      
+        'email': staff.admin.email,    
         "id": staff_id,
         "staffContactInfo": staffContactInfo,
         "staffEmploymentInfo": staffEmploymentInfo,
         "staffPhysicalInfo": staffPhysicalInfo,
         "staffGovernmentId": staffGovernmentId,
         "staffEducBackground": staffEducBackground,
+        "blood_type": staffPhysicalInfo.blood_type,
     }
+
     return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
 
-def edit_staff_save(request):
+def edit_staff_save(request, staff_id):
     if request.method != "POST":
-        return HttpResponse("<h2>Method Not Allowed</h2>")
-    else:
-        staff_id = request.POST.get('staff_id')
-        username = request.POST.get('username')
-        email = request.POST.get('email')
+        messages.error(request, "Method Not Allowed!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    try:
+        # Fetch the staff based on the provided staff_id
+        staff = Staffs.objects.get(admin=staff_id)
+        user = staff.admin  # The associated CustomUser instance (admin)
+
+        # Extract data from request.POST
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
-        address = request.POST.get('address')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        middle_name = request.POST.get('middle_name')
+        dob = request.POST.get('dob')
+        age = request.POST.get('age')
+        pob = request.POST.get('pob')
+        sex = request.POST.get('sex')
+        civil_status = request.POST.get('civil_status')
+        citizenship = request.POST.get('citizenship')
+        dual_country = request.POST.get('dual_country')
+        max_load = request.POST.get('max_load')
 
-        try:
-            # INSERTING into Customuser Model
-            user = CustomUser.objects.get(id=staff_id)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.email = email
-            user.username = username
-            user.save()
-            
-            # INSERTING into Staff Model
-            staff_model = Staffs.objects.get(admin=staff_id)
-            staff_model.address = address
-            staff_model.save()
+        # Update user details
+        user.username = username
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()  # Save the CustomUser instance
 
-            messages.success(request, "Staff Updated Successfully.")
-            return redirect('/edit_staff/'+staff_id)
+        # Update staff details
+        staff.middle_name = middle_name
+        staff.dob = dob
+        staff.age = age
+        staff.pob = pob
+        staff.sex = sex
+        staff.civil_status = civil_status
+        staff.citizenship = citizenship
+        staff.dual_country = dual_country
+        staff.max_load = max_load
+        staff.save()  # Save the Staff instance
 
-        except:
-            messages.error(request, "Failed to Update Staff.")
-            return redirect('/edit_staff/'+staff_id)
+        # Update Staff Contact Information
+        contact_info, _ = staff_contact_info.objects.get_or_create(staffs_id=staff)
+        contact_info.region = request.POST.get('region-text')
+        contact_info.province = request.POST.get('province-text')
+        contact_info.city = request.POST.get('city-text')
+        contact_info.barangay = request.POST.get('barangay-text')
+        contact_info.street = request.POST.get('street')
+        contact_info.telephone_no = request.POST.get('telephone_no')
+        contact_info.cellphone_no = request.POST.get('cellphone_no')
+        contact_info.emergency_contact_name = request.POST.get('emergency_contact_name')
+        contact_info.emergency_contact_no = request.POST.get('emergency_contact_no')
+        contact_info.emergency_relationship = request.POST.get('emergency_relationship')
+        contact_info.medical_condition = request.POST.get('medical_condition')
+        contact_info.save()
 
+        # Update Staff Employment Information
+        employment_info, _ = staff_employment_info.objects.get_or_create(staffs_id=staff)
+        employment_info.employee_number = request.POST.get('employee_number')
+        employment_info.employee_type = request.POST.get('employee_type')
+        employment_info.position = request.POST.get('position')
+        employment_info.employment_status = request.POST.get('employment_status')
+        employment_info.save()
+
+        # Update Staff Physical Information
+        physical_info, _ = staff_physical_info.objects.get_or_create(staffs_id=staff)
+        physical_info.blood_type = request.POST.get('blood_type')
+        physical_info.height = request.POST.get('height')
+        physical_info.weight = request.POST.get('weight')
+        physical_info.eye_color = request.POST.get('eye_color')
+        physical_info.hair_color = request.POST.get('hair_color')
+        physical_info.save()
+
+        # Update Staff Government ID Information
+        government_info, _ = staff_government_ID_info.objects.get_or_create(staffs_id=staff)
+        government_info.gsis_id = request.POST.get('gsis_id')
+        government_info.philhealth_id = request.POST.get('philhealth_id')
+        government_info.pagibig_id = request.POST.get('pagibig_id')
+        government_info.sss_id = request.POST.get('sss_id')
+        government_info.tin_id = request.POST.get('tin_id')
+        government_info.save()
+
+        # Update Staff Educational Background Information
+        education_info, _ = Staffs_Educ_Background.objects.get_or_create(staffs_id=staff)
+        education_info.HEA = request.POST.get('HEA')
+        education_info.preferred_subject = request.POST.get('preferred_subject')
+        education_info.Cert_License = request.POST.get('Cert_License')
+        education_info.teaching_exp = request.POST.get('teaching_exp')
+        education_info.skills_competencies = request.POST.get('skills_competencies')
+        education_info.language_spoken = request.POST.get('language_spoken')
+        education_info.save()
+
+        # Success message
+        messages.success(request, "Staff Information Updated Successfully!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    except Staffs.DoesNotExist:
+        messages.error(request, "Staff Not Found!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    except Exception as e:
+        messages.error(request, f"Failed to Update Staff! Error: {str(e)}")
+        return redirect('edit_staff', staff_id=staff_id)
 
 def deactivate_staff(request, staff_id):
     try:
@@ -1653,7 +1733,7 @@ def edit_student_save(request, student_id):
 
         # Success message
         messages.success(request, "Student Information Updated Successfully!")
-        return redirect('edit_student', student_id=student_id)
+        return redirect('manage_student')
 
     except Students.DoesNotExist:
         messages.error(request, "Student Not Found!")
@@ -2257,7 +2337,6 @@ def save_load_data(request):
         try:
             # Parse the JSON data from the request body
             data = json.loads(request.body)
-            print("Received Data:", data)  # Log incoming data for debugging
 
             # Extract 'loads' list from the data
             loads = data.get('loads', [])
@@ -2522,19 +2601,21 @@ def check_schedule_conflict(request):
         end_time = request.GET.get('end_time')
         gradelevel_id = request.GET.get('gradelevel_id')
         section_id = request.GET.get('section_id')
+        session_year_id = request.GET.get('session_year_id')  # Added session_year_id
 
         # Ensure all required data is provided
-        if not (day_of_week and start_time and end_time and gradelevel_id and section_id):
+        if not (day_of_week and start_time and end_time and gradelevel_id and section_id and session_year_id):
             return JsonResponse({"conflict": False, "message": "Incomplete data provided."})
 
         # Convert times to time objects
         start_time = time.fromisoformat(start_time)
         end_time = time.fromisoformat(end_time)
 
-        # Check for schedule conflicts in the database
+        # Check for schedule conflicts in the database for the given grade level, section, and session year
         conflicts = Schedule.objects.filter(
-            load_id__AssignSection_id__GradeLevel_id=gradelevel_id,
-            load_id__AssignSection_id__section_id=section_id,
+            load_id__AssignSection_id__GradeLevel_id=gradelevel_id,  # Check for grade level conflict
+            load_id__AssignSection_id__section_id=section_id,       # Check for section conflict
+            load_id__session_year_id=session_year_id,                # Check for session year conflict
             day_of_week=day_of_week,
         ).filter(
             Q(start_time__lt=end_time) & Q(end_time__gt=start_time)  # Overlapping condition

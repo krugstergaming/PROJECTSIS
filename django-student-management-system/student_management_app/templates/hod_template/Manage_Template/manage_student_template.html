@@ -112,10 +112,20 @@
                                         <!-- <td>{{ student.admin.username }}</td> -->
                                         <td>{{ student.admin.email }}</td>
                                         <!-- <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td> -->
-                                        <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ student.student_status}}</td>
-                                        <!-- <td>{{ student.admin.last_login }}</td>
-                                        <td>{{ student.admin.date_joined }}</td> -->
+                                        <td>{{ user.session_year }}</td>
+                                        <td>{{ user.grade_level }}</td>
+                                        <td style="background-color: 
+                                        {% if user.student_status == 'Enrolled' %}lightgreen
+                                            {% elif user.student_status == 'Pending' %}yellow
+                                            {% else %}transparent
+                                        {% endif %}; 
+                                                border-radius: 10px; 
+                                                padding: 5px; 
+                                                text-align: center;">
+                                            {{ user.student_status }}
+                                        </td>
+                                        <!-- <td>{{ user.last_login }}</td>
+                                        <td>{{ user.date_joined }}</td> -->
                                         <td>
                                             <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
                                             <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning">Edit</a>
@@ -131,6 +141,7 @@
                                                     Activate
                                                 {% endif %}
                                             </a> 
+                                            <!-- <a href="{% url 'delete_student' user.user_id %}" class="btn btn-danger">Delete</a> -->
                                             <!-- <a href="" class="btn btn-secondary">Archive</a> -->
                                         </td>
                                     </tr>

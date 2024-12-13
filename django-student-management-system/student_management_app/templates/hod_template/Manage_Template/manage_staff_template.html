@@ -147,7 +147,7 @@
                                         </td>
                                         <td>
                                             <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
-                                            <a href="" class="btn btn-warning">Edit</a>
+                                            <a href="{% url 'edit_staff' staff_id=user.user_id %}" class="btn btn-warning">Edit</a>
                                             <a href="{% url 'toggle_user_activation' user.user_id %}" class="btn 
                                                 {% if user.user.is_active %}
                                                     btn-danger
@@ -178,6 +178,7 @@
                                                             <!-- Personal Information -->
                                                             <div class="grid-item">
                                                                 <h3><b> Personal Information: </b></h3>
+                                                                <p>UserName: <b>{{ user.username }}</b></p>
                                                                 <p>First Name: <b>{{ user.first_name }}</b></p>
                                                                 <p>Last Name: <b>{{ user.last_name }}</b></p>
                                                                 <p>Middle Name: <b>{{ user.middle_name }}</b></p>
@@ -195,6 +196,7 @@
                                                             <!-- Contact Information -->
                                                             <div class="grid-item">
                                                                 <h3><b>Contact Information: </b></h3>
+                                                                <p>Email: <b>{{ user.email }}</b></p>
                                                                 <p>Region: <b>{{ user.contact_info.region }}</b></p>
                                                                 <p>Province: <b>{{ user.contact_info.province }}</b></p>
                                                                 <p>City: <b>{{ user.contact_info.city }}</b></p>

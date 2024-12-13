@@ -72,8 +72,8 @@ class Command(BaseCommand):
             staff.age = random.randint(25, 60)
             staff.pob = fake.city()
             staff.sex = random.choice(["Male", "Female"])
-            staff.civil_status = random.choice(["Single", "Married", "Widowed"])
-            staff.citizenship = random.choice(["Philippines"])
+            staff.civil_status = random.choice(["Single", "Married", "Other"])
+            staff.citizenship = random.choice(["Filipino"])
             staff.dual_country = None if random.random() > 0.5 else fake.country()
             staff.max_load = random.randint(5, 10)
             staff.save()
@@ -101,12 +101,12 @@ class Command(BaseCommand):
                 employment_status=random.choice(["Active", "Inactive"]),
             )
             staff_physical_info.objects.create(
-                staffs_id=staff,  # Pass the staff object (not the ID)
-                blood_type=random.choice(["A", "B", "AB", "O"]),
-                height=random.randint(150, 200),  # Height in cm
-                weight=random.randint(50, 90),  # Weight in kg
-                eye_color=random.choice(["Brown", "Blue", "Green"]),
-                hair_color=random.choice(["Black", "Brown", "Blonde"]),
+                staffs_id=staff,
+                blood_type = random.choice(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
+                height=random.randint(5, 6),
+                weight=random.randint(50, 90),
+                eye_color = random.choice(["Black", "Brown", "Blue", "Green", "Hazel", "Gray"]),
+                hair_color = random.choice(["Black", "Brown", "Blonde", "Red", "Gray", "White"]),
             )
             staff_government_ID_info.objects.create(
                 staffs_id=staff,  # Pass the staff object (not the ID)
@@ -117,8 +117,8 @@ class Command(BaseCommand):
                 tin_id=generate_individual_tin(),
             )
             Staffs_Educ_Background.objects.create(
-                staffs_id=staff,  # Pass the staff object (not the ID)
-                HEA=fake.random_element([
+                staffs_id=staff,
+                HEA=random.choice([
                     "Elementary", 
                     "High School", 
                     "Vocational", 
@@ -126,8 +126,8 @@ class Command(BaseCommand):
                     "Bachelor's Degree", 
                     "Master's Degree", 
                     "Doctorate/PhD"
-                ]),
-                preferred_subject=fake.random_element([
+                ]),  # Randomly select from the valid options
+                preferred_subject=random.choice([
                     "Reading", 
                     "Language", 
                     "Mathematics", 
@@ -173,7 +173,7 @@ class Command(BaseCommand):
             admin.age = random.randint(30, 55)
             admin.pob = fake.city()
             admin.sex = random.choice(["Male", "Female"])
-            admin.civil_status = random.choice(["Single", "Married", "Widowed"])
+            admin.civil_status = random.choice(["Single", "Married", "Other"])
             admin.citizenship = fake.country()
             admin.dual_country = None if random.random() > 0.5 else fake.country()
             admin.max_load = 0
@@ -203,11 +203,11 @@ class Command(BaseCommand):
             )
             staff_physical_info.objects.create(
                 adminhod_id=admin,
-                blood_type=random.choice(["A", "B", "AB", "O"]),
-                height=random.randint(150, 200),  # Height in cm
-                weight=random.randint(50, 90),  # Weight in kg
-                eye_color=random.choice(["Brown", "Blue", "Green"]),
-                hair_color=random.choice(["Black", "Brown", "Blonde"]),
+                blood_type = random.choice(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
+                height=random.randint(5, 6),
+                weight=random.randint(50, 90),
+                eye_color = random.choice(["Black", "Brown", "Blue", "Green", "Hazel", "Gray"]),
+                hair_color = random.choice(["Black", "Brown", "Blonde", "Red", "Gray", "White"]),
             )
             staff_government_ID_info.objects.create(
                 adminhod_id=admin,
@@ -219,16 +219,16 @@ class Command(BaseCommand):
             )
             Staffs_Educ_Background.objects.create(
                 adminhod_id=admin,
-                HEA=fake.random_element([
+                HEA=random.choice([
                     "Elementary", 
                     "High School", 
                     "Vocational", 
-                    "Associate Degree", 
-                    "Bachelor's Degree", 
-                    "Master's Degree", 
+                    "Associate ", 
+                    "Bachelor", 
+                    "Master", 
                     "Doctorate/PhD"
-                ]),
-                preferred_subject=fake.random_element([
+                ]),  # Randomly select from the valid options
+                preferred_subject=random.choice([
                     "Reading", 
                     "Language", 
                     "Mathematics", 
