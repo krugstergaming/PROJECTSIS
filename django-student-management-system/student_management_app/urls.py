@@ -21,8 +21,8 @@ urlpatterns = [
     path('manage_staff/', HodViews.manage_staff, name="manage_staff"),
     path('toggle_grading_state/', HodViews.toggle_grading_state, name='toggle_grading_state'),
 
-    path('edit_staff/<staff_id>/', HodViews.edit_staff, name="edit_staff"),
-    path('edit_staff_save/', HodViews.edit_staff_save, name="edit_staff_save"),
+    path('edit_staff/<int:staff_id>/', HodViews.edit_staff, name="edit_staff"),
+    path('edit_staff_save/<int:staff_id>/', HodViews.edit_staff_save, name='edit_staff_save'),
     path('delete_staff/<staff_id>/', HodViews.delete_staff, name="delete_staff"),
 
     path('toggle_user_activation/<int:user_id>/', HodViews.toggle_user_activation, name='toggle_user_activation'),
@@ -74,6 +74,10 @@ urlpatterns = [
     path('edit_student_save/<student_id>/', HodViews.edit_student_save, name="edit_student_save"),
     path('manage_student/', HodViews.manage_student, name="manage_student"),
     path('toggle_student_activation/<int:user_id>/', HodViews.toggle_student_activation, name='toggle_student_activation'),
+
+    path('archive_curriculum/<curriculum_id>/', HodViews.archive_curriculum, name="archive_curriculum"),
+    path('unarchive_curriculum/<curriculum_id>/', HodViews.unarchive_curriculum, name="unarchive_curriculum"),
+    path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
 
 
     # enrollment urls
@@ -174,8 +178,11 @@ urlpatterns = [
     path('staff_apply_leave_save/', StaffViews.staff_apply_leave_save, name="staff_apply_leave_save"),
     path('staff_feedback/', StaffViews.staff_feedback, name="staff_feedback"),
     path('staff_feedback_save/', StaffViews.staff_feedback_save, name="staff_feedback_save"),
+
     path('staff_profile/', StaffViews.staff_profile, name="staff_profile"),
     path('staff_profile_update/', StaffViews.staff_profile_update, name="staff_profile_update"),
+    path('edit_staff_profile/<int:staff_id>/', HodViews.edit_staff, name="edit_staff"),
+    path('edit_staff_saveprofile/<int:staff_id>/', HodViews.edit_staff_save, name='edit_staff_save'),
 
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
     path('staff_add_result_save/', StaffViews.staff_add_result_save, name="staff_add_result_save"),

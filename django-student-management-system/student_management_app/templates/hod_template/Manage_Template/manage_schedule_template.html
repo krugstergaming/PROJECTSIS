@@ -66,6 +66,7 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Academic Year</th>
                                     <th>Grade level and Section</th>
                                     <th>Subject</th>
                                     <th>Staff</th>
@@ -79,6 +80,7 @@
                                 {% for schedule in schedules %}
                                 <tr>
                                     <td>{{ schedule.id }}</td>
+                                    <td>{{ schedule.load_id.session_year_id.session_start_year.year }} - {{ schedule.load_id.session_year_id.session_end_year.year }}</td>
                                     <td>{{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ schedule.load_id.AssignSection_id.section_id.section_name }}</td>
                                     <td>{{ schedule.load_id.subject_id.subject_name }}</td>
                                     <td>{{ schedule.load_id.staff_id.first_name }} {{ schedule.load_id.staff_id.last_name }}</td>
@@ -86,8 +88,8 @@
                                     <td>{{ schedule.start_time|time:"h:i a" }}</td>
                                     <td>{{ schedule.end_time|time:"h:i a" }}</td>
                                     <td>
-                                        <a href="{% url 'edit_schedule' schedule.id %}" class="btn btn-warning">Edit</a> 
-                                        <a href="" class="btn btn-secondary">Archive</a>
+                                        <!-- <a href="#" class="btn btn-warning">Edit</a> 
+                                        <a href="#" class="btn btn-secondary">Archive</a> -->
                                     </td>
                                 </tr>
                                 {% empty %}

@@ -1,17 +1,7 @@
 {% extends 'student_template/base_template.html' %}
 
 {% block page_title %}
-    <!-- Display the academic year from the first schedule -->
-    {% if academic_year %}
-    <div class="mb-3">
-        <h4>Academic Year: 
-            <strong>
-                {{ academic_year.session_start_year.year }} - 
-                {{ academic_year.session_end_year.year }}
-            </strong>
-        </h4>
-    </div>
-    {% endif %}
+    Schedules
 {% endblock page_title %}
 
 {% block main_content %}
@@ -22,7 +12,7 @@
             <div class="col-md-12">
                 <div class="card card">
                     <div class="card-header">
-                        <h3 class="card-title"> 
+                        <h3 class="card-title">
                             <strong style="color: green;">
                                 {{ student.admin.last_name|upper }}, {{ student.admin.first_name|upper }} ({{ student.student_number|upper }})
                             </strong>
@@ -30,40 +20,76 @@
                     </div>
 
                     <div class="card-body">
-                        {% if student_schedule %}
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Subject Code </th>
-                                            <th>Description </th>
-                                            <th>Teacher</th>
-                                            <th>Schedule</th>
-                                            <!-- <th>Day</th>
-                                            <th>Start Time</th>
-                                            <th>End Time</th> -->
-                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for schedule in student_schedule %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td>{{ schedule.load_id.subject_id.subject_code }}</td>
-                                            <td>
-                                                <strong> {{ schedule.load_id.subject_id.subject_name }}     </strong> - {{ schedule.load_id.subject_id.subject_description }}</td>
-                                            <td>{{ schedule.load_id.staff_id.first_name }} {{ schedule.load_id.staff_id.last_name }}</td>
-                                            <td>{{ schedule.day_of_week }} / {{ schedule.start_time|time:"h:i a" }} - {{ schedule.end_time|time:"h:i a" }}</td>
-                                            <!-- <td>{{ schedule.day_of_week }}</td>
-                                            <td>{{ schedule.start_time }}</td>
-                                            <td>{{ schedule.end_time }}</td> -->
-                                            
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                        {% if schedules_by_year %}
+                            {% for academic_year, schedules in schedules_by_year.items %}
+                                {% if schedules %}
+                                    <div class="mb-4">
+                                        <h4>Academic Year: 
+                                            <strong>
+                                                {{ academic_year.session_start_year.year }} - 
+                                                {{ academic_year.session_end_year.year }}
+                                            </strong>
+                                        </h4>
+                                        <h5>
+                                            Grade Level - Section:
+                                            <b>
+                                                {% for schedule in schedules %}
+                                                    {% if schedule.show_grade_section %}
+                                                        {{ schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name }} -
+                                                        {{ schedule.load_id.AssignSection_id.section_id.section_name }}
+                                                        
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </b>
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="schedule-table">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>No.</th> <!-- Keep the header for the row number -->
+                                                    <th>Subject Code</th>
+                                                    <th>Description</th>
+                                                    <th>Schedule</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for schedule in schedules %}
+                                                    <tr>
+                                                        <!-- Display row number if it is not None -->
+                                                        <td>{% if schedule.row_number %}{{ schedule.row_number }}{% endif %}</td>
+                                
+                                                        <!-- Subject Code -->
+                                                        {% if schedule.show_subject_code %}
+                                                            <td>{{ schedule.load_id.subject_id.subject_code }}</td>
+                                                        {% else %}
+                                                            <td></td>
+                                                        {% endif %}
+                                
+                                                        <!-- Description -->
+                                                        {% if schedule.show_description %}
+                                                            <td>
+                                                                <strong>{{ schedule.load_id.subject_id.subject_name }}</strong> - 
+                                                                {{ schedule.load_id.subject_id.subject_description }}
+                                                            </td>
+                                                        {% else %}
+                                                            <td></td>
+                                                        {% endif %}
+                                
+                                                        <!-- Schedule -->
+                                                        <td>{{ schedule.day_of_week }} / {{ schedule.start_time|time:"h:i a" }} - {{ schedule.end_time|time:"h:i a" }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        No schedule found for {{ academic_year.session_start_year.year }} - {{ academic_year.session_end_year.year }}.
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         {% else %}
                             <div class="alert alert-warning">
                                 No Schedule Information found.
@@ -77,3 +103,40 @@
 </section>
 
 {% endblock main_content %}
+
+{% block extra_js %}
+<script>
+    window.onload = function () {
+        const table = document.getElementById("schedule-table");
+        const rows = Array.from(table.querySelectorAll("tbody > tr"));
+
+        const mergeCells = (columnIndex) => {
+            let lastText = "";
+            let lastCell = null;
+            let rowspan = 0;
+
+            rows.forEach((row) => {
+                const currentCell = row.children[columnIndex];
+                const currentText = currentCell.textContent.trim();
+
+                if (currentText === lastText) {
+                    // Increment rowspan and hide current cell
+                    rowspan++;
+                    lastCell.rowSpan = rowspan;
+                    currentCell.style.display = "none";
+                } else {
+                    // New group, reset rowspan
+                    lastText = currentText;
+                    lastCell = currentCell;
+                    rowspan = 1;
+                }
+            });
+        };
+
+        // Apply merging for specific columns
+        mergeCells(1); // Grade Level - Section
+        mergeCells(2); // Subject Code
+        mergeCells(3); // Description
+    };
+</script>
+{% endblock extra_js %}

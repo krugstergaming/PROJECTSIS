@@ -240,8 +240,6 @@ def student_view_result(request):
 
     return render(request, "student_template/student_view_result.html", context)
 
-
-
 def student_view_schedule(request):
     # Get the student object for the currently logged-in user
     student = Students.objects.get(admin=request.user.id)
@@ -249,35 +247,74 @@ def student_view_schedule(request):
     # Query the assigned section for the student
     assign_section = AssignSection.objects.filter(Student_id=student.id).first()
 
-    # Check if the student is assigned to a section
     if assign_section:
         # Get the section that the student is assigned to
         section = assign_section.section_id
 
-        # Query the schedule for all loads assigned to this section
-        student_schedule = Schedule.objects.filter(load_id__AssignSection_id__section_id=section)
+        # Get the schedules where the student is assigned
+        student_schedules = Schedule.objects.filter(
+            load_id__AssignSection_id__section_id=section
+        ).select_related(
+            'load_id', 'load_id__session_year_id', 'load_id__AssignSection_id', 'load_id__subject_id'
+        )
 
-        # Get the academic year from the first schedule (if any)
-        academic_year = None
-        if student_schedule.exists():
-            academic_year = student_schedule.first().load_id.session_year_id
+        # Organize schedules by academic year
+        schedules_by_year = {}
+        for schedule in student_schedules:
+            academic_year = schedule.load_id.session_year_id
+            if academic_year not in schedules_by_year:
+                schedules_by_year[academic_year] = []
+            schedules_by_year[academic_year].append(schedule)
 
-        # Prepare context to pass to the template 
+        # Sort schedules_by_year by academic year in descending order
+        sorted_schedules_by_year = dict(
+            sorted(schedules_by_year.items(), key=lambda item: item[0].session_start_year, reverse=True)
+        )
+
+        # Add flags to avoid repeating data for Grade Level - Section, Subject Code, and Description
+        for academic_year, schedules in sorted_schedules_by_year.items():
+            last_grade_section = None
+            last_subject_code = None
+            last_description = None
+
+            for schedule in schedules:
+                # Get values
+                grade_section = f"{schedule.load_id.AssignSection_id.GradeLevel_id.GradeLevel_name} - {schedule.load_id.AssignSection_id.section_id.section_name}"
+                subject_code = schedule.load_id.subject_id.subject_code
+                description = f"{schedule.load_id.subject_id.subject_name} - {schedule.load_id.subject_id.subject_description}"
+
+                # Determine whether to show each field
+                schedule.show_grade_section = grade_section != last_grade_section
+                schedule.show_subject_code = subject_code != last_subject_code
+                schedule.show_description = description != last_description
+
+                # Update last seen values
+                last_grade_section = grade_section
+                last_subject_code = subject_code
+                last_description = description
+
+        # Track visible rows for numbering
+        for academic_year, schedules in sorted_schedules_by_year.items():
+            row_counter = 1  # Initialize row counter for visible rows
+            for schedule in schedules:
+                if schedule.show_grade_section or schedule.show_subject_code or schedule.show_description:
+                    schedule.row_number = row_counter
+                    row_counter += 1
+                else:
+                    schedule.row_number = None  # Hide the row number if the row is empty
+
         context = {
-            "student_schedule": student_schedule,
-            "academic_year": academic_year,
-            "student": student,  # Pass student details to the template
+            "schedules_by_year": sorted_schedules_by_year,
+            "student": student,
         }
     else:
         # If the student is not assigned to any section, return a message
         context = {
-            "student_schedule": None,
-            "academic_year": None,
+            "schedules_by_year": None,
             "message": "You are not assigned to any section yet.",
-            "student": student,  # Pass student details even if no schedule
+            "student": student,
         }
 
-    # Render the schedule template
     return render(request, "student_template/student_view_schedule.html", context)
 
 

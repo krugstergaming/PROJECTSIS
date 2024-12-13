@@ -98,8 +98,8 @@
                                 <th>School Year</th>
                                 <th>Grade Level</th>
                                 <th>Student Status</th>
-                                <th>Last Login</th>
-                                <th>Date Joined</th>
+                                <!-- <th>Last Login</th>
+                                <th>Date Joined</th> -->
                                 <th>Action</th>
                                 </tr>
                             </thead>
@@ -124,8 +124,8 @@
                                                 text-align: center;">
                                             {{ user.student_status }}
                                         </td>
-                                        <td>{{ user.last_login }}</td>
-                                        <td>{{ user.date_joined }}</td>
+                                        <!-- <td>{{ user.last_login }}</td>
+                                        <td>{{ user.date_joined }}</td> -->
                                         <td>
                                             <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
                                             <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning">Edit</a>
@@ -142,7 +142,7 @@
                                                 {% endif %}
                                             </a> 
                                             <!-- <a href="{% url 'delete_student' user.user_id %}" class="btn btn-danger">Delete</a> -->
-                                            <a href="" class="btn btn-secondary">Archive</a>
+                                            <!-- <a href="" class="btn btn-secondary">Archive</a> -->
                                         </td>
                                     </tr>
 

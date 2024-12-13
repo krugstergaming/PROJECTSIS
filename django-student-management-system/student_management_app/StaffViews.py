@@ -11,7 +11,7 @@ from django.db.models import Avg
 from collections import defaultdict
 
 
-from student_management_app.models import CustomUser, Staffs, GradeLevel, Section, Schedule, AssignSection, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration
+from student_management_app.models import CustomUser, Staffs, staff_contact_info, GradeLevel, Section, Schedule, AssignSection, Subjects, Load, Students, SessionYearModel, Attendance, AttendanceReport, LeaveReportStaff, FeedBackStaffs, StudentResult, GradingConfiguration, staff_employment_info, staff_government_ID_info, staff_physical_info, Staffs_Educ_Background
 
 
 
@@ -268,6 +268,142 @@ def staff_profile(request):
         "staff": staff
     }
     return render(request, 'staff_template/staff_profile.html', context)
+
+
+def edit_staff(request, staff_id):
+    # Retrieve the staff object using the staff_id directly
+    staff = get_object_or_404(Staffs, id=staff_id)  # Use id, not admin
+    # Retrieve associated information
+    staffContactInfo = staff_contact_info.objects.filter(staffs_id=staff).first()
+    staffEmploymentInfo = staff_employment_info.objects.filter(staffs_id=staff).first()
+    staffPhysicalInfo = staff_physical_info.objects.filter(staffs_id=staff).first()
+    staffGovernmentId = staff_government_ID_info.objects.filter(staffs_id=staff).first()
+    staffEducBackground = Staffs_Educ_Background.objects.filter(staffs_id=staff).first()
+
+    # Pass data to the template
+    context = {
+        "staff": staff,
+        'first_name': staff.admin.first_name,  
+        'last_name': staff.admin.last_name,    
+        'username': staff.admin.username,      
+        'email': staff.admin.email,    
+        "id": staff_id,
+        "staffContactInfo": staffContactInfo,
+        "staffEmploymentInfo": staffEmploymentInfo,
+        "staffPhysicalInfo": staffPhysicalInfo,
+        "staffGovernmentId": staffGovernmentId,
+        "staffEducBackground": staffEducBackground,
+        "blood_type": staffPhysicalInfo.blood_type,
+    }
+
+    return render(request, "hod_template/Edit_Template/edit_staff_template.html", context)
+
+def edit_staff_save(request, staff_id):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    try:
+        # Fetch the staff based on the provided staff_id
+        staff = Staffs.objects.get(admin=staff_id)
+        user = staff.admin  # The associated CustomUser instance (admin)
+
+        # Extract data from request.POST
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        middle_name = request.POST.get('middle_name')
+        dob = request.POST.get('dob')
+        age = request.POST.get('age')
+        pob = request.POST.get('pob')
+        sex = request.POST.get('sex')
+        civil_status = request.POST.get('civil_status')
+        citizenship = request.POST.get('citizenship')
+        dual_country = request.POST.get('dual_country')
+        max_load = request.POST.get('max_load')
+
+        # Update user details
+        user.username = username
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()  # Save the CustomUser instance
+
+        # Update staff details
+        staff.middle_name = middle_name
+        staff.dob = dob
+        staff.age = age
+        staff.pob = pob
+        staff.sex = sex
+        staff.civil_status = civil_status
+        staff.citizenship = citizenship
+        staff.dual_country = dual_country
+        staff.max_load = max_load
+        staff.save()  # Save the Staff instance
+
+        # Update Staff Contact Information
+        contact_info, _ = staff_contact_info.objects.get_or_create(staffs_id=staff)
+        contact_info.region = request.POST.get('region-text')
+        contact_info.province = request.POST.get('province-text')
+        contact_info.city = request.POST.get('city-text')
+        contact_info.barangay = request.POST.get('barangay-text')
+        contact_info.street = request.POST.get('street')
+        contact_info.telephone_no = request.POST.get('telephone_no')
+        contact_info.cellphone_no = request.POST.get('cellphone_no')
+        contact_info.emergency_contact_name = request.POST.get('emergency_contact_name')
+        contact_info.emergency_contact_no = request.POST.get('emergency_contact_no')
+        contact_info.emergency_relationship = request.POST.get('emergency_relationship')
+        contact_info.medical_condition = request.POST.get('medical_condition')
+        contact_info.save()
+
+        # Update Staff Employment Information
+        employment_info, _ = staff_employment_info.objects.get_or_create(staffs_id=staff)
+        employment_info.employee_number = request.POST.get('employee_number')
+        employment_info.employee_type = request.POST.get('employee_type')
+        employment_info.position = request.POST.get('position')
+        employment_info.employment_status = request.POST.get('employment_status')
+        employment_info.save()
+
+        # Update Staff Physical Information
+        physical_info, _ = staff_physical_info.objects.get_or_create(staffs_id=staff)
+        physical_info.blood_type = request.POST.get('blood_type')
+        physical_info.height = request.POST.get('height')
+        physical_info.weight = request.POST.get('weight')
+        physical_info.eye_color = request.POST.get('eye_color')
+        physical_info.hair_color = request.POST.get('hair_color')
+        physical_info.save()
+
+        # Update Staff Government ID Information
+        government_info, _ = staff_government_ID_info.objects.get_or_create(staffs_id=staff)
+        government_info.gsis_id = request.POST.get('gsis_id')
+        government_info.philhealth_id = request.POST.get('philhealth_id')
+        government_info.pagibig_id = request.POST.get('pagibig_id')
+        government_info.sss_id = request.POST.get('sss_id')
+        government_info.tin_id = request.POST.get('tin_id')
+        government_info.save()
+
+        # Update Staff Educational Background Information
+        education_info, _ = Staffs_Educ_Background.objects.get_or_create(staffs_id=staff)
+        education_info.HEA = request.POST.get('HEA')
+        education_info.preferred_subject = request.POST.get('preferred_subject')
+        education_info.Cert_License = request.POST.get('Cert_License')
+        education_info.teaching_exp = request.POST.get('teaching_exp')
+        education_info.skills_competencies = request.POST.get('skills_competencies')
+        education_info.language_spoken = request.POST.get('language_spoken')
+        education_info.save()
+
+        # Success message
+        messages.success(request, "Staff Information Updated Successfully!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    except Staffs.DoesNotExist:
+        messages.error(request, "Staff Not Found!")
+        return redirect('edit_staff', staff_id=staff_id)
+
+    except Exception as e:
+        messages.error(request, f"Failed to Update Staff! Error: {str(e)}")
+        return redirect('edit_staff', staff_id=staff_id)
 
 
 def staff_profile_update(request):
