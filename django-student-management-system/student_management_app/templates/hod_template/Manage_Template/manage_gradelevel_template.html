@@ -76,9 +76,10 @@
                                 <td>{{ gradelevel.created_at }}</td>
                                 <td>{{ gradelevel.updated_at }}</td>
                                 <td>
-                                    <a href="{% url 'edit_gradelevel' gradelevel.id %}" class="btn btn-warning">Edit</a> 
-                                    <!-- <a href="{% url 'delete_gradelevel' gradelevel.id %}" class="btn btn-danger">Delete</a> -->
-                                    <a href="" class="btn btn-secondary">Archive</a>
+                                    <a href="{% url 'edit_gradelevel' gradelevel.id %}" class="btn btn-warning"
+                                        class="btn btn-warning"data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                 </td>
                                 </tr>
                                 {% endfor %}

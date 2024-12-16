@@ -58,10 +58,10 @@ class staff_contact_info(models.Model):
     city = models.CharField(max_length=255, blank=True, null=True)
     barangay = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
-    telephone_no = models.CharField(max_length=20, blank=True, null=True)
-    cellphone_no = models.CharField(max_length=20, blank=True, null=True)
+    telephone_no = models.CharField(max_length=255, blank=True, null=True)
+    cellphone_no = models.CharField(max_length=255, blank=True, null=True)
     emergency_contact_name = models.CharField(max_length=255, blank=True, null=True)
-    emergency_contact_no = models.CharField(max_length=20, blank=True, null=True)
+    emergency_contact_no = models.CharField(max_length=255, blank=True, null=True)
     emergency_relationship = models.CharField(max_length=255, blank=True, null=True)
     medical_condition = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -157,8 +157,6 @@ class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     student_number = models.CharField(max_length=12, unique=True, editable=False, blank=True, null=True)
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
     suffix = models.CharField(max_length=20, blank=True, null=True)
     nickname = models.CharField(max_length=50, blank=True, null=True)
@@ -223,27 +221,10 @@ class Enrollment_voucher(models.Model):
 
 class Enrollment(models.Model):
     id = models.AutoField(primary_key=True)
-
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
-
-    registration_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    misc_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    tuition_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    total_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    downpayment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    installment_option = models.CharField(max_length=50, default='Monthly', blank=True, null=True)
-    installment_payment = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, blank=True, null=True)
-    assessed_by = models.CharField(max_length=100, blank=True, null=True)
-    assessed_date = models.DateField(blank=True, null=True)
-    payment_received_by = models.CharField(max_length=100, blank=True, null=True)
-    payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    payment_date = models.DateField(blank=True, null=True)
+    session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     enrollment_status = models.CharField(max_length=20, default='Pending')
-    remarks = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -300,9 +281,8 @@ class Subjects(models.Model):
 
 class AssignSection(models.Model):
     id = models.AutoField(primary_key=True)
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
     section_id = models.ForeignKey(Section, on_delete=models.CASCADE)
-    Student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -455,7 +435,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 2:
             Staffs.objects.create(admin=instance)
         if instance.user_type == 3:
-            Students.objects.create(admin=instance, GradeLevel_id=GradeLevel.objects.get(id=1), session_year_id=SessionYearModel.objects.get(id=1), address="", profile_pic="", sex="")
+            Students.objects.create(admin=instance)
     
 
 @receiver(post_save, sender=CustomUser)

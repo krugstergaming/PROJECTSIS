@@ -104,18 +104,30 @@
                                                 <td style="text-align: center;">{{ row.subject_second_quarter|floatformat:0 }}</td>
                                                 <td style="text-align: center;">{{ row.subject_third_quarter|floatformat:0 }}</td>
                                                 <td style="text-align: center;">{{ row.subject_fourth_quarter|floatformat:0 }}</td>
+                                
+                                                <!-- Final Rating Column -->
                                                 <td style="text-align: center;">
-                                                    {% if row.subject_final_grade %}
-                                                        {{ row.subject_final_grade }}
+                                                    {% if row.subject_first_quarter == 0 or row.subject_second_quarter == 0 or row.subject_third_quarter == 0 or row.subject_fourth_quarter == 0 %}
+                                                    
                                                     {% else %}
-                                                        N/A
+                                                        {% if row.subject_final_grade %}
+                                                            {{ row.subject_final_grade }}
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
                                                     {% endif %}
                                                 </td>
+                                
+                                                <!-- Remarks Column (Pass/Fail) -->
                                                 <td style="text-align: center;">
-                                                    {% if row.subject_final_grade >= 75 %}
-                                                        <span class="alert alert-success" style="background-color: #90EE90; color: black; border: none;">Pass</span>
+                                                    {% if row.subject_first_quarter == 0 or row.subject_second_quarter == 0 or row.subject_third_quarter == 0 or row.subject_fourth_quarter == 0 %}
+                                                        <span class="alert alert-warning" style="background-color: #FFD700; color: black; border: none;">Pending</span>
                                                     {% else %}
-                                                        <span class="alert alert-danger">Fail</span>
+                                                        {% if row.subject_final_grade >= 75 %}
+                                                            <span class="alert alert-success" style="background-color: #90EE90; color: black; border: none;">Pass</span>
+                                                        {% else %}
+                                                            <span class="alert alert-danger">Fail</span>
+                                                        {% endif %}
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -197,8 +209,21 @@
                                                         <td>{{ row.subject_second_quarter|floatformat:0 }}</td>
                                                         <td>{{ row.subject_third_quarter|floatformat:0 }}</td>
                                                         <td>{{ row.subject_fourth_quarter|floatformat:0 }}</td>
-                                                        <td>{{ row.subject_final_grade|default:"N/A" }}</td>
-                                                        <td>{% if row.subject_final_grade >= 75 %} Pass {% else %} Fail {% endif %}</td>
+                                                        <td>
+                                                            {% if row.subject_first_quarter == 0 or row.subject_second_quarter == 0 or row.subject_third_quarter == 0 or row.subject_fourth_quarter == 0 %}
+                                                                Pending
+                                                            {% else %}
+                                                                {{ row.subject_final_grade|default:"N/A" }}
+                                                            {% endif %}
+                                                        </td>
+                                                        
+                                                        <td>
+                                                            {% if row.subject_final_grade >= 75 %}
+                                                                Pass
+                                                            {% else %}
+                                                                Fail
+                                                            {% endif %}
+                                                        </td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>

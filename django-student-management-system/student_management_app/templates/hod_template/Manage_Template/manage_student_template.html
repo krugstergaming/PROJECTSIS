@@ -37,6 +37,25 @@
     .custom-modal-width {
         max-width: 1400px; /* Adjust the value as needed */
     }
+
+    .student-status {
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+
+    }
+
+    .student-status[data-status="Enrolled"] {
+        background-color: lightgreen;
+    }
+
+    .student-status[data-status="Pending"] {
+        background-color: yellow;
+    }
+
+    .student-status[data-status="Other"] {
+        background-color: transparent;
+    }
 </style>
 
 <section class="content">
@@ -92,12 +111,10 @@
                                 <th>No.</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
-                                <th>Username</th>
+                                <!-- <th>Username</th> -->
                                 <th>Email</th>
                                 <!-- <th>Profile Pic</th> -->
-                                <th>School Year</th>
-                                <th>Grade Level</th>
-                                <th>Student Status</th>
+                                <th>Status</th>
                                 <!-- <th>Last Login</th>
                                 <th>Date Joined</th> -->
                                 <th>Action</th>
@@ -109,40 +126,39 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ user.first_name }}</td>
                                         <td>{{ user.last_name }}</td>
-                                        <td>{{ user.username }}</td>
+                                        <!-- <td>{{ user.username }}</td> -->
                                         <td>{{ user.email }}</td>
                                         <!-- <td> <img src="{{ student.profile_pic }}" style="width: 100px;" /> </td> -->
-                                        <td>{{ user.session_year }}</td>
-                                        <td>{{ user.grade_level }}</td>
-                                        <td style="background-color: 
-                                        {% if user.student_status == 'Enrolled' %}lightgreen
-                                            {% elif user.student_status == 'Pending' %}yellow
-                                            {% else %}transparent
-                                        {% endif %}; 
-                                                border-radius: 10px; 
-                                                padding: 5px; 
-                                                text-align: center;">
+                                        <td id="student-status-{{ user.id }}" 
+                                            class="student-status" 
+                                            data-status="{{ user.student_status|default:'Other' }}">
                                             {{ user.student_status }}
                                         </td>
                                         <!-- <td>{{ user.last_login }}</td>
                                         <td>{{ user.date_joined }}</td> -->
                                         <td>
-                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
-                                            <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning">Edit</a>
+                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="{% url 'edit_student' user.user_id %}" class="btn btn-warning" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             <a href="{% url 'toggle_student_activation' user.user_id %}" class="btn 
                                                     {% if user.user.is_active %}
                                                         btn-danger
                                                     {% else %}
                                                         btn-success
-                                                    {% endif %}">
+                                                    {% endif %}" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="{% if user.user.is_active %} Deactivate {% else %} Activate {% endif %}">
                                                 {% if user.user.is_active %}
-                                                    Deactivate
+                                                    <i class="fas fa-ban"></i>
                                                 {% else %}
-                                                    Activate
+                                                    <i class="fas fa-check-circle"></i>
                                                 {% endif %}
                                             </a> 
-                                            <!-- <a href="{% url 'delete_student' user.user_id %}" class="btn btn-danger">Delete</a> -->
-                                            <!-- <a href="" class="btn btn-secondary">Archive</a> -->
                                         </td>
                                     </tr>
 

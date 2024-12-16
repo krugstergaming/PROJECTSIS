@@ -80,7 +80,7 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ load.session_year_id.session_start_year.year}} - {{load.session_year_id.session_end_year.year}}</td>
                                         <td>{{ load.curriculum_id.curriculum_name }}</td>
-                                        <td>{{ load.AssignSection_id.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
+                                        <td>{{ load.AssignSection_id.enrollment.GradeLevel_id.GradeLevel_name }} - {{ load.AssignSection_id.section_id.section_name }}</td>
                                         <td>{{ load.subject_id.subject_name }}</td>
                                         <td>{{ load.staff_id.first_name }} {{ load.staff_id.last_name }}</td>
                                         <td>
@@ -97,7 +97,7 @@
                                     </tr>
                                 {% empty %}
                                     <tr>
-                                        <td colspan="6" class="text-center">No records Found.</td>
+                                        <td colspan="8" class="text-center">No records Found.</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

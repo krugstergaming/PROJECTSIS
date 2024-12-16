@@ -50,9 +50,19 @@
                         {% endif %}
 
                         <div class="card-body">
-
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label>Academic Year</label>
+                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                            <option value="">Select a Academic Year</option>
+                                            {% for session_year in session_years %}
+                                                <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="gradelevel">Grade level</label>
                                         <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
@@ -63,7 +73,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Section</label>
                                         <select class="form-control" name="section_id" id="section_id" required disabled>
@@ -71,7 +81,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Classroom</label>
                                         <select class="form-control" name="classroom_id" id="classroom_id">
@@ -79,7 +89,6 @@
                                         </select>
                                     </div>
                                 </div>
-
                             </div>
                             <div class="form-group">
                                 <label>Students</label>
@@ -114,54 +123,78 @@
 {% endblock main_content %}
 
 {% block custom_js %}
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var gradeLevelSelect = document.getElementById('GradeLevel_id');
-        var sectionSelect = document.getElementById('section_id');
-        var studentTableBody = document.getElementById('student_table_body');
+    var gradeLevelSelect = document.getElementById('GradeLevel_id');
+    var sectionSelect = document.getElementById('section_id');
+    var studentTableBody = document.getElementById('student_table_body');
 
-        gradeLevelSelect.addEventListener('change', function() {
-            var selectedGradeLevelId = gradeLevelSelect.value;
+    gradeLevelSelect.addEventListener('change', function() {
+        var selectedGradeLevelId = gradeLevelSelect.value;
 
-            if (!selectedGradeLevelId) {
-                sectionSelect.setAttribute('disabled', true);
-                sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
-                studentTableBody.innerHTML = '';  // Clear table
-                return;
-            }
+        // Clear previous section options and student table
+        sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+        sectionSelect.setAttribute('disabled', true);
+        studentTableBody.innerHTML = '';
 
-            sectionSelect.removeAttribute('disabled');
+        if (!selectedGradeLevelId) {
+            return; // If no grade level is selected, stop here
+        }
 
-            fetch(`/load_sections_and_students/?gradelevel_id=` + selectedGradeLevelId)
-                .then(response => response.json())
-                .then(data => {
+        sectionSelect.removeAttribute('disabled');
+
+        fetch(`/load_sections_and_students/?gradelevel_id=` + selectedGradeLevelId)
+            .then(response => response.json())
+            .then(data => {
+                // Check if sections exist in the response
+                if (data.sections && data.sections.length > 0) {
                     // Populate section dropdown
-                    sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
                     data.sections.forEach(function(section) {
                         var option = document.createElement('option');
                         option.value = section.id;
                         option.textContent = section.name;
-                        sectionSelect.appendChild(option);  
+                        sectionSelect.appendChild(option);
                     });
+                } else {
+                    sectionSelect.innerHTML = '<option value="" disabled>No sections available</option>';
+                }
 
-                    // Populate student table in 3 columns
-                    studentTableBody.innerHTML = ''; // Clear previous rows
-                    let row;
+                // Populate student table in 3 columns
+                studentTableBody.innerHTML = ''; // Clear previous rows
+                let row;
+                if (data.students.length === 0) {
+                    const noStudentsMessage = document.createElement('tr');
+                    const noStudentsCell = document.createElement('td');
+                    noStudentsCell.colSpan = 5;
+                    noStudentsCell.textContent = 'No students available for this grade level';
+                    noStudentsCell.style.textAlign = 'center'; // Center the text
+                    noStudentsCell.style.backgroundColor = 'red'; // Red background
+                    noStudentsCell.style.color = 'white'; // White text for contrast
+                    noStudentsMessage.appendChild(noStudentsCell);
+                    studentTableBody.appendChild(noStudentsMessage);
+                } else {
                     data.students.forEach(function(student, index) {
                         if (index % 5 === 0) {
-                            // Create a new row every 3 students
+                            // Create a new row every 5 students
                             row = document.createElement('tr');
                             studentTableBody.appendChild(row);
                         }
                         // Create a new cell for the student
                         const cell = document.createElement('td');
-                        cell.innerHTML = `
+                        cell.innerHTML = ` 
                             <input type="checkbox" name="student_ids" value="${student.id}" checked>
                             ${student.name}`;
                         row.appendChild(cell);
                     });
-                });
-        });
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                // Show error message or handle as needed
+            });
     });
+});
+
 </script>
 {% endblock custom_js %}

@@ -10,9 +10,60 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<style>
+
+.no-records {
+    background-color: red;
+    color: white; /* Optional: Make the text white for better readability */
+}
+
+</style>
+
 <section class="content">
     <div class="container-fluid">
-
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <a class="btn btn-success" href="{% url 'add_assignsection' %}" role="button">+ Assign Section</a>
+                <button class="btn btn-secondary ml-auto" id="toggle-filters-btn">
+                    Show Filters
+                </button>
+            </div>
+            <div class="card-body" id="filter-fields" style="display: none;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                <option value="">Select an Academic Year</option>
+                                {% for session_year in session_years %}
+                                    <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="gradelevel">Grade Level</label>
+                            <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                <option value="">Select a Grade Level</option>
+                                {% for gradelevel in gradelevels %}
+                                    <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Section</label>
+                            <select class="form-control" name="section_id" id="section_id" required disabled>
+                                <option value="" disabled selected>Select a Section</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         {% if messages %}
         <div class="form-group">
             <div class="col-12">
@@ -27,8 +78,6 @@
             </div>
         </div>
         {% endif %}
-
-        <a class="btn btn-success" href="{% url 'add_assignsection' %}" role="button">+ Assign Section</a> <br/>&nbsp;
 
         <div class="row">
             <div class="col-md-12">
@@ -48,27 +97,27 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="assign_sections_table_body">
                                 {% for assignsection in assignsections %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ assignsection.Student_id.admin.first_name }} {{ assignsection.Student_id.admin.last_name }}</td>
-                                    <td>{{ assignsection.GradeLevel_id.GradeLevel_name }}</td>
+                                    <td>{{ assignsection.enrollment.student_id.admin.first_name }} {{ assignsection.enrollment.student_id.admin.last_name }}</td>
+                                    <td>{{ assignsection.enrollment.GradeLevel_id.GradeLevel_name }}</td>
                                     <td>{{ assignsection.section_id.section_name }}</td>
-                                    <td>{{ assignsection.created_at }}</td>
+                                    <td>{{ assignsection.created_at|date:"Y-m-d" }}</td>
                                     <td>
-                                        <button class="btn btn-warning edit-btn" 
-                                                data-id="{{ assignsection.id }}" 
-                                                data-gradelevel-id="{{ assignsection.GradeLevel_id.id }}" 
-                                                data-gradelevel-name="{{ assignsection.GradeLevel_id.GradeLevel_name }}" 
-                                                data-section="{{ assignsection.section_id.id }}" 
-                                                data-student="{{ assignsection.Student_id.id }}"
-                                                data-toggle="modal" 
-                                                data-target="#editModal">Edit
-                                        </button>
-
-                                        <!-- <a href="" class="btn btn-secondary">Archive</a> -->
-
+                                        <a href="#" 
+                                           class="btn btn-warning edit-btn" 
+                                           data-id="{{ assignsection.id }}" 
+                                           data-gradelevel-id="{{ assignsection.enrollment.GradeLevel_id.id }}" 
+                                           data-gradelevel-name="{{ assignsection.enrollment.GradeLevel_id.GradeLevel_name }}" 
+                                           data-section="{{ assignsection.section_id.id }}" 
+                                           data-student="{{ assignsection.enrollment.student_id.id }}" 
+                                           title="Edit" 
+                                           data-toggle="modal" 
+                                           data-target="#editModal">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 {% empty %}
@@ -79,6 +128,7 @@
                             </tbody>
                         </table>
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -123,38 +173,188 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const editButtons = document.querySelectorAll('.edit-btn');
+        const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+        const filterFields = document.getElementById('filter-fields');
 
-        editButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const id = this.dataset.id;
-                const gradeLevelId = this.dataset.gradelevelId;
-                const gradeLevelName = this.dataset.gradelevelName;
-                const currentSectionId = this.dataset.section;
-
-                // Set the hidden input and grade level text field
-                document.getElementById('assignSectionId').value = id;
-                document.getElementById('gradeLevel').value = gradeLevelName;
-
-                // Fetch sections for the selected grade level
-                fetch(`/get_sections_by_grade/${gradeLevelId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const sectionDropdown = document.getElementById('sectionDropdown');
-                        sectionDropdown.innerHTML = '<option value="">Select Section</option>';
-                        data.sections.forEach(section => {
-                            const option = document.createElement('option');
-                            option.value = section.id;
-                            option.textContent = section.section_name;
-                            if (section.id == currentSectionId) {
-                                option.selected = true;
-                            }
-                            sectionDropdown.appendChild(option);
-                        });
-                    });
-            });
+        toggleFiltersBtn.addEventListener('click', function () {
+            const isHidden = filterFields.style.display === 'none';
+            filterFields.style.display = isHidden ? 'block' : 'none';
+            toggleFiltersBtn.textContent = isHidden ? 'Hide Filters' : 'Show Filters';
         });
     });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const academicYearSelect = document.getElementById('session_year_id');
+    const gradeLevelSelect = document.getElementById('GradeLevel_id');
+    const sectionSelect = document.getElementById('section_id');
+    const assignSectionsTableBody = document.getElementById('assign_sections_table_body');
+
+    // Function to fetch and populate the table
+    function fetchAssignedSections() {
+        const academicYear = academicYearSelect.value || ''; // Default to empty string if not selected
+        const gradeLevel = gradeLevelSelect.value || '';
+        const section = sectionSelect.value || '';
+
+        // Fetch data from the backend, applying filters if provided
+        fetch(`/filter_assign_sections/?academic_year=${academicYear}&grade_level=${gradeLevel}&section=${section}`)
+            .then(response => response.json())
+            .then(data => {
+                assignSectionsTableBody.innerHTML = ''; // Clear previous rows
+                if (data.assignsections.length === 0) {
+                    assignSectionsTableBody.innerHTML = '<tr class="no-records"><td colspan="6" class="text-center">No records found.</td></tr>';
+                    return;
+                }
+
+                // Populate the table with records
+                data.assignsections.forEach((assign, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${assign.student_name}</td>
+                        <td>${assign.grade_level_name}</td>
+                        <td>${assign.section_name}</td>
+                        <td>${assign.date_assigned}</td>
+                        <td>
+                            <a href="#" 
+                            class="btn btn-warning edit-btn" 
+                            data-id="${assign.id}" 
+                            data-gradelevel-id="${assign.grade_level_id}" 
+                            data-gradelevel-name="${assign.grade_level_name}" 
+                            data-section="${assign.section_id}" 
+                            title="Edit" 
+                            data-toggle="modal" 
+                            data-target="#editModal">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>`;
+                    assignSectionsTableBody.appendChild(row);
+                });
+            });
+    }
+
+    // Fetch all records on page load
+    fetchAssignedSections();
+
+    // Event listeners for filtering
+    [academicYearSelect, gradeLevelSelect, sectionSelect].forEach(select => {
+        select.addEventListener('change', fetchAssignedSections);
+    });
+});
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var gradeLevelSelect = document.getElementById('GradeLevel_id');
+        var sectionSelect = document.getElementById('section_id');
+        var studentTableBody = document.getElementById('student_table_body');
+
+        gradeLevelSelect.addEventListener('change', function() {
+            var selectedGradeLevelId = gradeLevelSelect.value;
+
+            if (!selectedGradeLevelId) {
+                sectionSelect.setAttribute('disabled', true);
+                sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                studentTableBody.innerHTML = '';  // Clear table
+                return;
+            }
+
+            sectionSelect.removeAttribute('disabled');
+
+            fetch(`/load_sections_and_students/?gradelevel_id=` + selectedGradeLevelId)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate section dropdown
+                    sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+                    data.sections.forEach(function(section) {
+                        var option = document.createElement('option');
+                        option.value = section.id;
+                        option.textContent = section.name;
+                        sectionSelect.appendChild(option);  
+                    });
+
+                    // Populate student table in 3 columns
+                    studentTableBody.innerHTML = ''; // Clear previous rows
+                    let row;
+                    data.students.forEach(function(student, index) {
+                        if (index % 5 === 0) {
+                            // Create a new row every 3 students
+                            row = document.createElement('tr');
+                            studentTableBody.appendChild(row);
+                        }
+                        // Create a new cell for the student
+                        const cell = document.createElement('td');
+                        cell.innerHTML = `
+                            <input type="checkbox" name="student_ids" value="${student.id}" checked>
+                            ${student.name}`;
+                        row.appendChild(cell);
+                    });
+                });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const assignSectionsTableBody = document.getElementById('assign_sections_table_body');
+    const modal = document.getElementById('editModal');
+    const sectionDropdown = document.getElementById('sectionDropdown');
+
+    // Event delegation for edit buttons
+    assignSectionsTableBody.addEventListener('click', function (e) {
+        if (e.target.closest('.edit-btn')) {
+            const button = e.target.closest('.edit-btn');
+            const id = button.getAttribute('data-id');
+            const gradeLevelId = button.getAttribute('data-gradelevel-id');
+            const gradeLevelName = button.getAttribute('data-gradelevel-name');
+            const sectionId = button.getAttribute('data-section');
+
+            // Populate modal fields
+            document.getElementById('assignSectionId').value = id;
+            document.getElementById('gradeLevel').value = gradeLevelName;
+
+            // Fetch sections based on grade level
+            fetchSectionsByGrade(gradeLevelId, sectionId);
+        }
+    });
+
+    // Function to fetch sections dynamically based on grade level
+    function fetchSectionsByGrade(gradeLevelId, currentSectionId) {
+        if (!gradeLevelId) return; // Skip fetch if gradeLevelId is not provided or empty
+
+        fetch(`/get_sections_by_grade/${gradeLevelId}/`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error("Failed to fetch sections:", response);
+                    return { sections: [] }; // Fallback in case of failure
+                }
+            })
+            .then(data => {
+                sectionDropdown.innerHTML = '<option value="">Select Section</option>';
+                data.sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.id;
+                    option.textContent = section.section_name;
+
+                    // Mark the current section as selected
+                    if (section.id == currentSectionId) {
+                        option.selected = true;
+                    }
+                    sectionDropdown.appendChild(option);
+                });
+            });
+    }
+
+    // Optionally, fetch sections when the modal is shown (with no grade level or based on some default)
+    $('#editModal').on('show.bs.modal', function () {
+        const gradeLevelId = document.getElementById('gradeLevel').value;
+        const sectionId = sectionDropdown.value; // Use selected section if any
+        fetchSectionsByGrade(gradeLevelId, sectionId); // Trigger section population when modal opens
+    });
+});
 </script>
 
 

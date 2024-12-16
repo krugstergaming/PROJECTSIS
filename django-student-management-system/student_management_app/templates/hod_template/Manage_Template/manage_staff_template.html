@@ -146,21 +146,32 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}">Details</a>
-                                            <a href="{% url 'edit_staff' staff_id=user.user_id %}" class="btn btn-warning">Edit</a>
+                                            <a href="#" class="btn btn-info" style="color: black;" data-bs-toggle="modal" data-bs-target="#userModal-{{ user.user_id }}" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Details">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a>
+                                            <a href="{% url 'edit_staff' staff_id=user.user_id %}" class="btn btn-warning" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             <a href="{% url 'toggle_user_activation' user.user_id %}" class="btn 
+                                                    {% if user.user.is_active %}
+                                                        btn-danger
+                                                    {% else %}
+                                                        btn-success
+                                                    {% endif %}" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="{% if user.user.is_active %} Deactivate {% else %} Activate {% endif %}">
                                                 {% if user.user.is_active %}
-                                                    btn-danger
+                                                    <i class="fas fa-ban"></i>
                                                 {% else %}
-                                                    btn-success
-                                                {% endif %}">
-                                                {% if user.user.is_active %}
-                                                    Deactivate
-                                                {% else %}
-                                                    Activate
+                                                    <i class="fas fa-check-circle"></i>
                                                 {% endif %}
                                             </a>
-                                            <!-- <a href="" class="btn btn-secondary">Archive</a> -->
+                                            <a href="" class="btn btn-secondary" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Archive">
+                                                <i class="fas fa-archive"></i>
+                                            </a>
                                         </td>
                                     </tr>
 

@@ -51,7 +51,18 @@
                         <div class="card-body">
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Academic Year</label>
+                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                            <option value="">Select a Academic Year</option>
+                                            {% for session_year in session_years %}
+                                                <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="gradelevel">Grade Level</label>
                                         <select class="form-control" name="gradelevel_id" id="gradelevel_id" required>
@@ -62,7 +73,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="section">Section</label>
                                         <select class="form-control" name="section_id" id="section_id" required disabled>
@@ -71,9 +82,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-
-                            
 
                             <div class="form-group">
                                 <label for="next_gradelevel">Next Grade Level</label>
@@ -99,9 +107,9 @@
                                 </table>
                             </div>
                         </div>
-
                         <div class="card-footer">
                             <button type="submit" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_enrollment' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
                 </div>
