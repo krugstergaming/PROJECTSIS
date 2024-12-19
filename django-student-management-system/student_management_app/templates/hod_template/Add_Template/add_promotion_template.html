@@ -15,6 +15,8 @@
                 <div class="card card-success">
                     <div class="card-header">
                     </div>
+                    
+                    
                     <form role="form" method="POST" action="{% url 'add_promotion_save' %}">
                         {% csrf_token %}
                         {% if messages %}
@@ -48,13 +50,25 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div class="card-body">
 
+                        
+                        <div class="card-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Academic Year</label>
+                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                            <option value="">Select a Academic Year</option>
+                                            {% for session_year in session_years %}
+                                                <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="gradelevel">Grade Level</label>
-                                        <select class="form-control" name="gradelevel_id" id="gradelevel_id" required>
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
                                             <option value="">Select Grade Level</option>
                                             {% for gradelevel in gradelevels %}
                                                 <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
@@ -62,7 +76,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="section">Section</label>
                                         <select class="form-control" name="section_id" id="section_id" required disabled>
@@ -71,27 +85,35 @@
                                     </div>
                                 </div>
                             </div>
-                            
 
-                            
-
-                            <div class="form-group">
-                                <label for="next_gradelevel">Next Grade Level</label>
-                                <select class="form-control" name="next_gradelevel_id" id="next_gradelevel_id" required>
-                                    <option value="">Select Grade Level</option>
-                                    {% for gradelevel in all_gradelevels %}
-                                        <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Next Academic Year</label>
+                                        <select class="form-control" name="next_session_year_id" id="next_session_year_id" required>
+                                            <option value="">Select a Academic Year</option>
+                                            {% for session_year in session_years %}
+                                                <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="next_gradelevel">Next Grade Level</label>
+                                        <select class="form-control" name="next_gradelevel_id" id="next_gradelevel_id" required>
+                                            <option value="">Select Grade Level</option>
+                                            {% for gradelevel in all_gradelevels %}
+                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-
                             <div class="form-group">
                                 <label>Students</label>
                                 <table class="table table-bordered" id="student_table">
                                     <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                        </tr>
                                     </thead>
                                     <tbody id="student_table_body">
                                         <!-- Student rows will be populated here -->
@@ -99,9 +121,9 @@
                                 </table>
                             </div>
                         </div>
-
                         <div class="card-footer">
                             <button type="submit" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_enrollment' %}" class="btn btn-secondary">Back</a>
                         </div>
                     </form>
                 </div>
@@ -115,100 +137,127 @@
 {% block custom_js %}
 
 <script>
-    // Filter Next Grade Level options based on Grade Level selection
-    document.getElementById("gradelevel_id").addEventListener("change", function () {
-        const selectedGradeLevel = this.value;
-        const nextGradeLevelDropdown = document.getElementById("next_gradelevel_id");
-
-        // Show all options except the selected one
-        Array.from(nextGradeLevelDropdown.options).forEach(option => {
-            if (option.value === selectedGradeLevel) {
-                option.style.display = "none"; // Hide the selected grade level
-            } else {
-                option.style.display = "block"; // Show all other options
-            }
-        });
-
-        // Reset the Next Grade Level selection
-        nextGradeLevelDropdown.value = "";
-    });
-</script>
-
-<script>
     document.addEventListener('DOMContentLoaded', function() {
-        const gradeLevelSelect = document.getElementById('gradelevel_id');
-        const sectionSelect = document.getElementById('section_id');
-        const nextGradeLevelSelect = document.getElementById('next_gradelevel_id');
-        const studentTableBody = document.getElementById('student_table_body');
+        var gradeLevelSelect = document.getElementById('GradeLevel_id');
+        var sectionSelect = document.getElementById('section_id');
+        var sessionYearSelect = document.getElementById('session_year_id');
+        var studentTableBody = document.getElementById('student_table_body');
 
-        // Function to handle enabling/disabling Next Grade Level dropdown
-        const toggleNextGradeLevel = () => {
-            if (gradeLevelSelect.value && sectionSelect.value) {
-                nextGradeLevelSelect.removeAttribute('disabled');
-            } else {
-                nextGradeLevelSelect.setAttribute('disabled', true);
-            }
-        };
-
-        // When the Grade Level is changed
         gradeLevelSelect.addEventListener('change', function() {
-            const selectedGradeLevelId = gradeLevelSelect.value;
+            var selectedGradeLevelId = gradeLevelSelect.value;
+            var selectedSessionYearId = sessionYearSelect.value;
+            var selectedSectionId = sectionSelect.value;  // Get the section (which can be empty initially)
 
-            // Disable the Next Grade Level until both Grade Level and Section are selected
-            toggleNextGradeLevel();
+            // Clear previous section options and student table
+            sectionSelect.innerHTML = '<option value="" disabled selected>Select a Section</option>';
+            sectionSelect.setAttribute('disabled', true);
+            studentTableBody.innerHTML = '';
 
-            if (!selectedGradeLevelId) {
-                sectionSelect.setAttribute('disabled', true);
-                return;
+            if (!selectedGradeLevelId || !selectedSessionYearId) {
+                return; // If no grade level or session year is selected, stop here
             }
 
-            // Fetch and populate sections based on selected Grade Level
-            fetch(`/promote_sections_and_students/?gradelevel_id=${selectedGradeLevelId}`)
+            // Fetch sections for the selected grade level and session year
+            fetch(`/load_promotion/?session_year_id=${selectedSessionYearId}&gradelevel_id=${selectedGradeLevelId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);  // Log the response data to check if sections are coming through
-                    sectionSelect.innerHTML = '<option value="" disabled selected>Select Section</option>';
-                    data.sections.forEach(section => {
-                        const option = document.createElement('option');
-                        option.value = section.id;
-                        option.textContent = section.name;
-                        sectionSelect.appendChild(option);
-                    });
-                    sectionSelect.removeAttribute('disabled');
-
-                    // Clear the student table if no section is selected yet
-                    studentTableBody.innerHTML = '';
+                    // Populate section dropdown
+                    if (data.sections && data.sections.length > 0) {
+                        sectionSelect.removeAttribute('disabled');
+                        data.sections.forEach(function(section) {
+                            var option = document.createElement('option');
+                            option.value = section.id;
+                            option.textContent = section.name;
+                            sectionSelect.appendChild(option);
+                        });
+                    } else {
+                        sectionSelect.innerHTML = '<option value="" disabled>No sections available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching sections:", error);
+                    // Handle error
                 });
         });
 
-        // When the Section is changed
         sectionSelect.addEventListener('change', function() {
-            const gradeLevelId = gradeLevelSelect.value;
-            const sectionId = sectionSelect.value;
+            var selectedGradeLevelId = gradeLevelSelect.value;
+            var selectedSessionYearId = sessionYearSelect.value;
+            var selectedSectionId = sectionSelect.value;
 
-            // Enable the Next Grade Level dropdown if both Grade Level and Section are selected
-            toggleNextGradeLevel();
+            if (!selectedSectionId) {
+                return; // Ensure that the user selects a section before proceeding
+            }
 
-            if (gradeLevelId && sectionId) {
-                // Fetch and populate students based on selected Grade Level and Section
-                fetch(`/promote_sections_and_students/?gradelevel_id=${gradeLevelId}&section_id=${sectionId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Populate student table
-                        studentTableBody.innerHTML = '';  // Clear existing rows
-                        data.students.forEach(student => {
-                            var row = document.createElement('tr');
+            // Clear previous student table
+            studentTableBody.innerHTML = '';
+
+            // Fetch students for the selected grade level, session year, and section
+            fetch(`/load_promotion/?session_year_id=${selectedSessionYearId}&gradelevel_id=${selectedGradeLevelId}&section_id=${selectedSectionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Create the table header
+                    const tableHeader = `
+                        <tr>
+                            <th style="width: 3%;">
+                                <input type="checkbox" id="select_all" onclick="toggleSelectAll(this)">
+                            </th>
+                            <th style="width: 5%;">No.</th>
+                            <th style="width: 25%;">Student Number</th>
+                            <th style="width: 25%;">Full Name</th>
+                            <th>Student Status</th>
+                            <th>Enrollment Status</th>
+                        </tr>
+                    `;
+                    studentTableBody.innerHTML = tableHeader; // Set the table header
+
+                    // Populate student table with students for the selected grade level and section
+                    if (data.students && data.students.length > 0) {
+                        data.students.forEach(function(student, index) {
+                            let row = document.createElement('tr');
+
+                            // Create cells for each student
                             row.innerHTML = `
                                 <td>
-                                    <input type="checkbox" name="student_ids" value="${student.id}" checked>
-                                    ${student.name}
+                                    <input type="checkbox" name="student_ids" value="${student.id}" class="student_checkbox">
                                 </td>
+                                <td>${index + 1}</td>
+                                <td>${student.student_number}</td>
+                                <td>${student.last_name}, ${student.first_name} ${student.middle_name ? student.middle_name.charAt(0) + '.' : ''} </td>
+                                <td>${student.student_status}</td>
+                                <td>${student.enrollment_status}</td> 
                             `;
+
+                            // Append the row to the table body
                             studentTableBody.appendChild(row);
                         });
-                    });
-            }
+                    } else {
+                        const noStudentsMessage = document.createElement('tr');
+                        const noStudentsCell = document.createElement('td');
+                        noStudentsCell.colSpan = 6;
+                        noStudentsCell.textContent = 'No students available for this grade level';
+                        noStudentsCell.style.textAlign = 'center'; // Center the text
+                        noStudentsCell.style.backgroundColor = 'red'; // Red background
+                        noStudentsCell.style.color = 'white'; // White text for contrast
+                        noStudentsMessage.appendChild(noStudentsCell);
+                        studentTableBody.appendChild(noStudentsMessage);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching students:", error);
+                    // Handle error
+                });
         });
     });
+
+    // Function to toggle 'Select All' checkbox state
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.student_checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
 </script>
+
+
 {% endblock custom_js %}

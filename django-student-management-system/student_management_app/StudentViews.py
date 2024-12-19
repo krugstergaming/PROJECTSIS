@@ -5,7 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 import datetime 
 import math
-from student_management_app.models import CustomUser, Staffs, Enrollment, BalancePayment, GradeLevel, School_info, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+from student_management_app.models import CustomUser, Staffs, Enrollment, GradeLevel, School_info, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
 
 
 def student_home(request):
@@ -197,9 +197,15 @@ def student_view_result(request):
         academic_year = result.load_id.session_year_id
         if academic_year not in results_by_year:
             results_by_year[academic_year] = {'results': [], 'general_averages': []}
-        # Append results and general averages
+
+        # Append results and general averages (exclude general_average if a quarter has a zero)
+        if (result.subject_first_quarter == 0 or result.subject_second_quarter == 0 or 
+            result.subject_third_quarter == 0 or result.subject_fourth_quarter == 0):
+            result.general_average = " "  # Don't pass the general average
+        else:
+            results_by_year[academic_year]['general_averages'].append(result.general_average)
+
         results_by_year[academic_year]['results'].append(result)
-        results_by_year[academic_year]['general_averages'].append(result.general_average)
 
     # Calculate general averages and apply rounding
     for academic_year, data in results_by_year.items():
@@ -208,8 +214,8 @@ def student_view_result(request):
             if result.subject_final_grade is not None:
                 result.subject_final_grade = math.ceil(result.subject_final_grade)
 
-        # Calculate general average and round up
-        general_average = sum(data['general_averages']) / len(data['general_averages']) if data['general_averages'] else 0
+        # Calculate general average and round up, but exclude None values from general averages
+        general_average = sum([avg for avg in data['general_averages'] if avg is not None]) / len([avg for avg in data['general_averages'] if avg is not None]) if data['general_averages'] else 0
         data['general_average'] = math.ceil(general_average)
 
     # Sort results_by_year by academic year in descending order
@@ -239,6 +245,7 @@ def student_view_result(request):
     }
 
     return render(request, "student_template/student_view_result.html", context)
+
 
 def student_view_schedule(request):
     # Get the student object for the currently logged-in user
@@ -293,16 +300,6 @@ def student_view_schedule(request):
                 last_subject_code = subject_code
                 last_description = description
 
-        # Track visible rows for numbering
-        for academic_year, schedules in sorted_schedules_by_year.items():
-            row_counter = 1  # Initialize row counter for visible rows
-            for schedule in schedules:
-                if schedule.show_grade_section or schedule.show_subject_code or schedule.show_description:
-                    schedule.row_number = row_counter
-                    row_counter += 1
-                else:
-                    schedule.row_number = None  # Hide the row number if the row is empty
-
         context = {
             "schedules_by_year": sorted_schedules_by_year,
             "student": student,
@@ -325,13 +322,10 @@ def student_view_account(request):
     # Query the enrollment record associated with the student
     enrollment = Enrollment.objects.filter(student_id=student).first()
     
-    # Query the balance payment records associated with the enrollment
-    balance_payments = BalancePayment.objects.filter(enrollment=enrollment).order_by('-payment_balance_date') if enrollment else None
 
     # Check if the student has an enrollment record
     context = {
         "enrollment": enrollment,
-        "balance_payments": balance_payments,
         "message": "No enrollment or payment records found." if not enrollment else None
     }
 

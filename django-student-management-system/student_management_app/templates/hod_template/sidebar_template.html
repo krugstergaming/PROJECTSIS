@@ -75,8 +75,7 @@
                 </p>
               </a>
             </li>
-              
-
+            
             <!-- Class Scheduling Management -->
             <li class="nav-item has-treeview 
               {% if request.path == add_schedule or request.path == manage_class_scheduling or request.path == edit_schedule or request.path == add_assignsection or request.path == manage_assign_section or request.path == add_load or request.path == manage_load_scheduling %} 
@@ -136,18 +135,6 @@
                 </li>
               </ul>
             </li>
-
-            <li class="nav-item">
-              {% url 'add_promotion' as add_promotion %}
-              <a href="{{ add_promotion }}" class="nav-link 
-                {% if request.path == add_promotion or request.path == add_promotion %} 
-                  active 
-                {% endif %}">
-                <i class="nav-icon fas fa-list"></i>
-                <p>Student Promotion</p>
-              </a>
-            </li>
-
 
             <!-- System Configuration -->
             <li class="nav-item has-treeview {% if request.path == add_session or request.path == add_curriculum or request.path == add_gradelevel or request.path == add_subject or request.path == add_section or request.path == add_enrollment %} menu-open {% endif %}">

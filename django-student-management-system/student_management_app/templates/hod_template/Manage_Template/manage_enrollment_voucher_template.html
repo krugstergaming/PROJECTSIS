@@ -63,7 +63,10 @@
                                         <td>{{ enrollment_voucher.created_at|date:"Y-m-d H:i" }}</td>
                                         <td>{{ enrollment_voucher.updated_at|date:"Y-m-d H:i" }}</td>
                                         <td>
-                                            <a href="{% url 'edit_enrollment' enrollment_id=enrollment_voucher.id %}" class="btn btn-warning">Edit</a>
+                                            <a href="{% url 'edit_enrollment' enrollment_id=enrollment_voucher.id %}" 
+                                                class="btn btn-warning"data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% empty %}

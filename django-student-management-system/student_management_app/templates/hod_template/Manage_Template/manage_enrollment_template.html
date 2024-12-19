@@ -60,7 +60,7 @@
         background-color: red;
         color: white;
     }
-    </style>
+</style>
 
 <section class="content">
     <div class="container-fluid">
@@ -88,6 +88,51 @@
             </div>
         {% endif %}
 
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <a class="btn btn-success" href="{% url 'add_admission' %}" role="button">Admission</a>
+                <a class="btn btn-success ml-3" href="{% url 'add_promotion' %}" role="button">Promote</a>
+                <a class="btn btn-danger ml-3" href="" role="button">LOE/Drop/Transfer</a>
+                <button class="btn btn-secondary ml-auto" id="toggle-filters-btn">
+                    Show Filters
+                </button>
+            </div>
+            <div class="card-body" id="filter-fields" style="display: none;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                <option value="">Select an Academic Year</option>
+                                {% for session_year in session_years %}
+                                    <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="gradelevel">Grade Level</label>
+                            <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                <option value="">Select a Grade Level</option>
+                                {% for gradelevel in gradelevels %}
+                                    <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Section</label>
+                            <select class="form-control" name="section_id" id="section_id" required disabled>
+                                <option value="" disabled selected>Select a Section</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -109,9 +154,10 @@
                                     <th>No. </th>
                                     <th>Student Name</th>
                                     <th>Grade Level</th>
-                                    <th>Enrollment Status</th>
-                                    <th>Date Enrolled</th>
-                                    <th>Date Updated</th>
+                                    <th>Enrollment Status</th> <!-- Column for Enrollment Status -->
+                                    <th>Student Status</th>
+                                    <!-- <th>Date Enrolled</th>
+                                    <th>Date Updated</th> -->
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -120,14 +166,35 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
-                                        <td>{{ student.GradeLevel_id.GradeLevel_name }}</td>
-                                        <td>{{ student.student_status }}</td>
-                                        <td>{{ student.created_at|date:"M d, Y" }}</td>
-                                        <td>{{ student.updated_at|date:"M d, Y" }}</td>
+                                        <td>{{ student.grade_level_name }}</td>  <!-- Display the grade level -->
                                         <td>
-                                            <button type="button" class="btn btn-info" onclick="printReceipt({{ student.id }})">Print</button>
+                                            {% if student.enrollment_status %}
+                                                {{ student.enrollment_status }}  <!-- Display Enrollment Status -->
+                                            {% else %}
+                                                No status
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ student.student_status }}</td>
+                                        <!-- <td>{{ student.created_at|date:"M d, Y" }}</td>
+                                        <td>{{ student.updated_at|date:"M d, Y" }}</td> -->
+                                        <td>
+                                            <a href="#" 
+                                               class="btn btn-info" 
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="top" 
+                                               title="Print" 
+                                               onclick="printReceipt({{ student.id }})">
+                                                <i class="fas fa-print"></i>
+                                            </a>
                                             <input type="hidden" name="student_id" value="{{ student.id }}">
-                                            <button type="button" class="btn btn-warning" onclick="showModal({{ student.id }})">Update Status</button>
+                                            <a href="#" 
+                                               class="btn btn-warning" 
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="top" 
+                                               title="Update Status" 
+                                               onclick="showModal({{ student.id }})">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% empty %}
@@ -137,6 +204,12 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-success" onclick="confirmPrintBatchReceipts()">
+                                Print All Receipts
+                            </button>
+                        </div>
 
                         {% for student in students %}
                             <!-- Modal for Student Receipt Details -->
@@ -296,26 +369,12 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                                Close
-                                            </button>
-                                            <!-- Print Button for Individual Receipt -->
-                                            <button type="button" class="btn btn-primary" onclick="printReceipt('{{ student.id }}')">
-                                                Print Receipt
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         {% endfor %} 
                     </div>
                 </div>
-                <!-- Batch Print Button -->
-                <button type="button" class="btn btn-success" onclick="confirmPrintBatchReceipts()">
-                    Print All Receipts
-                </button>
-                <!-- /.card -->
             </div>
         </div>
     </div><!-- /.container-fluid -->
@@ -324,6 +383,20 @@
 
 <script>
     document.cookie = "csrftoken={{ csrf_token }}";
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+        const filterFields = document.getElementById('filter-fields');
+
+        toggleFiltersBtn.addEventListener('click', function () {
+            const isHidden = filterFields.style.display === 'none';
+            filterFields.style.display = isHidden ? 'block' : 'none';
+            toggleFiltersBtn.textContent = isHidden ? 'Hide Filters' : 'Show Filters';
+        });
+    });
 </script>
 
 <!-- Confirmation Modal -->

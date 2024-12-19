@@ -1190,15 +1190,12 @@ def add_student_save(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         username = request.POST.get('username')
+        email = request.POST.get('email')
+        
         middlename = request.POST.get('middle_name')
-
         suffix = request.POST.get("suffix")
         nickname = request.POST.get("nickname")
-
-        email = request.POST.get('email')
         address = request.POST.get('address')
-        session_year_id = request.POST.get('session_year_id')
-        GradeLevel_id = request.POST.get('GradeLevel_id')
         sex = request.POST.get('sex')
         age = request.POST.get('age')
         dob = request.POST.get('dob')
@@ -1240,20 +1237,12 @@ def add_student_save(request):
             last_name=last_name, 
             user_type=3
         )
-        user.students.student_number = student_number  # Set student_number
-        user.students.address = address
-
-        # Assign GradeLevel and Session Year
-        gradelevel_obj = GradeLevel.objects.get(id=GradeLevel_id)
-        session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-        user.students.GradeLevel_id = gradelevel_obj
-        user.students.session_year_id = session_year_obj
-
-        # Additional Student Details
+        user.students.student_number = student_number  
         user.students.middle_name = middlename
         user.students.suffix = suffix
         user.students.nickname = nickname
         user.students.sex = sex
+        user.students.address = address
         user.students.profile_pic = profile_pic_url
         user.students.age = age
         user.students.dob = dob
@@ -1313,21 +1302,22 @@ def manage_student(request):
 
     all_users = []
 
-    # Retrieve and structure data for Staffs
+    # Retrieve and structure data for Students
     for student in students:
+        # Retrieve the enrollment record for the student
+        enrollment = Enrollment.objects.filter(student_id=student).first()
+
         # Retrieve associated user data
         student_data = {
             'user': student.admin,
             'user_id': student.admin.id,
-            'first_name': student.admin.first_name,  # Access first_name from CustomUser
-            'last_name': student.admin.last_name,    # Access last_name from CustomUser
-            'username': student.admin.username,      # Access username from CustomUser
-            'email': student.admin.email,            # Access email from CustomUser
-            'last_login': student.admin.last_login,  # Access last_login from CustomUser
-            'date_joined': student.admin.date_joined, # Access date_joined from CustomUser
-            'user_type': student.admin.user_type,    # Access user_type from CustomUser
-            'grade_level': student.GradeLevel_id.GradeLevel_name,  # Assuming 'GradeLevel_name' is a field in the GradeLevel model
-            'session_year': f"{student.session_year_id.session_start_year.year}-{student.session_year_id.session_end_year.year}",  # Example of combining the start and end year
+            'first_name': student.admin.first_name,  
+            'last_name': student.admin.last_name,    
+            'username': student.admin.username,      
+            'email': student.admin.email,            
+            'last_login': student.admin.last_login,  
+            'date_joined': student.admin.date_joined, 
+            'user_type': student.admin.user_type,
             'student_number': student.student_number,
             'middle_name': student.middle_name,
             'suffix': student.suffix,
@@ -1347,6 +1337,12 @@ def manage_student(request):
             'parent_guardian': ParentGuardian.objects.filter(students_id=student).first(),
             'previous_school': PreviousSchool.objects.filter(students_id=student).first(),
             'emergency_contact': EmergencyContact.objects.filter(students_id=student).first(),
+            'grade_level': enrollment.GradeLevel_id.GradeLevel_name if enrollment else None,
+            'session_year': (
+                f"{enrollment.session_year_id.session_start_year.year}-{enrollment.session_year_id.session_end_year.year}"
+                if enrollment else None
+            ),
+            'enrollment': enrollment,
         }
         all_users.append(student_data)
 
@@ -1354,6 +1350,7 @@ def manage_student(request):
         'all_users': all_users
     }
     return render(request, 'hod_template/Manage_Template/manage_student_template.html', context)
+
 
 def toggle_student_activation(request, user_id):
     user = get_user_model().objects.get(id=user_id)
@@ -1416,15 +1413,22 @@ def add_enrollment_save(request):
     return redirect('add_enrollment')
 
 def manage_enrollment(request):
-    # Filter students with "Pending" status
-    students = Students.objects.filter(student_status="Pending")
+    # Filter students with "Pending" enrollment status
+    students = Students.objects.filter(
+        enrollment__enrollment_status="Pending"
+    ).distinct()  # Ensure we only get students with a "Pending" enrollment status
 
     # Create a dictionary of vouchers by GradeLevel_id
     enrollment_vouchers = {voucher.GradeLevel_id.id: voucher for voucher in Enrollment_voucher.objects.all()}
 
-    # Annotate each student with the relevant voucher
+    # Annotate each student with the relevant voucher and grade level based on GradeLevel_id
     for student in students:
-        student.voucher = enrollment_vouchers.get(student.GradeLevel_id.id)
+        # Get the corresponding enrollment for the student to check the GradeLevel_id
+        enrollment = Enrollment.objects.filter(student_id=student.id, enrollment_status="Pending").first()
+        if enrollment:
+            student.voucher = enrollment_vouchers.get(enrollment.GradeLevel_id.id)
+            student.grade_level_name = enrollment.GradeLevel_id.GradeLevel_name  # Add grade level to student
+            student.enrollment_status = enrollment.enrollment_status  # Add enrollment status to student
 
     school = School_info.objects.first()
     context = {
@@ -1444,12 +1448,18 @@ def update_student_status(request):
                 # Find the student by ID
                 student = Students.objects.get(id=student_id)
                 
-                # Update the student status
-                student.student_status = 'Enrolled'  # You can set your desired status
-                student.save()
+                # Find the enrollment record for the student
+                enrollment = Enrollment.objects.filter(student_id=student).first()
+                
+                if enrollment:
+                    # Update the enrollment status
+                    enrollment.enrollment_status = 'Enrolled'  # Update enrollment status
+                    enrollment.save()
 
-                # Add a success message to be shown after redirection
-                messages.success(request, 'Status updated successfully.')
+                    # Add a success message to be shown after redirection
+                    messages.success(request, 'Enrollment status updated successfully.')
+                else:
+                    messages.error(request, 'Enrollment record not found for this student.')
 
                 # Redirect to a page, like managing the enrollment
                 return redirect('manage_enrollment')
@@ -1468,9 +1478,15 @@ def update_student_status(request):
         student_id = request.POST.get('student_id')
         try:
             student = Students.objects.get(id=student_id)
-            student.student_status = "Enrolled"
-            student.save()
-            messages.success(request, 'Status updated successfully.')
+            # Find the enrollment record for the student
+            enrollment = Enrollment.objects.filter(student_id=student).first()
+            
+            if enrollment:
+                enrollment.enrollment_status = "Enrolled"  # Update enrollment status
+                enrollment.save()
+                messages.success(request, 'Enrollment status updated successfully.')
+            else:
+                messages.error(request, 'Enrollment record not found for this student.')
         except Students.DoesNotExist:
             messages.error(request, 'Student not found.')
 
@@ -1527,83 +1543,6 @@ def edit_enrollment_save(request, enrollment_id):
         # If there was an error, redirect back to the edit enrollment page
         return HttpResponseRedirect(reverse("edit_enrollment", kwargs={"enrollment_id": enrollment_id}))
 
-def update_balance(request, enrollment_id=None):
-    # Fetch enrollment based on enrollment_id
-    enrollment = get_object_or_404(Enrollment, id=enrollment_id)
-
-    if request.method == 'POST':
-        # Get form data from POST request
-        payment_balance_amount = request.POST.get('payment_balance_amount')
-        payment_balance_date = request.POST.get('payment_balance_date')
-        payment_balance_remarks = request.POST.get('payment_balance_remarks')
-
-        try:
-            # Remove commas and convert to Decimal
-            payment_balance_amount = Decimal(payment_balance_amount.replace(',', ''))
-
-            # Store previous balance
-            past_balance = enrollment.balance
-
-            # Update the balance (ensure both are Decimal for arithmetic)
-            enrollment.balance -= payment_balance_amount
-            enrollment.save()
-
-            # Create a new payment record with past balance
-            BalancePayment.objects.create(
-                enrollment=enrollment,
-                payment_balance_amount=payment_balance_amount,
-                payment_balance_date=payment_balance_date,
-                payment_balance_remarks=payment_balance_remarks,
-                past_balance=past_balance
-            )
-
-            # Success message
-            messages.success(request, f'Balance updated successfully. Current balance: {enrollment.balance:.2f}, Past balance: {past_balance:.2f}')
-            return redirect('manage_enrollment')
-
-        except IntegrityError:
-            messages.error(request, 'There was an error updating the balance. Please try again.')
-        except Exception as e:
-            messages.error(request, f'An unexpected error occurred: {str(e)}')
-
-    return render(request, 'hod_template/Manage_Template/manage_enrollment_template.html', {
-        'enrollment': enrollment,
-        'enrollments': Enrollment.objects.all(),
-    })  
-
-def promote_students(request):
-    if request.method == "POST":
-        current_grade_id = request.POST.get('current_grade')
-        next_grade_id = request.POST.get('next_grade')
-        
-        try:
-            current_grade = GradeLevel.objects.get(id=current_grade_id)
-            next_grade = GradeLevel.objects.get(id=next_grade_id)
-            
-            # Get all students in the current grade
-            students_to_promote = Students.objects.filter(GradeLevel_id=current_grade)
-            
-            # Create a promotion history for each student
-            for student in students_to_promote:
-                StudentPromotionHistory.objects.create(
-                    student=student,
-                    previous_grade=current_grade,
-                    new_grade=next_grade,
-                    promotion_date=timezone.now()
-                )
-
-            # Promote students to the next grade
-            students_to_promote.update(GradeLevel_id=next_grade)
-            
-            messages.success(request, f"All students have been promoted from {current_grade.name} to {next_grade.name}.")
-        except Exception as e:
-            messages.error(request, f"Failed to promote students. Error: {e}")
-        
-    return redirect('students_list')
-
-def view_promotion_history(request, student_id):
-    promotion_history = StudentPromotionHistory.objects.filter(student_id=student_id)
-    return render(request, 'view_promotion_history.html', {'promotion_history': promotion_history})
 
 def edit_student(request, student_id):
     student = get_object_or_404(Students, id=student_id)
@@ -1838,7 +1777,6 @@ def edit_section_save(request):
             messages.error(request, "Failed to Update Section.")
             return HttpResponseRedirect(reverse("edit_section", kwargs={"section_id":section_id}))
             
-
 def add_subject(request):
     curriculums = Curriculums.objects.all()
     gradelevels = GradeLevel.objects.all()
@@ -2030,147 +1968,192 @@ def delete_subject(request, subject_id):
         return redirect('manage_subject')
 
 def add_promotion(request):
-    # Filter grade levels for students eligible for promotion
-    eligible_students = Students.objects.filter(
-        student_status="Enrolled",
-        id__in=StudentResult.objects.filter(general_average__gte=75).values_list('student_id', flat=True)
-    )
-
-    # Grade levels associated with eligible students
-    gradelevels = GradeLevel.objects.filter(
-        id__in=eligible_students.values_list('GradeLevel_id', flat=True)
-    )
-
-    # Fetch all grade levels for "Next Grade Level" dropdown
+    
+    session_years = SessionYearModel.objects.filter(session_status='Active')
     all_gradelevels = GradeLevel.objects.all()
 
+    gradelevels = GradeLevel.objects.filter(
+        id__in=Enrollment.objects.filter(
+            enrollment_status="Enrolled"  # Only include enrolled students by enrollment_status
+        ).values_list('GradeLevel_id', flat=True)  # Use the GradeLevel_id field in Enrollment
+    )
+
     context = {
-        "gradelevels": gradelevels,  # Filtered grade levels
-        "all_gradelevels": all_gradelevels,  # All grade levels
+        "session_years": session_years,
+        "gradelevels": gradelevels,  
+        "all_gradelevels": all_gradelevels, # All grade levels
     }
     return render(request, 'hod_template/Add_Template/add_promotion_template.html', context)
 
-def promote_sections_and_students(request):
-    gradelevel_id = request.GET.get('gradelevel_id')
-    section_id = request.GET.get('section_id')  # Get section ID
+def load_promotion(request):
+    session_year_id = request.GET.get('session_year_id')  # Academic Year
+    gradelevel_id = request.GET.get('gradelevel_id')  # Grade Level
+    section_id = request.GET.get('section_id')  # Section
 
-    # Fetch sections by GradeLevel
+    # Debugging to check the received parameters
+    print("Query Parameters - session_year_id:", session_year_id)
+    print("Query Parameters - gradelevel_id:", gradelevel_id)
+    print("Query Parameters - section_id:", section_id)
+
+    # Check if session_year_id and gradelevel_id are provided
+    if not session_year_id or not gradelevel_id:
+        return JsonResponse({'error': 'Missing required parameters: session_year_id or gradelevel_id'}, status=400)
+
+    # Fetch sections filtered by GradeLevel if gradelevel_id is provided
     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
 
-    # Get students in the GradeLevel eligible for promotion
-    eligible_student_ids = StudentResult.objects.filter(
-        general_average__gte=75,
-        load_id__AssignSection_id__GradeLevel_id=gradelevel_id  # Correct reference to GradeLevel_id
-    ).values_list('student_id', flat=True)
-
+    # Filter students by academic year, grade level, and enrollment status
     students = Students.objects.filter(
-        GradeLevel_id=gradelevel_id,
-        student_status="Enrolled",
-        id__in=eligible_student_ids
+        enrollment__session_year_id=session_year_id,  # Filter by academic year
+        enrollment__GradeLevel_id=gradelevel_id,  # Filter by grade level
+        enrollment__enrollment_status="Enrolled"  # Ensure students are enrolled
     )
 
-    # If section_id is provided, filter students by AssignSection model
+    # If section_id is provided, filter students by section through AssignSection model
     if section_id:
-        # Filter the students that are assigned to the selected section
-        students = students.filter(assignsection__section_id=section_id)
+        students = students.filter(
+            enrollment__assignsection__section_id=section_id  # Ensure students are assigned to the selected section
+        )
 
-    # Prepare data for response
+    print("Students Found:", students)  # Debugging
+
+    # Prepare data for response with additional fields
     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
     student_list = [
-        {"id": student.id, "name": f"{student.admin.first_name} {student.admin.last_name}"}
+        {
+            "id": student.id,
+            "student_number": student.student_number,
+            "first_name": student.admin.first_name,
+            "middle_name": student.middle_name[0] if student.middle_name else '',  # First letter of middle name
+            "last_name": student.admin.last_name,
+            "student_status": student.student_status,
+            "enrollment_status": Enrollment.objects.filter(student_id=student.id).first().enrollment_status  # Fetch the enrollment status
+        }
         for student in students
     ]
 
     return JsonResponse({'sections': section_list, 'students': student_list})
 
-def create_new_student_results(student, next_gradelevel):
-    # Fetch the AssignSection records for the next grade level
-    assign_sections_for_next_grade = AssignSection.objects.filter(GradeLevel_id=next_gradelevel)
-
-    # Fetch loads for those AssignSections
-    loads_for_next_grade = Load.objects.filter(AssignSection_id__in=assign_sections_for_next_grade)
-
-    # Create new StudentResult records for the student
-    for load in loads_for_next_grade:
-        StudentResult.objects.create(
-            student_id=student,
-            load_id=load,
-            subject_first_quarter=0,
-            subject_second_quarter=0,
-            subject_third_quarter=0,
-            subject_fourth_quarter=0,
-            subject_final_grade=0,
-            general_average=0,
-            remarks=""
-        )
-
 def add_promotion_save(request):
     if request.method != "POST":
         messages.error(request, "Method Not Allowed!")
         return redirect('add_promotion')
-
+    
     try:
-        gradelevel_id = request.POST.get('gradelevel_id')
+        # Get the selected students, next session year, and next grade level
+        student_ids = request.POST.getlist('student_ids')  # List of selected student IDs
+        next_session_year_id = request.POST.get('next_session_year_id')
         next_gradelevel_id = request.POST.get('next_gradelevel_id')
 
-        # Fetch the grade levels
-        gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+        # Ensure students are selected
+        if not student_ids:
+            messages.error(request, "No students selected!")
+            return redirect('add_promotion')
+
+        # Ensure valid next session year and grade level are selected
+        if not next_session_year_id or not next_gradelevel_id:
+            messages.error(request, "Please select a valid next session year and grade level!")
+            return redirect('add_promotion')
+
+        # Retrieve the next session year and grade level
+        next_session_year = SessionYearModel.objects.get(id=next_session_year_id)
         next_gradelevel = GradeLevel.objects.get(id=next_gradelevel_id)
 
-        student_ids = request.POST.getlist('student_ids')  # Get multiple student IDs
+        # Create new Enrollment records for the selected students
+        for student_id in student_ids:
+            student = Students.objects.get(id=student_id)
 
-        # Check if student_ids is empty
-        if not student_ids:
-            messages.error(request, "No students selected! Please select students for promotion.")
-            return redirect('add_promotion')
-
-        # Fetch students eligible for promotion
-        students_to_promote = Students.objects.filter(id__in=student_ids, GradeLevel_id=gradelevel)
-
-        # Check if any students are found for the selected grade level
-        if not students_to_promote:
-            messages.error(request, f"No students found in {gradelevel} for promotion.")
-            return redirect('add_promotion')
-
-        # Save the promotion history and update grade level for each student
-        for student in students_to_promote:
-            # Save the promotion history
-            StudentPromotionHistory.objects.create(
-                student=student,
-                previous_grade=gradelevel,
-                new_grade=next_gradelevel,
-                promotion_date=timezone.now()
+            # Create a new Enrollment record for the student in the next session year and grade level
+            Enrollment.objects.create(
+                student_id=student,
+                session_year_id=next_session_year,
+                GradeLevel_id=next_gradelevel,
+                enrollment_status='Pending'  # Default status for new enrollment
             )
 
-            # Update the student's grade level
-            student.GradeLevel_id = next_gradelevel
-            student.save()
+            # Update the student's status to Active if it's not already
+            if student.student_status != 'Active':
+                student.student_status = 'Active'
+                student.save()
 
-            # Update the GradeLevel_id in the AssignSection model for the promoted student
-            AssignSection.objects.filter(Student_id=student, GradeLevel_id=gradelevel).update(GradeLevel_id=next_gradelevel)
-
-            # Call the function to create new StudentResult records for the next grade level
-            create_new_student_results(student, next_gradelevel)
-
-        success_message = f"{len(students_to_promote)} students promoted successfully from {gradelevel.GradeLevel_name} to {next_gradelevel.GradeLevel_name}."
-        messages.success(request, success_message)
-
-        return redirect('add_promotion')
+        messages.success(request, "Selected students have been promoted successfully!")
+        return redirect('add_promotion')  # Redirect to a success page or the same form
 
     except Exception as e:
-        messages.error(request, f"Failed to promote students! Error: {e}")
+        messages.error(request, f"Error: {str(e)}")
         return redirect('add_promotion')
 
-def add_assignsection(request):
-    # Filter grade levels for students with student_status="Enrolled"
-    gradelevels = GradeLevel.objects.filter(
-        id__in=Students.objects.filter(
-            student_status="Enrolled"  # Only include enrolled students
-        ).values_list('GradeLevel_id', flat=True)
-    )
+def add_admission(request):
+    
+    session_years = SessionYearModel.objects.filter(session_status='Active')
+    gradelevels = GradeLevel.objects.all()
+    # Filter students with Admission status
+    students = Students.objects.filter(student_status="Admission")
     context = {
+        "session_years": session_years,
+        "gradelevels": gradelevels,
+        "students": students,
+    }
+    return render(request, 'hod_template/Add_Template/add_admission_template.html', context)
+
+def add_admission_save(request):
+    if request.method != "POST":
+        messages.error(request, "Method Not Allowed!")
+        return redirect('add_admission')
+    
+    try:
+        # Retrieve selected session year and grade level
+        session_year_id = request.POST.get('session_year_id')
+        session_year = SessionYearModel.objects.get(id=session_year_id)
+
+        gradelevel_id = request.POST.get('GradeLevel_id')
+        gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+
+        # Get the selected student IDs from the form
+        student_ids = request.POST.getlist('student_ids')  # Get list of selected student IDs
+
+        if not student_ids:
+            messages.error(request, "No students selected!")
+            return redirect('add_admission')
+
+        # Save the Enrollment records for each selected student and update student status
+        for student_id in student_ids:
+            student = Students.objects.get(id=student_id)
+
+            # Create an Enrollment record
+            Enrollment.objects.create(
+                student_id=student,
+                session_year_id=session_year,
+                GradeLevel_id=gradelevel,
+                enrollment_status='Pending'  # Default status
+            )
+
+            # Update student status to Active
+            student.student_status = 'Active'
+            student.save()
+
+        messages.success(request, "Selected students have been enrolled and status updated to Active!")
+        return redirect('add_admission')  # Redirect to a success page or the same form
+    
+    except Exception as e:
+        messages.error(request, f"Error: {str(e)}")
+        return redirect('add_admission')
+
+def add_assignsection(request):
+    session_years = SessionYearModel.objects.all()
+
+    # Filter grade levels for students with enrollment_status="Enrolled"
+    gradelevels = GradeLevel.objects.filter(
+        id__in=Enrollment.objects.filter(
+            enrollment_status="Enrolled"  # Only include enrolled students by enrollment_status
+        ).values_list('GradeLevel_id', flat=True)  # Use the GradeLevel_id field in Enrollment
+    )
+    
+    context = {
+        "session_years": session_years,
         "gradelevels": gradelevels,
     }
+
     return render(request, 'hod_template/Add_Template/add_assignsection_template.html', context)
 
 def load_sections_and_students(request):
@@ -2179,12 +2162,16 @@ def load_sections_and_students(request):
     # Fetch sections and students filtered by GradeLevel
     sections = Section.objects.filter(GradeLevel_id=gradelevel_id)
 
-    # Get all students in the GradeLevel who are NOT already assigned to a section
-    assigned_students = AssignSection.objects.filter(GradeLevel_id=gradelevel_id).values_list('Student_id', flat=True)
+    # Get all students who are assigned to sections in this grade level
+    assigned_students = AssignSection.objects.filter(
+        enrollment__GradeLevel_id=gradelevel_id  # Filter AssignSection by GradeLevel
+    ).values_list('enrollment__student_id', flat=True)  # Access student_id through enrollment
+    
+    # Fetch students who are enrolled in the given grade level
     students = Students.objects.filter(
-        GradeLevel_id=gradelevel_id,
-        student_status="Enrolled"  # Only include students with status "Enrolled"
-    ).exclude(id__in=assigned_students)
+        enrollment__GradeLevel_id=gradelevel_id,  # Use Enrollment to filter by GradeLevel_id
+        enrollment__enrollment_status="Enrolled"  # Only include enrolled students
+    ).exclude(id__in=assigned_students)  # Exclude students already assigned to a section
 
     # Prepare data for response
     section_list = [{"id": section.id, "name": section.section_name} for section in sections]
@@ -2196,38 +2183,50 @@ def add_assignsection_save(request):
     if request.method != "POST":
         messages.error(request, "Method Not Allowed!")
         return redirect('add_assignsection')
-    else:
-        try:
-            gradelevel_id = request.POST.get('GradeLevel_id')
-            gradelevel = GradeLevel.objects.get(id=gradelevel_id)
+    try:
+        # Get session year and grade level from the form
+        session_year_id = request.POST.get('session_year_id')
+        session_id = SessionYearModel.objects.get(id=session_year_id)
 
-            section_id = request.POST.get('section_id')
-            section = Section.objects.get(id=section_id)
+        gradelevel_id = request.POST.get('GradeLevel_id')
+        gradelevel = GradeLevel.objects.get(id=gradelevel_id)
 
-            # Get the list of student_ids
-            student_ids = request.POST.getlist('student_ids')
+        section_id = request.POST.get('section_id')
+        section = Section.objects.get(id=section_id)
 
-            if not student_ids:
-                messages.error(request, "No students selected!")
-                return redirect('add_assignsection')
+        # Get the list of student_ids
+        student_ids = request.POST.getlist('student_ids')
 
-            # Check the current count of students in this section
-            current_count = AssignSection.objects.filter(section_id=section).count()
-            remaining_slots = section.section_limit - current_count
+        if not student_ids:
+            messages.error(request, "No students selected!")
+            return redirect('add_assignsection')
 
-            # Filter students to add based on remaining slots
-            students_to_add = student_ids[:remaining_slots]  # Students that can be added within the limit
-            students_not_added = student_ids[remaining_slots:]  # Students exceeding the limit
+        # Check the current count of students in this section
+        current_count = AssignSection.objects.filter(section_id=section).count()
+        remaining_slots = section.section_limit - current_count
 
-            # Proceed to save the assignment for each student within the limit
-            for student_id in students_to_add:
-                student = Students.objects.get(id=student_id)
-                assignsection = AssignSection(
-                    GradeLevel_id=gradelevel, 
-                    section_id=section,
-                    Student_id=student
-                )
-                assignsection.save()
+        # Filter students to add based on remaining slots
+        students_to_add = student_ids[:remaining_slots]  # Students that can be added within the limit
+        students_not_added = student_ids[remaining_slots:]  # Students exceeding the limit
+
+        # Proceed to save the assignment for each student within the limit
+        for student_id in students_to_add:
+            student = Students.objects.get(id=student_id)
+            
+            # Create an enrollment for the student if it doesn't exist
+            enrollment, created = Enrollment.objects.get_or_create(
+                student_id=student,
+                session_year_id=session_id,
+                GradeLevel_id=gradelevel,
+                enrollment_status='Enrolled'  # Adjust status if necessary
+            )
+            
+            # Now create the AssignSection entry linking the Enrollment with the Section
+            assignsection = AssignSection(
+                enrollment=enrollment,
+                section_id=section
+            )
+            assignsection.save()
 
             # Prepare a success message
             success_message = f"{len(students_to_add)} students assigned successfully to section '{section.section_name}'."
@@ -2241,43 +2240,95 @@ def add_assignsection_save(request):
             messages.success(request, success_message)
             return redirect('add_assignsection')
 
-        except Exception as e:
+    except Exception as e:
             messages.error(request, f"Failed to Assign Section! Error: {e}")
             return redirect('add_assignsection')
 
-
 def manage_assign_section(request):
+    # Fetch all session years
+    session_years = SessionYearModel.objects.all()
+
+    # Fetch all grade levels (no filtering)
+    gradelevels = GradeLevel.objects.all()
+
+    # Filter enrollments for students with student_status="Enrolled"
+    enrollments = Enrollment.objects.filter(
+        student_id__student_status="Enrolled"  # Correct field name is student_id
+    )
+
+    # Get all assign sections
     assignsections = AssignSection.objects.all()
+
     context = {
-        "assignsections": assignsections
+        "session_years": session_years,
+        "gradelevels": gradelevels,  # Pass all grade levels
+        "assignsections": assignsections,
     }
+
     return render(request, 'hod_template/Manage_Template/manage_assignsection_template.html', context)
 
 def get_sections_by_grade(request, grade_level_id):
-    sections = Section.objects.filter(GradeLevel_id=grade_level_id).values('id', 'section_name')
-    return JsonResponse({'sections': list(sections)})
+    # Try to convert grade_level_id to an integer to handle numeric grade level IDs
+    try:
+        grade_level_id = int(grade_level_id)
+        # If it converts successfully, filter by numeric grade_level_id
+        sections = Section.objects.filter(GradeLevel_id=grade_level_id)
+    except ValueError:
+        # If conversion fails, treat grade_level_id as a string and filter by name
+        sections = Section.objects.filter(GradeLevel__name=grade_level_id)
+    
+    # Prepare the response
+    section_data = [{'id': section.id, 'section_name': section.section_name} for section in sections]
+    return JsonResponse({'sections': section_data})
+
+def filter_assign_sections(request):
+    academic_year = request.GET.get('academic_year')
+    grade_level = request.GET.get('grade_level')
+    section = request.GET.get('section')
+
+    # Build filters
+    filters = {}
+    if academic_year:
+        filters['enrollment__session_year_id'] = academic_year
+    if grade_level:
+        filters['enrollment__GradeLevel_id'] = grade_level
+    if section:
+        filters['section_id'] = section
+
+    # Query the database with related fields
+    assigned_sections = AssignSection.objects.filter(
+        **filters
+    ).select_related('enrollment__student_id__admin', 'enrollment__GradeLevel_id', 'section_id')
+
+    # Prepare the JSON response
+    data = {
+        "assignsections": [
+            {
+                "id": assign.id,
+                "student_name": f"{assign.enrollment.student_id.admin.first_name} {assign.enrollment.student_id.admin.last_name}",
+                "grade_level_id": assign.enrollment.GradeLevel_id.id,
+                "grade_level_name": assign.enrollment.GradeLevel_id.GradeLevel_name,
+                "section_id": assign.section_id.id if assign.section_id else None,
+                "section_name": assign.section_id.section_name if assign.section_id else "",
+                "date_assigned": assign.created_at.strftime('%Y-%m-%d'),
+            }
+            for assign in assigned_sections
+        ]
+    }
+    return JsonResponse(data)
 
 def edit_assignsection(request):
     if request.method == 'POST':
         assignsection_id = request.POST.get('id')
         section_id = request.POST.get('section_id')
 
-        # Debugging: Print received values
-        print("assignsection_id:", assignsection_id)
-        print("section_id:", section_id)
-
-        # Validate inputs
-        if not assignsection_id or not section_id:
-            messages.error(request, "Invalid data received.")
-            return redirect('manage_assign_section')
-
-        # Update the assigned section
         try:
-            assign_section = get_object_or_404(AssignSection, id=assignsection_id)
+            assign_section = AssignSection.objects.get(id=assignsection_id)
             assign_section.section_id_id = section_id
             assign_section.save()
-
             messages.success(request, "Section updated successfully!")
+        except AssignSection.DoesNotExist:
+            messages.error(request, "Assigned section not found.")
         except Exception as e:
             messages.error(request, f"An error occurred: {e}")
 
@@ -2287,16 +2338,29 @@ def add_load(request):
     # Fetch all necessary data for the context
     session_years = SessionYearModel.objects.all()
     curriculums = Curriculums.objects.all()
-    assignsections = AssignSection.objects.select_related('GradeLevel_id', 'section_id').distinct('GradeLevel_id', 'section_id')
+    
+    # Fetch distinct AssignSection records with proper filters
+    assignsections = AssignSection.objects.select_related(
+        'enrollment__GradeLevel_id', 'section_id'
+    ).distinct(
+        'enrollment__GradeLevel_id', 'section_id'
+    )
+    
     gradelevels = GradeLevel.objects.all()
     sections = Section.objects.all()
     subjects = Subjects.objects.all()
     
+    # Fetch Load records with necessary related data
+    loads = Load.objects.select_related(
+        'curriculum_id', 'AssignSection_id', 'subject_id', 'staff_id'
+    ).all()
+    
+    # Fetch staff users
     staffs = CustomUser.objects.filter(user_type='2')
     # Fetching existing loads to display in the table
     loads = Load.objects.select_related('curriculum_id', 'AssignSection_id', 'subject_id', 'staff_id').all()  
     context = {
-        "session_years":session_years,
+        "session_years": session_years,
         "curriculums": curriculums,
         "assignsections": assignsections,
         "gradelevels": gradelevels,
@@ -2307,6 +2371,22 @@ def add_load(request):
     }
     return render(request, 'hod_template/Add_Template/add_load_template.html', context)
 
+def is_load_exists(request):
+    if request.method == 'POST':
+        session_year_id = request.POST.get('session_year_id')
+        curriculum_id = request.POST.get('curriculum_id')
+        assign_section_id = request.POST.get('assign_section_id')
+
+        # Check if a Load record with the selected session_year, curriculum, and assign_section already exists
+        exists = Load.objects.filter(
+            session_year_id=session_year_id,
+            curriculum_id=curriculum_id,
+            AssignSection_id=assign_section_id  # Updated to match field name
+        ).exists()
+
+        # Return a JSON response indicating whether the record exists
+        return JsonResponse({'exists': exists})
+
 def get_subject_data(request):
     curriculum_id = request.GET.get('curriculum_id')
     gradelevel_id = request.GET.get('gradelevel_id')
@@ -2315,8 +2395,8 @@ def get_subject_data(request):
         # Fetch subjects based on curriculum and grade level
         subjects = Subjects.objects.filter(curriculum_id=curriculum_id, GradeLevel_id=gradelevel_id)
         
-        # Fetch all staff for the faculty dropdown
-        staffs = Staffs.objects.all()
+        # Fetch all staff for the faculty dropdown (assuming user_type='2' for staff)
+        staffs = CustomUser.objects.filter(user_type='2')
 
         # Prepare the subject data
         subject_data = [
@@ -2325,7 +2405,7 @@ def get_subject_data(request):
 
         # Prepare the staff data
         staff_data = [
-            {"id": staff.id, "name": f"{staff.admin.first_name} {staff.admin.last_name}"} for staff in staffs
+            {"id": staff.id, "name": f"{staff.first_name} {staff.last_name}"} for staff in staffs
         ]
 
         return JsonResponse({"subjects": subject_data, "staffs": staff_data}, status=200)

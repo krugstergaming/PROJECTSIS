@@ -81,7 +81,10 @@
                                     <td>{{ session_year.session_limit }}</td>
                                     <td>{{ session_year.session_status }}</td>
                                     <td>
-                                        <a href="{% url 'edit_session' session_year.id %}" class="btn btn-warning">Edit</a> 
+                                        <a href="{% url 'edit_session' session_year.id %}" class="btn btn-warning"
+                                            class="btn btn-warning"data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a> 
                                         <!-- <a href="{% url 'delete_session' session_year.id %}" class="btn btn-danger">Delete</a> -->
                                         <a href="{% url 'archive_session' session_year.id %}" class="btn btn-secondary">Archive</a>
                                         

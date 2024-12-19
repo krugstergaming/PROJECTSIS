@@ -1,0 +1,128 @@
+{% extends 'hod_template/base_template.html' %}
+
+{% block page_title %}
+    Admission
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-success">
+                        <div class="card-header"></div>
+                    <form role="form" method="POST" action="{% url 'add_admission_save' %}">
+                        {% csrf_token %}
+                            {% comment %} Display Messages {% endcomment %}
+                                {% if messages %}
+                                    <div class="form-group">
+                                        <div class="col-12">
+                                            {% for message in messages %}
+                                                {% if message.tags == "error" %}
+                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    </div>
+                                                {% elif message.tags == "success" %}
+                                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                                    {{ message }}
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="session">Academic Year <span style="color: red;">*</span></label>
+                                        <select class="form-control" name="session_year_id" id="session_year_id" required>
+                                            <option value="">Select a Academic Year</option> <!-- Optional placeholder -->
+                                            {% for session_year in session_years %}
+                                                <option value="{{ session_year.id }}">{{ session_year.session_start_year.year }} - {{ session_year.session_end_year.year }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="gradelevel">Grade Level <span style="color: red;">*</span></label>
+                                        <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
+                                            <option value="">Select a Grade Level</option> <!-- Optional placeholder -->
+                                            {% for gradelevel in gradelevels %}
+                                                <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Students</label>
+                                <table class="table table-bordered" id="student_table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 3%;">
+                                                <input type="checkbox" id="select_all" onclick="toggleSelectAll(this)">
+                                            </th>
+                                            <th style="width: 5%;">No.</th>
+                                            <th style="width: 25%;">Student Number</th>
+                                            <th style="width: 25%;">Full Name</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="student_table_body">
+                                        {% if students %}
+                                            {% for student in students %}
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" name="student_ids" value="{{ student.id }}" class="student_checkbox">
+                                                </td>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ student.student_number }}</td>
+                                                <td>{{ student.admin.last_name }}, {{ student.admin.first_name }} {{ student.middle_name|slice:":1" }}. </td>
+                                                <td>{{ student.student_status }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No students available with status "Admission".</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>                                                       
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <a href="{% url 'manage_enrollment' %}" class="btn btn-secondary">Back</a>
+                        </div>
+                    </form>
+                    </div>
+                    <!-- /.card -->
+
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+      </section>
+<script>
+    function toggleSelectAll(selectAllCheckbox) {
+        const checkboxes = document.querySelectorAll('.student_checkbox');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+    }
+</script>
+
+  {% endblock main_content %}
+

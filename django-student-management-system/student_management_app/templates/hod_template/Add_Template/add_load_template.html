@@ -78,8 +78,8 @@
                                     <select class="form-control" id="AssignSection_id" name="AssignSection_id" required>
                                         <option value="">Select Assigned Section</option>
                                         {% for assignsection in assignsections %}
-                                            <option value="{{ assignsection.id }}" data-gradelevel-id="{{ assignsection.GradeLevel_id.id }}">
-                                                {{ assignsection.GradeLevel_id.GradeLevel_name }} - {{ assignsection.section_id.section_name }}
+                                            <option value="{{ assignsection.id }}" data-gradelevel-id="{{ assignsection.enrollment.GradeLevel_id.id }}">
+                                                {{ assignsection.enrollment.GradeLevel_id.GradeLevel_name }} - {{ assignsection.section_id.section_name }}
                                             </option>
                                         {% endfor %}
                                     </select>
@@ -143,6 +143,57 @@
 {% endblock main_content %}
 
 {% block custom_js %}
+
+<script>
+    $(document).ready(function() {
+        // When any of the dropdowns change
+        $('#session_year_id, #curriculum_id, #AssignSection_id').change(function() {
+            var sessionYearId = $('#session_year_id').val();
+            var curriculumId = $('#curriculum_id').val();
+            var assignSectionId = $('#AssignSection_id').val();
+
+            // Check if all fields have a value selected
+            if (sessionYearId && curriculumId && assignSectionId) {
+                // Send AJAX request to check if the record already exists
+                $.ajax({
+                    url: "{% url 'is_load_exists' %}",  // URL for the check_load_exists view
+                    type: 'POST',
+                    data: {
+                        'session_year_id': sessionYearId,
+                        'curriculum_id': curriculumId,
+                        'assign_section_id': assignSectionId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        // Check if the record exists
+                        if (response.exists) {
+                            // Show conflict message in the table
+                            $('#load_table_body').html(`
+                                <tr>
+                                    <td colspan="7" class="text-center" style="color: red;">
+                                        This record already exists. Please check the details.
+                                    </td>
+                                </tr>
+                            `);
+                        } else {
+                            // Clear the table and display a message asking to select values
+                            $('#load_table_body').html(`
+                                <tr>
+                                    <td colspan="7" class="text-center">Select an Academic Year, Curriculum, and Assigned Section to load data.</td>
+                                </tr>
+                            `);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error checking record: " + error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const csrfToken = '{{ csrf_token }}';

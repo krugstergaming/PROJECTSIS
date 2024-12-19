@@ -79,18 +79,23 @@ urlpatterns = [
     path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
     path('manage_enrollment_voucher', HodViews.manage_enrollment_voucher, name="manage_enrollment_voucher"),
-    path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
     path('edit_enrollment/<int:enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
     path('edit_enrollment_save/<int:enrollment_id>/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
+
+    path('add_admission/', HodViews.add_admission, name="add_admission"),
+    path('add_admission_save/', HodViews.add_admission_save, name="add_admission_save"),
 
     path('update_student_status/', HodViews.update_student_status, name='update_student_status'),
 
     path('add_promotion/', HodViews.add_promotion, name="add_promotion"),
-    path('promote_sections_and_students/', HodViews.promote_sections_and_students, name="promote_sections_and_students"),
+    
     path('add_promotion_save/', HodViews.add_promotion_save, name="add_promotion_save"),
+
+    path('load_promotion/', HodViews.load_promotion, name='load_promotion'),
 
     path('add_load/', HodViews.add_load, name="add_load"), 
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),
+    path('is_load_exists/', HodViews.is_load_exists, name='is_load_exists'),
 
     path('get_subject_data/', HodViews.get_subject_data, name='get_subject_data'),
     path('save_load_data/', HodViews.save_load_data, name='save_load_data'),
@@ -106,6 +111,7 @@ urlpatterns = [
     path('add_assignsection_save/', HodViews.add_assignsection_save, name="add_assignsection_save"),
     path('get_sections_by_grade/<int:grade_level_id>/', HodViews.get_sections_by_grade, name='get_sections_by_grade'),
     path('edit_assignsection/', HodViews.edit_assignsection, name='edit_assignsection'),
+    path('filter_assign_sections/', HodViews.filter_assign_sections, name='filter_assign_sections'),
 
 
     path('add_schedule/', HodViews.add_schedule, name="add_schedule"),

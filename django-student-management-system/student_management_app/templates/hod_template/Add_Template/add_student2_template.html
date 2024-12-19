@@ -53,31 +53,7 @@
                             <!-- Basic Student Information -->
                             <div style="font-size: 25px; font-weight: bold; text-align: center; margin: 10px 0;"> I. BASIC STUDENT INFORMATION</div>
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <!-- Dynamic Session Selection -->
-                                        <div class="form-group">
-                                            <label for="session">Academic Year <span style="color: red;">*</span></label>
-                                            <select class="form-control" name="session_year_id" id="session_year_id" required>
-                                                <option value="">Select a Session</option> <!-- Optional placeholder -->
-                                                {% for session in sessions %}
-                                                    <option value="{{ session.id }}">{{ session.session_start_year.year }} - {{ session.session_end_year.year }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <!-- Dynamic GradeLevel Selection -->
-                                        <div class="form-group">
-                                            <label for="gradelevel">Grade Level <span style="color: red;">*</span></label>
-                                            <select class="form-control" name="GradeLevel_id" id="GradeLevel_id" required>
-                                                <option value="">Select a GradeLevel</option> <!-- Optional placeholder -->
-                                                {% for gradelevel in gradelevels %}
-                                                    <option value="{{ gradelevel.id }}">{{ gradelevel.GradeLevel_name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-12">
                                         <!-- Profile Picture -->
                                         <div class="form-group">
                                             <label for="profile_pic">Profile Picture</label>
@@ -85,7 +61,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="row">
                                     <div class="col-md-2">
                                         <div class="form-group">

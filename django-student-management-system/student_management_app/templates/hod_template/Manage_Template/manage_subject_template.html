@@ -82,7 +82,10 @@
                                         <td>{{ subject.created_at }}</td>
                                         <td>{{ subject.updated_at }}</td>
                                         <td>
-                                            <a href="{% url 'edit_subject' subject.id %}" class="btn btn-warning">Edit</a> 
+                                            <a href="{% url 'edit_subject' subject.id %}" class="btn btn-warning"
+                                                class="btn btn-warning"data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a> 
                                             <!-- <a href="{% url 'delete_subject' subject.id %}" class="btn btn-danger">Delete</a> -->
                                             <a href="" class="btn btn-secondary">Archive</a>
                                         </td>
