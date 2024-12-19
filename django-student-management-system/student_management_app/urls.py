@@ -74,7 +74,7 @@ urlpatterns = [
     path('archived_curriculums/', HodViews.archived_curriculums, name='archived_curriculums'),
 
 
-    # enrollment urls
+    # enrollment urlss
     path('add_enrollment/', HodViews.add_enrollment, name="add_enrollment"),
     path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),

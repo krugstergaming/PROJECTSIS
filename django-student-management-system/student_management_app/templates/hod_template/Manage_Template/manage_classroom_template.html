@@ -1,99 +1,198 @@
 {% extends 'hod_template/base_template.html' %}
 
-{% block page_title %}
-    Manage Classroom
-{% endblock page_title %}
-
 {% block main_content %}
 
 {% load static %}
 
+
 <section class="content">
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-            <button class="btn btn-success" id="add-classroom-btn">+ Add Classroom</button> <br/>&nbsp;
+        <!-- DataTables Core CSS -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-            {% if messages %}
-                                <div class="form-group">
-                                <div class="col-12">
-                                    {% for message in messages %}
-                                    {% if message.tags == "error" %}
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% elif message.tags == "success" %}
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
-                                        {{ message }}
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                        </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                                </div>
-                                {% endif %}
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mb-3">
+            <h3>Manage Classroom</h3>
+            <button class="btn btn-success" id="add-classroom-btn">+ Add Classroom</button>
+        </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Classroom Details</h3>
+        <!-- Display Messages -->
+        {% if messages %}
+        <div class="form-group">
+            <div class="col-12">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
 
-                            <div class="card-tools">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="table-search" class="form-control float-right" placeholder="Search">
+        <!-- Table Card -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <!-- Filter Section -->
+                    <div class="d-flex align-items-center mb-3">
+                        <label for="capacityFilter" class="font-weight-bold mr-2">Filter:</label>
+                        <!-- Capacity Filter -->
+                        <div class="dropdown mr-2">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="capacityFilterBtn"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Select Capacity
+                            </button>
+                            <div class="dropdown-menu" id="capacityFilter">
                             </div>
+                        </div>
+                        <!-- Room Filter -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button"
+                                id="classroomNameFilterBtn" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                Select Room
+                            </button>
+                            <div class="dropdown-menu" id="classroomNameFilter">
                             </div>
                         </div>
-                        <!-- /.card-header -->
-                        <div class="card-body table-responsive p-0">
-                            <table id="classroomTable" class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Classroom Name</th>
-                                    <th>Capacity</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for classroom in classrooms %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ classroom.classroom_name}}</td>
-                                    <td>{{ classroom.capacity }}</td>
-                                </tr>
-                                            {% empty %}
-                <tr>
-                    <td colspan="3">No classrooms found.</td>
-                </tr>
-            {% endfor %}
-                            </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                        </div>
-                    <!-- /.card -->
-
+                    </div>
+                    <table id="classroomTable" class="table table-hover text-nowrap text-center">
+                        <thead class="bg-success text-white">
+                            <tr>
+                                <th style="width: 10%;">No.</th>
+                                <th style="width: 45%;">Classroom Name</th>
+                                <th style="width: 45%;">Capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for classroom in classrooms %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ classroom.classroom_name }}</td>
+                                <td>{{ classroom.capacity }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No classrooms found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </div>
 
-        </div><!-- /.container-fluid -->
-      </section>
+    <!-- DataTables Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 
+    <!-- Initialize DataTables -->
+    <script>
+        $(document).ready(function () {
+            // Initialize the DataTable
+            var table = $('#classroomTable').DataTable({
+                dom: '<"top d-flex justify-content-between"Blf>rt<"bottom d-flex justify-content-between"ip>',
+                buttons: [
+                    { extend: 'excel', className: 'btn btn-sm btn-success' },
+                    { extend: 'pdf', className: 'btn btn-sm btn-danger' },
+                    { extend: 'print', className: 'btn btn-sm btn-primary' }
+                ],
+                lengthMenu: [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "All"]
+                ],
+                pageLength: 5,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search classrooms..."
+                },
+                initComplete: function () {
+                    // Populate the dropdown filter with unique capacities
+                    var uniqueCapacities = new Set(); // Use Set to avoid duplicates
+                    this.api().column(2).data().each(function (value) {
+                        uniqueCapacities.add(value); // Add each unique capacity to the Set
+                    });
 
-      <script>
-        document.getElementById('add-classroom-btn').addEventListener('click', function() {
-            fetch("{% url 'fetch_classroom' %}", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                    // Sort and append capacities to the dropdown
+                    var capacityDropdown = $('#capacityFilter');
+                    [...uniqueCapacities].sort().forEach(function (capacity) {
+                        capacityDropdown.append(
+                            `<div class="dropdown-item">
+                                <input type="checkbox" class="capacity-checkbox" value="${capacity}" id="capacity-${capacity}">
+                                <label for="capacity-${capacity}" class="ml-2">${capacity}</label>
+                            </div>`
+                        );
+                    });
+
+                    // Populate the dropdown filter with unique classroom names
+                    var uniqueClassroomNames = new Set(); // Use Set to avoid duplicates
+                    this.api().column(1).data().each(function (value) {
+                        uniqueClassroomNames.add(value); // Add each unique classroom name to the Set
+                    });
+
+                    // Sort and append classroom names to the dropdown
+                    var classroomDropdown = $('#classroomNameFilter');
+                    [...uniqueClassroomNames].sort().forEach(function (name) {
+                        classroomDropdown.append(
+                            `<div class="dropdown-item">
+                                <input type="checkbox" class="classroom-checkbox" value="${name}" id="classroom-${name}">
+                                <label for="classroom-${name}" class="ml-2">${name}</label>
+                            </div>`
+                        );
+                    });
                 }
-            })
+            });
+
+            // Event listener for capacity filter
+            $('#capacityFilter').on('change', '.capacity-checkbox', function () {
+                var selectedCapacities = [];
+
+                // Collect all checked capacities
+                $('.capacity-checkbox:checked').each(function () {
+                    selectedCapacities.push($(this).val());
+                });
+
+                // Apply custom filter for capacities
+                table.column(2).search(selectedCapacities.join('|'), true, false).draw();
+            });
+
+            // Event listener for classroom name filter
+            $('#classroomNameFilter').on('change', '.classroom-checkbox', function () {
+                var selectedClassroomNames = [];
+
+                // Collect all checked classroom names
+                $('.classroom-checkbox:checked').each(function () {
+                    selectedClassroomNames.push($(this).val());
+                });
+
+                // Apply custom filter for classroom names
+                table.column(1).search(selectedClassroomNames.join('|'), true, false).draw();
+            });
+        });
+    </script>
+</section>
+
+<script>
+    document.getElementById('add-classroom-btn').addEventListener('click', function () {
+        fetch("{% url 'fetch_classroom' %}", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            }
+        })
             .then(response => {
                 if (response.redirected) {
                     window.location.href = response.url; // Reload page to show messages
@@ -103,7 +202,7 @@
                 console.error("Error:", error);
                 alert("An unexpected error occurred.");
             });
-        });
-    </script>
+    });
+</script>
 
-  {% endblock main_content %}
+{% endblock main_content %}

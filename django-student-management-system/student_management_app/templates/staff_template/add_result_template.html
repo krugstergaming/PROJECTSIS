@@ -15,9 +15,8 @@
                     <!-- general form elements -->
                     <form method="POST" action="{% url 'staff_add_result_save' %}">
                     {% csrf_token %}
-                    <div class="card card-warning">
+                    <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">Add Result</h3>
                     </div>
                     <!-- /.card-header -->
 
@@ -68,7 +67,7 @@
                         <!-- /.card-body --> 
 
                         <div class="card-footer">
-                        <button type="button" class="btn btn-primary" id="fetch_student">Fetch Student</button>
+                        <button type="button" class="btn btn-success" id="fetch_student">Fetch Student</button>
                         </div>
 
                         {% comment %} Displaying Students Here {% endcomment %}
