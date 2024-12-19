@@ -5,7 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 import datetime 
 import math
-from student_management_app.models import CustomUser, Staffs, Enrollment, BalancePayment, GradeLevel, School_info, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
+from student_management_app.models import CustomUser, Staffs, Enrollment, GradeLevel, School_info, AssignSection, Schedule, Subjects, Students, Attendance, AttendanceReport, LeaveReportStudent, FeedBackStudent, StudentResult
 
 
 def student_home(request):
@@ -322,13 +322,10 @@ def student_view_account(request):
     # Query the enrollment record associated with the student
     enrollment = Enrollment.objects.filter(student_id=student).first()
     
-    # Query the balance payment records associated with the enrollment
-    balance_payments = BalancePayment.objects.filter(enrollment=enrollment).order_by('-payment_balance_date') if enrollment else None
 
     # Check if the student has an enrollment record
     context = {
         "enrollment": enrollment,
-        "balance_payments": balance_payments,
         "message": "No enrollment or payment records found." if not enrollment else None
     }
 

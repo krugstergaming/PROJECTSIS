@@ -114,7 +114,8 @@
                                 <!-- <th>Username</th> -->
                                 <th>Email</th>
                                 <!-- <th>Profile Pic</th> -->
-                                <th>Status</th>
+                                <th>Student Status</th>
+                                <th>Enrollment Status</th>
                                 <!-- <th>Last Login</th>
                                 <th>Date Joined</th> -->
                                 <th>Action</th>
@@ -134,6 +135,7 @@
                                             data-status="{{ user.student_status|default:'Other' }}">
                                             {{ user.student_status }}
                                         </td>
+                                        <td>{{ user.enrollment.enrollment_status }}</td>
                                         <!-- <td>{{ user.last_login }}</td>
                                         <td>{{ user.date_joined }}</td> -->
                                         <td>

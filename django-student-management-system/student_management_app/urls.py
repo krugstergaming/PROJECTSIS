@@ -85,7 +85,6 @@ urlpatterns = [
     path('add_enrollment_save/', HodViews.add_enrollment_save, name="add_enrollment_save"),
     path('manage_enrollment/', HodViews.manage_enrollment, name="manage_enrollment"),
     path('manage_enrollment_voucher', HodViews.manage_enrollment_voucher, name="manage_enrollment_voucher"),
-    path('manage_enrollment/<int:enrollment_id>/', HodViews.update_balance, name="update_balance"),
     path('edit_enrollment/<int:enrollment_id>/', HodViews.edit_enrollment, name="edit_enrollment"),
     path('edit_enrollment_save/<int:enrollment_id>/', HodViews.edit_enrollment_save, name="edit_enrollment_save"),
 
@@ -95,8 +94,10 @@ urlpatterns = [
     path('update_student_status/', HodViews.update_student_status, name='update_student_status'),
 
     path('add_promotion/', HodViews.add_promotion, name="add_promotion"),
-    path('promote_sections_and_students/', HodViews.promote_sections_and_students, name="promote_sections_and_students"),
+    
     path('add_promotion_save/', HodViews.add_promotion_save, name="add_promotion_save"),
+
+    path('load_promotion/', HodViews.load_promotion, name='load_promotion'),
 
     path('add_load/', HodViews.add_load, name="add_load"), 
     path('add_load_save/', HodViews.add_load_save, name="add_load_save"),

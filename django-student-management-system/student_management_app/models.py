@@ -153,6 +153,18 @@ class GradeLevel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+class Subjects(models.Model):
+    id = models.AutoField(primary_key=True)
+    curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
+    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
+    subject_name = models.CharField(max_length=255, blank=True, null=True)
+    subject_description = models.CharField(max_length=255, blank=True, null=True)
+    subject_code = models.CharField(max_length=255, blank=True, null=True)
+    subject_hours = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
+
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
@@ -229,52 +241,12 @@ class Enrollment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-class Attachment(models.Model):
-    enrollment = models.ForeignKey('Enrollment', on_delete=models.CASCADE, related_name='attachments')
-    id_picture_file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    psa_file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    form_138_file = models.FileField(upload_to='attachments/', blank=True, null=True)
-    attachment_remarks = models.CharField(max_length=255, blank=True, null=True)  
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    objects = models.Manager()
-
-class BalancePayment(models.Model):
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='payments')
-    payment_balance_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_balance_date = models.DateField(blank=True, null=True)
-    past_balance = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_balance_remarks = models.TextField(blank=True, null=True)
-
-class StudentPromotionHistory(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE)
-    previous_grade = models.ForeignKey(GradeLevel, related_name='previous_grade', on_delete=models.SET_NULL, null=True)
-    new_grade = models.ForeignKey(GradeLevel, related_name='new_grade', on_delete=models.SET_NULL, null=True)
-    promotion_date = models.DateField(default=timezone.now)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.student} promoted from {self.previous_grade} to {self.new_grade} on {self.promotion_date}"
-    objects = models.Manager()
-
 class Section(models.Model):
     id = models.AutoField(primary_key=True)
     GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
     section_name = models.CharField(max_length=255)
     section_soft_limit = models.IntegerField(blank=True, null= True)
     section_limit = models.IntegerField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    objects = models.Manager()
-
-class Subjects(models.Model):
-    id = models.AutoField(primary_key=True)
-    curriculum_id = models.ForeignKey(Curriculums, on_delete=models.CASCADE)
-    GradeLevel_id = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, default=1)
-    subject_name = models.CharField(max_length=255, blank=True, null=True)
-    subject_description = models.CharField(max_length=255, blank=True, null=True)
-    subject_code = models.CharField(max_length=255, blank=True, null=True)
-    subject_hours = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()

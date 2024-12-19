@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils.timezone import now
+from datetime import datetime
 from faker import Faker
 import random
 from student_management_app.models import (
@@ -51,6 +52,7 @@ class Command(BaseCommand):
     
 
     def seed_students(self):
+        current_year = datetime.now().year  # Get the current year
         for i in range(20):  
             first_name = fake.first_name()
             last_name = fake.last_name()
@@ -68,6 +70,7 @@ class Command(BaseCommand):
             )
 
             student = user.students
+            student.student_number = f"{current_year}-{str(i+1).zfill(4)}"
             student.middle_name = fake.last_name()
             student.dob = fake.date_of_birth()  # Corrected line
             student.age = random.randint(15, 25)
